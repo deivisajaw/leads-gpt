@@ -1,0 +1,226 @@
+<div class="plan-overview-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h1 class="page-title">{{ 'ADMIN_PLAN_OVERVIEW.TITLE' | translate }}</h1>
+    </div>
+  </div>
+
+  <!-- Free Plan Section -->
+  <div class="plan-card">
+    <div class="plan-header">
+      <div>
+        <h2 class="plan-title">{{ (viewData?.planNameKey || '') | translate }}</h2>
+        <p class="plan-subtitle">
+          <i class="fas fa-info-circle info-icon"></i> {{ 'ADMIN_PLAN_OVERVIEW.FREE_PLAN_SUBTITLE' | translate:viewData?.freePlanSubtitleParams }}
+        </p>
+      </div>
+      <button class="purchase-btn">{{ 'ADMIN_PLAN_OVERVIEW.PURCHASE_PLAN_BUTTON' | translate }}</button>
+    </div>
+
+    <div class="plan-details">
+      <div class="plan-table">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'ADMIN_PLAN_OVERVIEW.TABLE_HEADER_WHAT_INCLUDED' | translate }}</th>
+              <th>&nbsp;</th>
+              <th>{{ 'ADMIN_PLAN_OVERVIEW.TABLE_HEADER_PRICE' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feature-name" data-label="Feature">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_USERS' | translate }}</td>
+
+              <td class="feature-value" data-label="Details">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_USERS_DETAILS' | translate:viewData?.featureUsersDetailsParams }}</td>
+
+              <td class="feature-price" data-label="Price">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_USERS_PRICE' | translate }}</td>
+            </tr>
+            
+            <tr>
+     
+              <td class="feature-name" data-label="Feature">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_CREDITS_IN_PLAN' | translate }}</td>
+         
+              <td class="feature-value" data-label="Details">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_CREDITS_IN_PLAN_DETAILS' | translate:viewData?.featureCreditsInPlanDetailsParams }}</td>
+              <td class="feature-price" data-label="Price"></td>
+            </tr>
+            
+            <tr>
+     
+              <td class="feature-name" data-label="Feature">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_ADDON_CREDITS' | translate }}</td>
+              <td class="feature-value" data-label="Details">
+            
+                <span>{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_ADDON_CREDITS_DETAILS' | translate:viewData?.featureAddonCreditsDetailsParams }} <i class="fas fa-info-circle"></i></span>
+           
+                <a href="#" class="add-credits-link">{{ 'ADMIN_PLAN_OVERVIEW.ADD_MORE_CREDITS_LINK' | translate }}</a>
+              </td>
+ 
+              <td class="feature-price" data-label="Price">{{ 'ADMIN_PLAN_OVERVIEW.FEATURE_ADDON_CREDITS_PRICE' | translate }}</td>
+            </tr>
+            
+            <tr class="total-row">
+
+              <td class="feature-name" data-label="Feature">{{ 'ADMIN_PLAN_OVERVIEW.MONTHLY_TOTAL' | translate }}</td>
+              <td class="feature-value" data-label="Details"></td>
+        
+              <td class="feature-price" data-label="Price">{{ viewData?.monthlyTotalPrice }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credits Usage Section -->
+<div class="usage-card">
+  <div class="credits-header">
+    <div class="credits-header-left">
+  
+      <h3 class="usage-title">{{ 'ADMIN_PLAN_OVERVIEW.CREDITS_USAGE_TITLE' | translate }}</h3>
+  
+      <div class="date-range">{{ 'ADMIN_PLAN_OVERVIEW.DATE_RANGE' | translate:viewData?.dateRangeParams }}</div>
+    
+      <a href="#" class="historical-link">{{ 'ADMIN_PLAN_OVERVIEW.VIEW_HISTORICAL_CREDIT_USAGE_LINK' | translate }}</a>
+    </div>
+    <div class="credits-header-right">
+      <div class="renewal-info">
+        <i class="fas fa-sync-alt"></i>
+
+        <span class="renewal-text">{{ 'ADMIN_PLAN_OVERVIEW.ESTIMATED_CREDIT_RENEWAL' | translate:viewData?.estimatedRenewalParams }}</span>
+        <i class="fas fa-info-circle info-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="usage-header">
+    <div class="usage-icon">
+      <i class="fas fa-credit-card"></i>
+    </div>
+    <div>
+      <div class="usage-stats">
+        <span class="current-usage">{{ viewData?.currentCreditsUsage }}</span>
+        <span class="usage-separator">{{ 'ADMIN_PLAN_OVERVIEW.USAGE_SEPARATOR_OF' | translate }}</span>
+        <span class="total-usage">{{ viewData?.totalCreditsAvailable }}</span>
+        <span class="usage-period">{{ 'ADMIN_PLAN_OVERVIEW.USAGE_PERIOD_MO' | translate }}</span>
+      </div>
+    </div>
+
+    <button class="buy-more-btn">{{ 'ADMIN_PLAN_OVERVIEW.BUY_MORE_BUTTON' | translate }}</button>
+  </div>
+  
+  <div class="progress-bar">
+    <div class="progress-fill" [style.width.%]="((viewData?.currentCreditsUsage || 0) / (viewData?.totalCreditsAvailable || 1)) * 100"></div>
+  </div>
+  
+  <p class="usage-description">
+    {{ 'ADMIN_PLAN_OVERVIEW.CREDITS_USAGE_DESCRIPTION' | translate }}
+    <a href="#" class="learn-more-link">{{ 'ADMIN_PLAN_OVERVIEW.LEARN_MORE_LINK' | translate }}</a>
+  </p>
+
+  <p class="team-note">{{ 'ADMIN_PLAN_OVERVIEW.TEAM_NOTE_NO_SHARING_CREDITS' | translate }}</p>
+</div>
+
+  <!-- AI-Generated Word Usage Section -->
+  <div class="usage-card">
+    <div class="usage-header">
+      <div class="usage-icon ai-icon">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>
+        <h3 class="usage-title">{{ 'ADMIN_PLAN_OVERVIEW.AI_WORD_USAGE_TITLE' | translate }}</h3>
+        <div class="usage-stats">
+          <span class="current-usage">{{ viewData?.aiWordUsageCurrent }}</span>
+          <span class="usage-separator">{{ 'ADMIN_PLAN_OVERVIEW.USAGE_SEPARATOR_OF' | translate }}</span>
+          <span class="total-usage">{{ viewData?.aiWordUsageLimit }}</span>
+          <span class="usage-period">{{ 'ADMIN_PLAN_OVERVIEW.AI_WORD_USAGE_PERIOD' | translate }}</span>
+        </div>
+      </div>
+      <button class="upgrade-btn">{{ 'ADMIN_PLAN_OVERVIEW.REQUEST_UPGRADE_BUTTON' | translate }}</button>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="((viewData?.aiWordUsageCurrent || 0) / (viewData?.aiWordUsageLimit || 1)) * 100"></div>
+    </div>
+    
+    <p class="usage-description">
+      <a href="#" class="policy-link">{{ 'ADMIN_PLAN_OVERVIEW.FAIR_USE_POLICY_LINK' | translate }}</a> {{ 'ADMIN_PLAN_OVERVIEW.AI_WORD_USAGE_DESCRIPTION' | translate:viewData?.aiWordUsageDescriptionParams }}
+    </p>
+  </div>
+
+  <!-- Conversation Usage Section -->
+  <div class="usage-card">
+    <div class="usage-header">
+      <div class="usage-icon conversation-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+      <div>
+
+        <h3 class="usage-title">{{ 'ADMIN_PLAN_OVERVIEW.CONVERSATION_USAGE_TITLE' | translate }}</h3>
+        <div class="usage-stats">
+          <span class="current-usage">{{ viewData?.conversationUsageCurrent }}</span>
+          <span class="usage-separator">{{ 'ADMIN_PLAN_OVERVIEW.USAGE_SEPARATOR_OF' | translate }}</span>
+          <span class="total-usage">{{ viewData?.conversationUsageLimit }}</span>
+
+          <span class="usage-period">{{ 'ADMIN_PLAN_OVERVIEW.CONVERSATION_USAGE_PERIOD' | translate }}</span>
+        </div>
+      </div>
+
+      <button class="buy-minutes-btn">{{ 'ADMIN_PLAN_OVERVIEW.BUY_MORE_MINUTES_BUTTON' | translate }}</button>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="((viewData?.conversationUsageCurrent || 0) / (viewData?.conversationUsageLimit || 1)) * 100"></div>
+    </div>
+    
+  
+    <p class="usage-description">
+      {{ 'ADMIN_PLAN_OVERVIEW.CONVERSATION_USAGE_DESCRIPTION' | translate }}
+    </p>
+   
+    <p class="team-note">{{ 'ADMIN_PLAN_OVERVIEW.TEAM_NOTE_NO_SHARING_MINUTES' | translate }}</p>
+  </div>
+
+  <!-- Payment History Section -->
+  <div class="payment-history-card">
+    <div class="payment-header">
+      <div class="payment-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+ 
+      <h3 class="payment-title">{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_HISTORY_TITLE' | translate }}</h3>
+    </div>
+    
+    <div class="payment-table">
+      <div class="payment-table-header">
+
+        <span>{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_TABLE_HEADER_DATE' | translate }}</span>
+        <span>{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_TABLE_HEADER_DESCRIPTION' | translate }}</span>
+        <span>{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_TABLE_HEADER_AMOUNT' | translate }}</span>
+        <span>{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_TABLE_HEADER_STATUS' | translate }}</span>
+        <span>{{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_TABLE_HEADER_INVOICE' | translate }}</span>
+      </div>
+      
+      <!-- Las filas de la tabla de pagos se iterarán sobre viewData.paymentHistory -->
+      <div class="payment-row" *ngFor="let payment of viewData?.paymentHistory">
+        <span class="payment-date">{{ payment.date | date:'shortDate' }}</span>
+   
+        <span class="payment-description">{{ payment.description | translate }}</span>
+        <span class="payment-amount">{{ payment.amount }}</span>
+        <span class="payment-status success">
+          <i class="fas fa-check-circle"></i> 
+          {{ payment.status | translate }}
+        </span>
+        <a [href]="payment.invoiceLink" class="invoice-link">
+          <i class="fas fa-download"></i>
+          {{ 'ADMIN_PLAN_OVERVIEW.PAYMENT_DOWNLOAD_INVOICE_LINK' | translate }}
+        </a>
+      </div>
+    </div>
+    
+    <div class="payment-footer">
+      <button class="view-all-btn">
+        <i class="fas fa-eye"></i> {{ 'ADMIN_PLAN_OVERVIEW.VIEW_ALL_PAYMENTS_BUTTON' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

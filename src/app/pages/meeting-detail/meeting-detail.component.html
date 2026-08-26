@@ -1,0 +1,215 @@
+<div class="page-container">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-section">
+    <div class="header-left">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <button class="breadcrumb-back" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          {{ 'MEETINGS.PAGE_TITLE' | translate }}
+        </button>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current">{{ meeting?.title || ('MEETINGS.DETAIL.TITLE' | translate) }}</span>
+      </div>
+
+      <h1>{{ meeting?.title || ('MEETINGS.DETAIL.TITLE' | translate) }}</h1>
+
+      <p *ngIf="meeting" class="header-subtitle">
+        {{ svc.formatLongDateTime(meeting.startTime) }}
+        &nbsp;·&nbsp;
+        {{ svc.formatTime(meeting.startTime) }} — {{ svc.formatTime(meeting.endTime) }}
+      </p>
+
+    </div>
+    <div class="header-right" *ngIf="meeting">
+      <span class="detail-status-chip" [ngClass]="statusClass(meeting.status)">
+        {{ statusKey(meeting.status) | translate }}
+      </span>
+      <a *ngIf="meeting.meetingUrl" [href]="meeting.meetingUrl" target="_blank" class="btn-join-header">
+        <i class="fas fa-video"></i> {{ 'MEETINGS.ACTION.JOIN' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="detail-state" *ngIf="isLoading">
+    <div class="detail-loader"></div>
+    <p>{{ 'MEETINGS.DETAIL.LOADING' | translate }}</p>
+  </div>
+
+  <!-- ===== ERROR ===== -->
+  <div class="detail-state" *ngIf="!isLoading && error">
+    <div class="detail-error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <p>{{ error }}</p>
+    <button class="btn-back-error" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> {{ 'MEETINGS.DETAIL.BACK' | translate }}
+    </button>
+  </div>
+
+  <!-- ===== CONTENIDO ===== -->
+  <div class="detail-layout" *ngIf="!isLoading && !error && meeting">
+
+    <!-- ── COLUMNA IZQUIERDA ── -->
+    <div class="detail-main">
+
+      <!-- BANNERS live / soon (en móvil suben aquí) -->
+      <div class="live-banner" *ngIf="svc.isHappeningNow(meeting)">
+        <span class="live-pulse"></span>
+        <div class="live-banner-text">
+          <strong>{{ 'MEETINGS.BADGE.LIVE' | translate }}</strong>
+          <span>{{ 'MEETINGS.DETAIL.LIVE_MSG' | translate }}</span>
+        </div>
+        <a [href]="meeting.meetingUrl" target="_blank" class="btn-join-banner" *ngIf="meeting.meetingUrl">
+          <i class="fas fa-video"></i> {{ 'MEETINGS.ACTION.JOIN' | translate }}
+        </a>
+      </div>
+
+      <div class="soon-banner" *ngIf="svc.isSoon(meeting) && !svc.isHappeningNow(meeting)">
+        <i class="fas fa-clock"></i>
+        <div class="soon-banner-text">
+          <strong>{{ 'MEETINGS.DETAIL.SOON_MSG' | translate: { mins: svc.minutesUntil(meeting.startTime) } }}</strong>
+          <span>{{ 'MEETINGS.DETAIL.SOON_SUB' | translate }}</span>
+        </div>
+      </div>
+
+      <!-- MEETING DETAILS -->
+      <div class="detail-card">
+        <div class="detail-card-header collapsible">
+          <i class="fas fa-calendar-alt"></i>
+          <span>{{ 'MEETINGS.DETAIL.CARD.DETAILS' | translate }}</span>
+        </div>
+        <div class="detail-card-body">
+
+          <div class="detail-field">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.DATE' | translate }}</span>
+            <span class="field-value">{{ svc.formatFullDate(meeting.startTime) }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.TIME' | translate }}</span>
+            <span class="field-value">
+              {{ svc.formatTime(meeting.startTime) }} — {{ svc.formatTime(meeting.endTime) }}
+            </span>
+          </div>
+
+          <div class="detail-field">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.DURATION' | translate }}</span>
+            <span class="field-value">
+              <span class="duration-pill">{{ svc.getDuration(meeting.startTime, meeting.endTime) }}</span>
+            </span>
+          </div>
+
+          <div class="detail-field" *ngIf="meeting.timeZone">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.TIMEZONE' | translate }}</span>
+            <span class="field-value">{{ meeting.timeZone }}</span>
+          </div>
+
+          <div class="detail-field" *ngIf="meeting.location || meeting.meetingUrl">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.LOCATION' | translate }}</span>
+            <span class="field-value">
+              <a *ngIf="meeting.meetingUrl" [href]="meeting.meetingUrl" target="_blank" class="location-link">
+                <i class="fas fa-video"></i> {{ meeting.meetingUrl }}
+              </a>
+              <span *ngIf="!meeting.meetingUrl && meeting.location">
+                <i class="fas fa-map-marker-alt"></i> {{ meeting.location }}
+              </span>
+            </span>
+          </div>
+
+          <div class="detail-field" *ngIf="meeting.description">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.DESCRIPTION' | translate }}</span>
+            <span class="field-value description-text">{{ meeting.description }}</span>
+          </div>
+
+          <div class="detail-field" *ngIf="meeting.updatedAt">
+            <span class="field-label">{{ 'MEETINGS.DETAIL.FIELD.UPDATED' | translate }}</span>
+            <span class="field-value field-muted">{{ svc.formatLongDateTime(meeting.updatedAt) }}</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- AGENT CARD -->
+      <div class="detail-card" *ngIf="meeting.agentName">
+        <div class="detail-card-header">
+          <i class="fas fa-robot"></i>
+          <span>{{ 'MEETINGS.DETAIL.CARD.AGENT' | translate }}</span>
+        </div>
+        <div class="detail-card-body agent-body">
+          <div class="agent-row">
+            <div class="agent-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="agent-info">
+              <span class="agent-name">{{ meeting.agentName }}</span>
+              <span class="agent-sub">{{ 'MEETINGS.DETAIL.AGENT_SUB' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── COLUMNA DERECHA ── -->
+    <div class="detail-side">
+
+      <!-- PARTICIPANTS -->
+      <div class="detail-card">
+        <div class="detail-card-header">
+          <i class="fas fa-users"></i>
+          <span>{{ 'MEETINGS.DETAIL.CARD.PARTICIPANTS' | translate }}</span>
+          <span class="participants-count">{{ meeting.attendees.length }}</span>
+        </div>
+        <div class="participants-body">
+          <div class="participant-row" *ngFor="let att of meeting.attendees">
+
+            <div class="participant-avatar" [style.background]="avatarColor(att.name)">
+              {{ getInitials(att.name) }}
+            </div>
+
+            <div class="participant-info">
+              <span class="participant-name">{{ att.name }}</span>
+              <span class="participant-email">{{ att.email }}</span>
+              <span class="participant-tz" *ngIf="att.timeZone">
+                <i class="fas fa-globe"></i> {{ att.timeZone }}
+              </span>
+            </div>
+
+            <div class="participant-badges">
+              <span class="role-badge role-owner" *ngIf="att.role === 'owner'">
+                {{ 'MEETINGS.DETAIL.ROLE.OWNER' | translate }}
+              </span>
+              <span class="attendee-status-badge" [ngClass]="'att-' + (att.attendeeStatus ?? 'pending')">
+                {{ attendeeStatusKey(att.attendeeStatus) | translate }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ORGANIZER -->
+      <div class="detail-card organizer-card">
+        <div class="detail-card-header">
+          <i class="fas fa-user-tie"></i>
+          <span>{{ 'MEETINGS.DETAIL.CARD.ORGANIZER' | translate }}</span>
+        </div>
+        <div class="detail-card-body">
+          <div class="organizer-row">
+            <div class="participant-avatar" [style.background]="avatarColor(meeting.organizer.name)">
+              {{ getInitials(meeting.organizer.name) }}
+            </div>
+            <div class="participant-info">
+              <span class="participant-name">{{ meeting.organizer.name }}</span>
+              <span class="participant-email">{{ meeting.organizer.email }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

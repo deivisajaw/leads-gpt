@@ -1,0 +1,85 @@
+<div class="company-details-page">
+  <!-- Header -->
+  <div class="company-details-header">
+    <button class="btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to My List
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; height: 400px;">
+    <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #5b4fe5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+  </div>
+
+  <!-- Company Details -->
+  <div *ngIf="!isLoading && company" class="company-details-content">
+    <div class="company-header">
+      <h1>{{ company.title }}</h1>
+      <p class="company-category">{{ company.categoryName }}</p>
+    </div>
+
+    <div class="company-info-grid">
+      <!-- Contact Information -->
+      <div class="info-section">
+        <h3>Contact Information</h3>
+        <div class="info-item" *ngIf="company.website">
+          <label>Website:</label>
+          <span>{{ company.website }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.phoneUnformatted">
+          <label>Phone:</label>
+          <span>{{ company.phoneUnformatted }}</span>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="info-section">
+        <h3>Location</h3>
+        <div class="info-item" *ngIf="company.address">
+          <label>Address:</label>
+          <span>{{ company.address }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.city">
+          <label>City:</label>
+          <span>{{ company.city }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.state">
+          <label>State:</label>
+          <span>{{ company.state }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.countryCode">
+          <label>Country:</label>
+          <span>{{ company.countryCode }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.postalCode">
+          <label>Postal Code:</label>
+          <span>{{ company.postalCode }}</span>
+        </div>
+      </div>
+
+      <!-- Business Information -->
+      <div class="info-section">
+        <h3>Business Information</h3>
+        <div class="info-item" *ngIf="company.openingHours && company.openingHours !== 'Not specified'">
+          <label>Opening Hours:</label>
+          <span>{{ company.openingHours }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.description">
+          <label>Description:</label>
+          <span>{{ company.description }}</span>
+        </div>
+        <div class="info-item" *ngIf="company.permanentlyClosed !== undefined">
+          <label>Status:</label>
+          <span>{{ company.permanentlyClosed ? 'Permanently Closed' : 'Open' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !company" style="text-align: center; padding: 40px;">
+    <h3>Company not found</h3>
+    <p>The company details could not be loaded.</p>
+  </div>
+</div>

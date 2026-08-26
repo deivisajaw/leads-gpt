@@ -1,0 +1,1383 @@
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "AGENTS.PAGE_TITLE" | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <div>
+    <div class="agent-manager">
+      <div id="main-view" class="main-view">
+        <div class="header">
+          <div class="agent-filters">
+            <div class="agent-search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="agent-search-input"
+                name="agentSearchText"
+                [placeholder]="'AGENTS.FILTERS.SEARCH_PLACEHOLDER' | translate"
+                [(ngModel)]="filterSearchText"
+              />
+            </div>
+            <select
+              id="agent-type-filter"
+              name="agentTypeFilter"
+              class="agent-filter-select"
+              [(ngModel)]="filterAgentType"
+            >
+              <option value="">
+                {{ "AGENTS.FILTERS.ALL_TYPES" | translate }}
+              </option>
+              <option value="voice">
+                {{ "AGENTS.FILTERS.TYPE_VOICE" | translate }}
+              </option>
+              <option value="text">
+                {{ "AGENTS.FILTERS.TYPE_TEXT" | translate }}
+              </option>
+              <option value="sms">
+                {{ "AGENTS.FILTERS.TYPE_SMS" | translate }}
+              </option>
+            </select>
+            <select
+              id="agent-direction-filter"
+              name="agentDirectionFilter"
+              class="agent-filter-select"
+              [(ngModel)]="filterAgentDirection"
+            >
+              <option value="">
+                {{ "AGENTS.FILTERS.ALL_DIRECTIONS" | translate }}
+              </option>
+              <option value="INBOUND">
+                {{ "AGENTS.FILTERS.DIRECTION_INBOUND" | translate }}
+              </option>
+              <option value="OUTBOUND">
+                {{ "AGENTS.FILTERS.DIRECTION_OUTBOUND" | translate }}
+              </option>
+            </select>
+          </div>
+          <button
+            id="add-agent-btn"
+            class="btn-primary"
+            (click)="showAgentModal()"
+          >
+            <i class="fas fa-plus"></i> {{ "AGENTS.ADD_NEW" | translate }}
+          </button>
+        </div>
+
+        <!-- Calendar connection polling status banner -->
+        <div class="calendar-polling-banner" *ngIf="isCalendarPolling">
+          <div class="polling-spinner"></div>
+          <span>{{ "AGENTS.CALENDAR.POLLING_MESSAGE" | translate }}</span>
+          <button class="polling-dismiss" (click)="stopCalendarPolling()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="agents-table">
+          <div
+            *ngIf="alertMessage"
+            class="alert"
+            [ngClass]="{
+              'alert-success': alertMessage.type === 'success',
+              'alert-error': alertMessage.type === 'error',
+            }"
+          >
+            {{ alertMessage.key | translate: alertMessage.params }}
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 5%"></th>
+                <th style="width: 15%">
+                  {{ "AGENTS.TABLE.NAME" | translate }}
+                </th>
+                <th>{{ "AGENTS.TABLE.SYSTEM_NAME" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.TYPE" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.DIRECTION" | translate }}</th>
+                <th style="width: 15%">
+                  {{ "AGENTS.TABLE.ACTIONS" | translate }}
+                </th>
+                <th>{{ "AGENTS.TABLE.VOICE" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.PHONE" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.LANGUAGE" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.CALENDAR" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.CREATED_AT" | translate }}</th>
+                <th>{{ "AGENTS.TABLE.INSTAGRAM" | translate }}</th>
+              </tr>
+            </thead>
+            <tbody id="agents-tbody">
+              <tr *ngFor="let agent of filteredAgents">
+                <td>
+                  <div class="processed-status">
+                    <span
+                      class="status-circle"
+                      [ngClass]="{
+                        'status-green': agent.processed,
+                        'status-red': !agent.processed,
+                      }"
+                      [title]="
+                        agent.processed
+                          ? ('AGENTS.STATUS.PROCESSED' | translate)
+                          : ('AGENTS.STATUS.PENDING' | translate)
+                      "
+                    ></span>
+                  </div>
+                </td>
+                <td>
+                  <a
+                    [routerLink]="['/agents', agent.id]"
+                    class="agent-name-link"
+                  >
+                    {{ agent.name }}
+                  </a>
+                </td>
+                <td>{{ agent.agentSystemName }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'badge-voice':
+                        (agent.agentType || '').toLowerCase() === 'voice',
+                      'badge-text':
+                        (agent.agentType || '').toLowerCase() === 'text',
+                      'badge-sms': 
+                        (agent.agentType || '').toLowerCase() === 'sms',  
+                    }"
+                  >
+                    {{ agent.agentType }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'badge-inbound': agent.agentDirection === 'INBOUND',
+                      'badge-outbound': agent.agentDirection === 'OUTBOUND',
+                    }"
+                  >
+                    <i
+                      class="fas"
+                      [ngClass]="{
+                        'fa-arrow-down': agent.agentDirection === 'INBOUND',
+                        'fa-arrow-up': agent.agentDirection === 'OUTBOUND',
+                      }"
+                    ></i>
+                    {{ agent.agentDirection }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      class="btn-action edit"
+                      (click)="editAgent(agent)"
+                      [title]="'AGENTS.ACTIONS.EDIT' | translate"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn-action delete"
+                      (click)="deleteAgent(agent.id)"
+                      [title]="'AGENTS.ACTIONS.DELETE' | translate"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    <button
+                      class="btn-action test"
+                      *ngIf="
+                        agent.processed &&
+                        agent.agentType &&
+                        agent.agentType.toLowerCase() === 'voice'
+                      "
+                      (click)="openTestCallModal(agent.id)"
+                      [title]="'AGENTS.ACTIONS.TEST_CALL' | translate"
+                    >
+                      <i class="fas fa-phone"></i>
+                    </button>
+                    <button
+                      class="btn-action view"
+                      [routerLink]="['/agents', agent.id]"
+                      [title]="'AGENTS.ACTIONS.VIEW_DETAILS' | translate"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+                <td>{{ agent.voice }}</td>
+                <td>{{ agent.companyPhoneNumberNumber }}</td>
+                <td>
+                  {{
+                    agent.language === "es"
+                      ? ("USER_CONFIG.LANGUAGE_PREFERENCES.SPANISH" | translate)
+                      : ("USER_CONFIG.LANGUAGE_PREFERENCES.ENGLISH" | translate)
+                  }}
+                </td>
+                <td class="calendar-cell">
+                  <span
+                    *ngIf="agent.hasCalendarIntegration"
+                    class="calendar-status calendar-connected"
+                  >
+                    <i class="fas fa-calendar-check"></i>
+                    {{ "AGENTS.CALENDAR.CONNECTED" | translate }}
+                  </span>
+                  <span
+                    *ngIf="
+                      !agent.hasCalendarIntegration &&
+                      calendarPollingAgentId === agent.id
+                    "
+                    class="calendar-status calendar-polling-badge"
+                  >
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    {{ "AGENTS.CALENDAR.POLLING_MESSAGE" | translate }}
+                  </span>
+                  <button
+                    *ngIf="
+                      !agent.hasCalendarIntegration &&
+                      calendarPollingAgentId !== agent.id
+                    "
+                    class="calendar-connect-btn"
+                    (click)="openCalendarPopup(agent.id)"
+                  >
+                    <i class="fab fa-google"></i>
+                    {{ "AGENTS.CALENDAR.CONNECT_BUTTON_SHORT" | translate }}
+                  </button>
+                </td>
+                <td>{{ agent.createDate | date: "medium" }}</td>
+                <!-- Instagram Integration Cell -->
+                <!-- hasInstagramIntegration = bandera de intención/configuración,
+                     NO indica si la conexión OAuth ya fue completada.
+                     Cuando el backend implemente un campo de estado real, actualizar aquí. -->
+                <td class="instagram-cell">
+                  <ng-container
+                    *ngIf="
+                      agent.agentType?.toLowerCase() === 'text' &&
+                        agent.agentDirection === 'INBOUND' &&
+                        agent.hasInstagramIntegration;
+                      else igNotApplicable
+                    "
+                  >
+                    <span class="instagram-status instagram-enabled">
+                      <i class="fab fa-instagram"></i>
+                      {{ "AGENTS.INSTAGRAM.ENABLED" | translate }}
+                    </span>
+                  </ng-container>
+                  <ng-template #igNotApplicable>
+                    <span class="instagram-na">—</span>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Added Angular conditional display for empty state -->
+          <div
+            class="empty-state"
+            id="empty-state"
+            *ngIf="!agents || agents.length === 0"
+            (click)="showAgentModal()"
+          >
+            <p>{{ "AGENTS.EMPTY.ADD_NEW" | translate }}</p>
+          </div>
+
+          <!-- Shown when there are agents, but none match the current filters -->
+          <div
+            class="empty-state"
+            id="empty-state-filtered"
+            *ngIf="agents && agents.length > 0 && filteredAgents.length === 0"
+          >
+            <p>{{ "AGENTS.FILTERS.NO_RESULTS" | translate }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Agente -->
+      <!-- Added Angular modal visibility binding -->
+      <div id="agent-modal" class="modal" [class.active]="isAgentModalVisible">
+        <div class="modal-content">
+          <div class="modal-header">
+            <!-- Added dynamic modal title based on editing state -->
+            <h2 id="modal-title">
+              {{
+                editingAgent
+                  ? ("AGENTS.MODAL.EDIT_TITLE" | translate)
+                  : ("AGENTS.MODAL.NEW_TITLE" | translate)
+              }}
+            </h2>
+            <button class="close-btn" (click)="hideAgentModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <!-- Horizontal Steps Navigation -->
+            <!-- Added Angular step navigation with dynamic classes -->
+            <div class="horizontal-steps">
+              <div
+                class="step-item"
+                [class.active]="currentStep === 1"
+                [class.completed]="currentStep > 1"
+                data-step="1"
+              >
+                <div class="step-circle">1</div>
+                <span>{{ "AGENTS.STEPS.NAME" | translate }}</span>
+              </div>
+              <div
+                class="step-item"
+                [class.active]="currentStep === 2"
+                [class.completed]="currentStep > 2"
+                data-step="2"
+              >
+                <div class="step-circle">2</div>
+                <span>{{ "AGENTS.STEPS.CONTEXT" | translate }}</span>
+              </div>
+              <div
+                class="step-item"
+                [class.active]="currentStep === 3"
+                data-step="3"
+              >
+                <div class="step-circle">3</div>
+                <span>{{ "AGENTS.STEPS.INSTRUCTIONS" | translate }}</span>
+              </div>
+            </div>
+
+            <div class="content-area">
+              <!-- Step 1: Name your agent -->
+              <!-- Added Angular conditional display and form binding -->
+              <div
+                id="step-1-content"
+                class="step-content"
+                [class.active]="currentStep === 1"
+              >
+                <div class="form-group campaign-name-section">
+                  <label for="agent-name"
+                    >{{ "AGENTS.STEP1.AGENT_NAME" | translate }} *</label
+                  >
+                  <input
+                    type="text"
+                    id="agent-name"
+                    required
+                    [(ngModel)]="agentName"
+                  />
+                </div>
+
+                <!-- ── Instagram Integration Toggle ──────────────────────── -->
+                <div class="instagram-toggle-section">
+                  <div
+                    class="instagram-toggle-card"
+                    [class.instagram-toggle-active]="useInstagramIntegration"
+                  >
+                    <div class="instagram-toggle-left">
+                      <div class="instagram-toggle-icon">
+                        <i class="fab fa-instagram"></i>
+                      </div>
+                      <div class="instagram-toggle-info">
+                        <span class="instagram-toggle-title">{{
+                          "AGENTS.INSTAGRAM.TOGGLE_TITLE" | translate
+                        }}</span>
+                        <span class="instagram-toggle-desc">{{
+                          "AGENTS.INSTAGRAM.TOGGLE_DESC" | translate
+                        }}</span>
+                      </div>
+                    </div>
+                    <label class="ig-switch">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="useInstagramIntegration"
+                        [ngModelOptions]="{ standalone: true }"
+                        (change)="onInstagramToggleChange()"
+                      />
+                      <span class="ig-slider"></span>
+                    </label>
+                  </div>
+                  <!-- Warning shown when Instagram locks type+direction -->
+                  <div
+                    class="instagram-lock-notice"
+                    *ngIf="useInstagramIntegration"
+                  >
+                    <i class="fas fa-info-circle"></i>
+                    {{ "AGENTS.INSTAGRAM.LOCK_NOTICE" | translate }}
+                  </div>
+                  <!-- Legal links for Instagram integration (Meta requirement) -->
+                  <div
+                    class="instagram-legal-links"
+                    *ngIf="useInstagramIntegration"
+                  >
+                    <i class="fas fa-shield-alt"></i>
+                    <span
+                      >{{
+                        "AGENTS.INSTAGRAM.LEGAL_NOTICE" | translate
+                      }}&nbsp;</span
+                    >
+                    <a
+                      routerLink="/legal/terms"
+                      target="_blank"
+                      class="instagram-legal-link"
+                    >
+                      {{ "AGENTS.INSTAGRAM.TERMS_LINK" | translate }}
+                    </a>
+                    <span>&nbsp;{{ "COMMON.AND" | translate }}&nbsp;</span>
+                    <a
+                      routerLink="/legal/privacy"
+                      target="_blank"
+                      class="instagram-legal-link"
+                    >
+                      {{ "AGENTS.INSTAGRAM.PRIVACY_LINK" | translate }}
+                    </a>
+                  </div>
+                </div>
+
+                <!-- ── WhatsApp Step 1 Option ───────────────────────────── -->
+                <div class="whatsapp-step-option-section">
+                  <div
+                    class="whatsapp-step-option-card"
+                    [class.whatsapp-step-option-active]="useWhatsappStepOption"
+                  >
+                    <div class="whatsapp-step-option-left">
+                      <div class="whatsapp-step-option-icon">
+                        <i class="fab fa-whatsapp"></i>
+                      </div>
+
+                      <div class="whatsapp-step-option-info">
+                        <span class="whatsapp-step-option-title">
+                          {{ "AGENTS.WHATSAPP.STEP1.TITLE" | translate }}
+                        </span>
+
+                        <span class="whatsapp-step-option-desc">
+                          {{ "AGENTS.WHATSAPP.STEP1.DESCRIPTION" | translate }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <label class="wa-step-switch">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="useWhatsappStepOption"
+                        [ngModelOptions]="{ standalone: true }"
+                        (change)="onWhatsappStepOptionChange()"
+                      />
+
+                      <span class="wa-step-slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- WhatsApp restriction warning -->
+                  <div
+                    class="whatsapp-step-lock-notice"
+                    *ngIf="useWhatsappStepOption"
+                  >
+                    <i class="fas fa-exclamation-triangle"></i>
+
+                    <span>
+                      {{
+                        "AGENTS.WHATSAPP.STEP1.RESTRICTION_NOTICE" | translate
+                      }}
+                    </span>
+                  </div>
+
+                  <!-- WhatsApp legal notice -->
+                  <div
+                    class="whatsapp-step-legal-notice"
+                    *ngIf="useWhatsappStepOption"
+                  >
+                    <i class="fas fa-shield-alt"></i>
+
+                    <span>
+                      {{
+                        "AGENTS.WHATSAPP.STEP1.LEGAL_NOTICE" | translate
+                      }}&nbsp;
+
+                      <a
+                        routerLink="/legal/terms"
+                        target="_blank"
+                        class="whatsapp-step-legal-link"
+                      >
+                        {{ "AGENTS.WHATSAPP.STEP1.TERMS_LINK" | translate }}
+                      </a>
+
+                      &nbsp;{{ "AGENTS.WHATSAPP.STEP1.AND" | translate }}&nbsp;
+
+                      <a
+                        routerLink="/legal/privacy"
+                        target="_blank"
+                        class="whatsapp-step-legal-link"
+                      >
+                        {{ "AGENTS.WHATSAPP.STEP1.PRIVACY_LINK" | translate }}
+                      </a>
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  class="instagram-lock-notice"
+                  *ngIf="
+                    selectedAgentType === 'text' &&
+                    !useInstagramIntegration &&
+                    !useWhatsappStepOption
+                  "
+                >
+                  <i class="fas fa-info-circle"></i>
+                  {{ "AGENTS.STEP1.TEXT_INTEGRATION_REQUIRED" | translate }}
+                </div>
+
+                <h3>{{ "AGENTS.STEP1.SELECT_TYPE_TITLE" | translate }}</h3>
+                <p>{{ "AGENTS.STEP1.SELECT_TYPE_DESC" | translate }}</p>
+
+                <div class="agent-types">
+                  <div
+                    class="agent-type-card"
+                    [class.selected]="selectedAgentType === 'voice'"
+                    [class.disabled]="
+                      useInstagramIntegration || useWhatsappStepOption
+                    "
+                    (click)="selectAgentType('voice')"
+                    data-type="voice"
+                  >
+                    <div class="card-icon">
+                      <i class="fas fa-microphone"></i>
+                    </div>
+                    <h4>{{ "AGENTS.STEP1.TYPE.VOICE_TITLE" | translate }}</h4>
+                    <p>{{ "AGENTS.STEP1.TYPE.VOICE_DESC" | translate }}</p>
+                    <input
+                      type="radio"
+                      name="agent-type"
+                      value="voice"
+                      [checked]="selectedAgentType === 'voice'"
+                    />
+                  </div>
+                  <div
+                    class="agent-type-card"
+                    [class.selected]="selectedAgentType === 'text'"
+                    (click)="selectAgentType('text')"
+                    data-type="text"
+                  >
+                    <div class="card-icon"><i class="fas fa-comments"></i></div>
+                    <h4>{{ "AGENTS.STEP1.TYPE.TEXT_TITLE" | translate }}</h4>
+                    <p>{{ "AGENTS.STEP1.TYPE.TEXT_DESC" | translate }}</p>
+                    <input
+                      type="radio"
+                      name="agent-type"
+                      value="text"
+                      [checked]="selectedAgentType === 'text'"
+                    />
+                  </div>
+
+                  <div
+                    class="agent-type-card"
+                    [class.selected]="selectedAgentType === 'sms'"
+                    [class.disabled]="useInstagramIntegration || useWhatsappStepOption"
+                    (click)="selectAgentType('sms')"
+                    data-type="sms"
+                  >
+                    <div class="card-icon"><i class="fas fa-sms"></i></div>
+                    <h4>{{ "AGENTS.STEP1.TYPE.SMS_TITLE" | translate }}</h4>
+                    <p>{{ "AGENTS.STEP1.TYPE.SMS_DESC" | translate }}</p>
+                    <input
+                      type="radio"
+                      name="agent-type"
+                      value="sms"
+                      [checked]="selectedAgentType === 'sms'"
+                    />
+                  </div>
+
+                </div>
+
+                <h3>{{ "AGENTS.STEP1.SELECT_DIRECTION_TITLE" | translate }}</h3>
+                <p>{{ "AGENTS.STEP1.SELECT_DIRECTION_DESC" | translate }}</p>
+
+                <div class="agent-types">
+                  <div
+                    class="agent-type-card"
+                    [class.selected]="selectedAgentDirection === 'INBOUND'"
+                    [class.disabled]="selectedAgentType === 'sms'"
+                    (click)="selectAgentDirection('INBOUND')"
+                    data-type="inbound"
+                  >
+                    <div class="card-icon">
+                      <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <h4>
+                      {{ "AGENTS.STEP1.DIRECTION.INBOUND_TITLE" | translate }}
+                    </h4>
+                    <p>
+                      {{ "AGENTS.STEP1.DIRECTION.INBOUND_DESC" | translate }}
+                    </p>
+                    <input
+                      type="radio"
+                      name="agent-direction"
+                      value="INBOUND"
+                      [checked]="selectedAgentDirection === 'INBOUND'"
+                    />
+                  </div>
+                  <div
+                    class="agent-type-card"
+                    [class.selected]="selectedAgentDirection === 'OUTBOUND'"
+                    [class.disabled]="
+                      useInstagramIntegration || useWhatsappStepOption || selectedAgentType === 'text'
+                    "
+                    (click)="selectAgentDirection('OUTBOUND')"
+                    data-type="outbound"
+                  >
+                    <div class="card-icon"><i class="fas fa-arrow-up"></i></div>
+                    <h4>
+                      {{ "AGENTS.STEP1.DIRECTION.OUTBOUND_TITLE" | translate }}
+                    </h4>
+                    <p>
+                      {{ "AGENTS.STEP1.DIRECTION.OUTBOUND_DESC" | translate }}
+                    </p>
+                    <input
+                      type="radio"
+                      name="agent-direction"
+                      value="OUTBOUND"
+                      [checked]="selectedAgentDirection === 'OUTBOUND'"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Agent Context -->
+              <div
+                id="step-2-content"
+                class="step-content"
+                [class.active]="currentStep === 2"
+              >
+                <div class="agent-context-layout">
+                  <div class="context-left">
+                    <h3>{{ "AGENTS.STEP2.INTRO.TITLE" | translate }}</h3>
+                    <h4>{{ "AGENTS.STEP2.INTRO.SUBTITLE" | translate }}</h4>
+                    <p>{{ "AGENTS.STEP2.INTRO.DESC" | translate }}</p>
+                  </div>
+                  <div class="context-right">
+                    <div class="form-group">
+                      <label for="language"
+                        >{{ "AGENTS.STEP2.LANGUAGE" | translate }} *</label
+                      >
+                      <select
+                        id="language"
+                        required
+                        [(ngModel)]="agentLanguage"
+                      >
+                        <option value="">
+                          {{ "AGENTS.SELECT" | translate }}
+                        </option>
+                        <option
+                          *ngFor="let lang of languageOptions"
+                          [value]="lang.value"
+                        >
+                          {{ lang.label }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="agent-system-name"
+                        >{{ "AGENTS.STEP2.IDENTITY_NAME" | translate }} *</label
+                      >
+                      <input
+                        type="text"
+                        id="agent-system-name"
+                        [placeholder]="
+                          'AGENTS.PLACEHOLDER.WRITE_HERE' | translate
+                        "
+                        required
+                        [(ngModel)]="agentSystemName"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="purpose"
+                        >{{ "AGENTS.STEP2.PURPOSE" | translate }} *</label
+                      >
+                      <select id="purpose" required [(ngModel)]="agentPurpose">
+                        <option value="">
+                          {{ "AGENTS.SELECT" | translate }}
+                        </option>
+                        <ng-container *ngIf="selectedAgentType === 'voice'">
+                          <option
+                            *ngFor="let purpose of voicePurposeOptions"
+                            [value]="purpose.toLowerCase()"
+                          >
+                            {{ purpose }}
+                          </option>
+                        </ng-container>
+                        <ng-container *ngIf="selectedAgentType === 'text'">
+                          <option
+                            *ngFor="let purpose of textPurposeOptions"
+                            [value]="purpose.toLowerCase()"
+                          >
+                            {{ purpose }}
+                          </option>
+                        </ng-container>
+                        <ng-container *ngIf="selectedAgentType === 'sms'">
+                          <option
+                            *ngFor="let purpose of textPurposeOptions"
+                            [value]="purpose.toLowerCase()"
+                          >
+                            {{ purpose }}
+                          </option>
+                        </ng-container>
+                      </select>
+                    </div>
+
+                    <div
+                      class="form-group"
+                      *ngIf="selectedAgentType === 'voice'"
+                    >
+                      <label for="voice"
+                        >{{ "AGENTS.STEP2.VOICE" | translate }} *</label
+                      >
+                      <div
+                        class="custom-dropdown"
+                        [class.active]="isVoiceDropdownOpen"
+                      >
+                        <div
+                          class="dropdown-trigger"
+                          (click)="toggleVoiceDropdown()"
+                        >
+                          {{
+                            selectedVoiceName ||
+                              ("AGENTS.STEP2.SELECT_VOICE" | translate)
+                          }}
+                          <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown-panel" *ngIf="isVoiceDropdownOpen">
+                          <div class="dropdown-search">
+                            <input
+                              type="text"
+                              [placeholder]="
+                                'AGENTS.PLACEHOLDER.SEARCH_VOICE' | translate
+                              "
+                              [(ngModel)]="voiceSearchTerm"
+                              (ngModelChange)="filterVoices()"
+                              (click)="$event.stopPropagation()"
+                            />
+                          </div>
+                          <div class="dropdown-options">
+                            <div
+                              *ngIf="isVoicesLoading"
+                              class="dropdown-option-item"
+                            >
+                              {{ "AGENTS.LOADING.VOICES" | translate }}
+                            </div>
+                            <div
+                              *ngFor="let voice of filteredVoiceOptions"
+                              class="dropdown-option-item"
+                              (click)="selectVoice(voice)"
+                            >
+                              <div class="voice-details">
+                                <div class="voice-name">{{ voice.name }}</div>
+                                <div class="voice-meta">
+                                  <span class="gender">
+                                    <i
+                                      class="fas"
+                                      [ngClass]="{
+                                        'fa-mars': voice.gender === 'male',
+                                        'fa-venus': voice.gender === 'female',
+                                      }"
+                                    ></i>
+                                    {{ voice.gender }}
+                                  </span>
+                                  <span class="accent">{{ voice.accent }}</span>
+                                </div>
+                              </div>
+                              <div class="voice-player">
+                                <button
+                                  (click)="
+                                    playVoicePreview($event, voice.previewUrl)
+                                  "
+                                >
+                                  <i
+                                    class="fas"
+                                    [ngClass]="{
+                                      'fa-play-circle':
+                                        playingPreviewUrl !== voice.previewUrl,
+                                      'fa-pause-circle':
+                                        playingPreviewUrl === voice.previewUrl,
+                                    }"
+                                  ></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div
+                              *ngIf="
+                                !isVoicesLoading &&
+                                filteredVoiceOptions.length === 0
+                              "
+                              class="dropdown-option-item"
+                            >
+                              {{ "AGENTS.EMPTY.VOICES" | translate }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- NEW: Phone Number Select -->
+                    <div
+                      class="form-group"
+                      *ngIf="selectedAgentType === 'voice' || selectedAgentType === 'sms'"
+                    >
+                      <label for="phoneNumber"
+                        >{{ "AGENTS.STEP2.PHONE_NUMBER" | translate }} *</label
+                      >
+                      <select
+                        id="phoneNumber"
+                        required
+                        [(ngModel)]="selectedPhoneNumberId"
+                        [compareWith]="compareWithId"
+                      >
+                        <option *ngIf="isPhoneNumbersLoading" value="" disabled>
+                          {{ "AGENTS.LOADING.PHONE_NUMBERS" | translate }}
+                        </option>
+                        <option
+                          *ngFor="let num of filteredPhoneNumbers"
+                          [ngValue]="num.id"
+                        >
+                          {{ num.twilioPhone }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div
+                      class="form-group"
+                      *ngIf="
+                        selectedAgentType === 'text' && !useInstagramIntegration
+                      "
+                    >
+                      <label for="whatsapp-number"
+                        >{{
+                          "AGENTS.STEP2.WHATSAPP_NUMBER" | translate
+                        }}
+                        *</label
+                      >
+                      <input
+                        type="text"
+                        id="whatsapp-number"
+                        placeholder="Ej: +573001234567"
+                        required
+                        [(ngModel)]="agentWhatsappNumber"
+                      />
+                      <!-- Privacy note for WhatsApp number (Meta requirement) -->
+                      <div class="whatsapp-privacy-note">
+                        <i class="fas fa-lock"></i>
+                        <span
+                          >{{
+                            "AGENTS.STEP2.WHATSAPP_PRIVACY_NOTE" | translate
+                          }}&nbsp;</span
+                        >
+                        <a
+                          routerLink="/legal/privacy"
+                          target="_blank"
+                          class="whatsapp-privacy-link"
+                        >
+                          {{ "AGENTS.INSTAGRAM.PRIVACY_LINK" | translate }}
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="label-with-ai">
+                        <label for="description">{{
+                          "AGENTS.STEP2.COMPANY_DESCRIPTION" | translate
+                        }}</label>
+                        <button
+                          type="button"
+                          class="btn-ai-analyze"
+                          (click)="openWebsiteModal()"
+                        >
+                          <i class="fas fa-magic"></i>
+                          {{ "AGENTS.AI_ANALYZE.BUTTON" | translate }}
+                        </button>
+                      </div>
+                      <textarea
+                        id="description"
+                        rows="4"
+                        [(ngModel)]="agentDescription"
+                      ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="company-instructions">{{
+                        "AGENTS.STEP2.COMPANY_INSTRUCTIONS" | translate
+                      }}</label>
+                      <textarea
+                        id="company-instructions"
+                        rows="4"
+                        [placeholder]="
+                          'AGENTS.PLACEHOLDER.COMPANY_INSTRUCTIONS' | translate
+                        "
+                        [(ngModel)]="agentInstructions"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Give instructions & Test -->
+              <div
+                id="step-3-content"
+                class="step-content"
+                [class.active]="currentStep === 3"
+              >
+                <div class="instructions-layout">
+                  <div class="instructions-left">
+                    <div class="form-group">
+                      <label for="opening-line">{{
+                        "AGENTS.STEP3.OPENING_LINE" | translate
+                      }}</label>
+                      <input
+                        type="text"
+                        id="opening-line"
+                        [(ngModel)]="agentOpeningLine"
+                      />
+                    </div>
+                    <div
+                      class="form-group"
+                      *ngIf="selectedAgentType === 'voice'"
+                    >
+                      <label for="voicemailMessage"
+                        >{{ "AGENTS.STEP3.VOICEMAIL" | translate }} *</label
+                      >
+                      <textarea
+                        id="voicemailMessage"
+                        rows="3"
+                        required
+                        [(ngModel)]="agentVoicemailMessage"
+                      ></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="prompt"
+                        >{{ "AGENTS.STEP3.PROMPT" | translate }} *</label
+                      >
+                      <textarea
+                        id="prompt"
+                        rows="15"
+                        [placeholder]="'AGENTS.PLACEHOLDER.PROMPT' | translate"
+                        [(ngModel)]="agentPrompt"
+                      ></textarea>
+                    </div>
+                  </div>
+                  <div class="instructions-right">
+                    <div class="test-info">
+                      <h4>{{ "AGENTS.STEP3.INFO.TITLE" | translate }}</h4>
+                      <div class="info-item">
+                        <strong
+                          >{{ "AGENTS.STEP3.INFO.TYPE" | translate }}:
+                        </strong>
+                        <span>{{
+                          selectedAgentType === "voice"
+                            ? ("AGENTS.AGENT_TYPE.VOICE" | translate)
+                            : ("AGENTS.AGENT_TYPE.TEXT" | translate)
+                        }}</span>
+                      </div>
+                      <div class="info-item">
+                        <strong
+                          >{{ "AGENTS.STEP3.INFO.NAME" | translate }}:
+                        </strong>
+                        <span>{{ agentName || "-" }}</span>
+                      </div>
+                      <div class="info-item">
+                        <strong
+                          >{{ "AGENTS.STEP3.INFO.LANGUAGE" | translate }}:
+                        </strong>
+                        <span>{{
+                          agentLanguage === "es"
+                            ? ("USER_CONFIG.LANGUAGE_PREFERENCES.SPANISH"
+                              | translate)
+                            : agentLanguage === "en"
+                              ? ("USER_CONFIG.LANGUAGE_PREFERENCES.ENGLISH"
+                                | translate)
+                              : "-"
+                        }}</span>
+                      </div>
+                      <div class="info-item">
+                        <strong
+                          >{{ "AGENTS.STEP3.INFO.PURPOSE" | translate }}:
+                        </strong>
+                        <span>{{
+                          getPurposeDisplayText(agentPurpose) || "-"
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal Actions -->
+              <div class="modal-actions">
+                <button
+                  class="btn-secondary"
+                  id="back-btn"
+                  (click)="goToPreviousStep()"
+                  *ngIf="currentStep > 1"
+                >
+                  <i class="fas fa-arrow-left"></i>
+                  {{ "AGENTS.NAV.BACK" | translate }}
+                </button>
+                <button
+                  class="btn-primary"
+                  id="next-btn"
+                  (click)="goToNextStep()"
+                  *ngIf="currentStep < 3"
+                  [disabled]="!canProceedToNextStep()"
+                >
+                  {{ "AGENTS.NAV.NEXT" | translate }} →
+                </button>
+                <button
+                  class="btn-primary"
+                  id="save-btn"
+                  (click)="openSaveConfirmModal()"
+                  *ngIf="currentStep === 3"
+                  [disabled]="!canProceedToNextStep()"
+                >
+                  {{ "AGENTS.NAV.SAVE" | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Confirmation Modal -->
+      <div
+        id="confirmation-modal"
+        class="modal"
+        [class.active]="isConfirmModalVisible"
+      >
+        <div class="modal-content small">
+          <div class="modal-body">
+            <h3>{{ "AGENTS.CONFIRM_SAVE.TITLE" | translate }}</h3>
+            <div class="modal-actions">
+              <button class="btn-secondary" (click)="cancelSave()">
+                {{ "AGENTS.NAV.BACK" | translate }}
+              </button>
+              <button class="btn-primary" (click)="confirmAndSave()">
+                {{ "AGENTS.CONFIRM_SAVE.YES" | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-qr-code-modal
+  [showModal]="isQrModalVisible"
+  [imageUrl]="qrCodeUrl"
+  (close)="hideQrModal()"
+></app-qr-code-modal>
+
+<!-- Indicador de estado del Workflow -->
+<div class="workflow-status-indicator" *ngIf="workflowStatus.inProgress">
+  <div class="spinner"></div>
+  <span>{{ workflowStatus.message }}</span>
+</div>
+
+<!-- Test Call Modal -->
+<div id="test-call-modal" class="modal" [class.active]="isTestCallModalVisible">
+  <div class="modal-content small">
+    <div class="modal-header">
+      <h2>
+        <h2>{{ "AGENTS.TEST_CALL.TITLE" | translate }}</h2>
+      </h2>
+      <button class="close-btn" (click)="closeTestCallModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{ "AGENTS.TEST_CALL.DESC" | translate }}</p>
+      <div class="form-group">
+        <label for="contact-phone"
+          >{{ "AGENTS.TEST_CALL.CONTACT_PHONE" | translate }} *</label
+        >
+        <input
+          type="text"
+          id="contact-phone"
+          [(ngModel)]="testCallContactPhone"
+          required
+        />
+        <div
+          *ngIf="showTestCallValidationErrors && !testCallContactPhone"
+          class="validation-error"
+        >
+          {{ "AGENTS.TEST_CALL.VALIDATION.PHONE_REQUIRED" | translate }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="contact-name"
+          >{{ "AGENTS.TEST_CALL.CONTACT_NAME" | translate }} *</label
+        >
+        <input
+          type="text"
+          id="contact-name"
+          [(ngModel)]="testCallContactName"
+          required
+        />
+        <div
+          *ngIf="showTestCallValidationErrors && !testCallContactName"
+          class="validation-error"
+        >
+          {{ "AGENTS.TEST_CALL.VALIDATION.NAME_REQUIRED" | translate }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="contact-email">{{
+          "AGENTS.TEST_CALL.CONTACT_EMAIL" | translate
+        }}</label>
+        <input
+          type="email"
+          id="contact-email"
+          [(ngModel)]="testCallContactEmail"
+        />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeTestCallModal()">
+          {{ "COMMON.CANCEL" | translate }}
+        </button>
+        <button
+          class="btn-primary"
+          [disabled]="!isTestCallFormValid() || isTestCallLoading"
+          (click)="triggerTestCall()"
+        >
+          <span
+            *ngIf="isTestCallLoading"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{
+            isTestCallLoading
+              ? ("AGENTS.TEST_CALL.CALLING" | translate)
+              : ("AGENTS.TEST_CALL.CALL_ME" | translate)
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Post-Create Calendar Connection Prompt - outside page-container to avoid stacking context issues -->
+<div
+  class="calendar-prompt-overlay"
+  [class.active]="isConnectCalendarPromptVisible"
+>
+  <div class="calendar-prompt-box">
+    <div class="calendar-prompt-header">
+      <i class="fas fa-calendar-plus"></i>
+      <h2>{{ "AGENTS.CALENDAR.PROMPT_TITLE" | translate }}</h2>
+    </div>
+    <div class="calendar-prompt-body">
+      <div class="calendar-prompt-icon">
+        <i class="fab fa-google"></i>
+      </div>
+      <p>{{ "AGENTS.CALENDAR.PROMPT_DESCRIPTION" | translate }}</p>
+      <p class="calendar-prompt-note">
+        {{ "AGENTS.CALENDAR.PROMPT_NOTE" | translate }}
+      </p>
+    </div>
+    <div class="calendar-prompt-actions">
+      <button class="btn-secondary" (click)="declineConnectCalendar()">
+        {{ "AGENTS.CALENDAR.PROMPT_SKIP" | translate }}
+      </button>
+      <button class="btn-primary" (click)="acceptConnectCalendar()">
+        <i class="fab fa-google"></i>
+        {{ "AGENTS.CALENDAR.PROMPT_CONNECT" | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Post-Create Instagram Connection Prompt -->
+<div class="instagram-prompt-overlay" [class.active]="isInstagramPromptVisible">
+  <div class="instagram-prompt-box">
+    <div class="instagram-prompt-header">
+      <i class="fab fa-instagram"></i>
+      <h2>{{ "AGENTS.INSTAGRAM.PROMPT_TITLE" | translate }}</h2>
+    </div>
+    <div class="instagram-prompt-body">
+      <div class="instagram-prompt-icon">
+        <i class="fab fa-instagram"></i>
+      </div>
+      <p>{{ "AGENTS.INSTAGRAM.PROMPT_DESCRIPTION" | translate }}</p>
+      <!-- Show specific error from workflow if any -->
+      <div class="instagram-prompt-error" *ngIf="instagramWorkflowError">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ instagramWorkflowError }}
+      </div>
+    </div>
+    <div class="instagram-prompt-actions">
+      <button class="btn-secondary" (click)="declineInstagramPrompt()">
+        {{ "AGENTS.INSTAGRAM.PROMPT_SKIP" | translate }}
+      </button>
+      <button
+        class="btn-instagram-primary"
+        (click)="acceptInstagramPrompt()"
+        [disabled]="workflowStatus.inProgress"
+      >
+        <i class="fab fa-instagram"></i>
+        {{ "AGENTS.INSTAGRAM.PROMPT_CONNECT" | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .custom-dropdown {
+    /* No position relative needed, it's now part of the flow */
+  }
+  .dropdown-trigger {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 38px;
+  }
+  .custom-dropdown.active .dropdown-trigger {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .dropdown-panel {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+  }
+  .dropdown-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  .dropdown-options {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .dropdown-option-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dropdown-option-item:hover {
+    background: #f0f0f0;
+  }
+  .voice-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .voice-name {
+    font-weight: bold;
+  }
+  .voice-meta {
+    font-size: 0.85em;
+    color: #666;
+  }
+  .voice-meta .gender {
+    margin-right: 10px;
+    text-transform: capitalize;
+  }
+  .voice-meta .accent {
+    text-transform: capitalize;
+  }
+  .voice-player button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #007bff;
+    padding: 5px;
+  }
+  .voice-player button:hover {
+    color: #0056b3;
+  }
+</style>
+<!-- ── WEBSITE AI ANALYSIS MODAL ──────────────────────────────────────────── -->
+<div
+  class="website-modal-overlay"
+  *ngIf="showWebsiteModal"
+  (click)="closeWebsiteModal()"
+>
+  <div class="website-modal-card" (click)="$event.stopPropagation()">
+    <div class="website-modal-header">
+      <div class="website-modal-icon">
+        <i class="fas fa-magic"></i>
+      </div>
+      <div>
+        <h3 class="website-modal-title">
+          {{ "AGENTS.AI_ANALYZE.MODAL_TITLE" | translate }}
+        </h3>
+        <p class="website-modal-sub">
+          {{ "AGENTS.AI_ANALYZE.MODAL_SUBTITLE" | translate }}
+        </p>
+      </div>
+      <button class="website-modal-close" (click)="closeWebsiteModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="website-modal-body">
+      <div class="website-modal-info">
+        <i class="fas fa-info-circle"></i>
+        {{ "AGENTS.AI_ANALYZE.INFO" | translate }}
+      </div>
+
+      <div class="form-group">
+        <label>{{ "AGENTS.AI_ANALYZE.URL_LABEL" | translate }}</label>
+        <div class="url-input-row">
+          <input
+            type="url"
+            class="url-input"
+            [(ngModel)]="websiteUrl"
+            [placeholder]="'AGENTS.AI_ANALYZE.URL_PLACEHOLDER' | translate"
+            [disabled]="isAnalyzingWebsite"
+            (keyup.enter)="analyzeWebsite()"
+          />
+        </div>
+      </div>
+
+      <div class="website-modal-error" *ngIf="websiteAnalysisError">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ websiteAnalysisError }}
+      </div>
+    </div>
+
+    <div class="website-modal-footer">
+      <button
+        class="btn-website-cancel"
+        (click)="closeWebsiteModal()"
+        [disabled]="isAnalyzingWebsite"
+      >
+        {{ "AGENTS.AI_ANALYZE.CANCEL" | translate }}
+      </button>
+      <button
+        class="btn-website-analyze"
+        (click)="analyzeWebsite()"
+        [disabled]="isAnalyzingWebsite || !websiteUrl.trim()"
+      >
+        <span *ngIf="isAnalyzingWebsite" class="ai-spinner"></span>
+        <i *ngIf="!isAnalyzingWebsite" class="fas fa-magic"></i>
+        <span>{{
+          (isAnalyzingWebsite
+            ? "AGENTS.AI_ANALYZE.ANALYZING"
+            : "AGENTS.AI_ANALYZE.ANALYZE"
+          ) | translate
+        }}</span>
+      </button>
+      <div
+        *ngIf="isAnalyzingWebsite && websiteAnalysisProgress"
+        class="analysis-progress"
+      >
+        <span class="progress-dot"></span>
+        {{ websiteAnalysisProgress }}
+      </div>
+    </div>
+  </div>
+</div>

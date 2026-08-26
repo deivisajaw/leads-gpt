@@ -1,0 +1,571 @@
+<div class="companies-shell screenin">
+
+  <!-- ═══════════ TOP BAR ═══════════ -->
+  <div class="topbar">
+    <div class="topbar-search">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="{{ 'COMPANIES.SEARCH_PLACEHOLDER' | translate }}"
+        [(ngModel)]="searchQuery"
+        (keypress)="onKeyPress($event)"
+      />
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-credits">
+      <span class="coin"></span>
+      <b>{{ creditsRemaining | number }}</b>&nbsp;Créditos
+    </div>
+  </div>
+
+  <!-- ═══════════ HERO / PANTALLA INICIAL ═══════════ -->
+  <div class="hero-screen" [class.hide]="currentQuery" [class.chat-active]="chatActive">
+
+    <section class="stats-row" *ngIf="!statsLoading && !chatActive">
+      <div class="metric">
+        <div class="m-lbl">Leads scrapeados</div>
+        <div class="m-row">
+          <span class="m-val">{{ dashboardStats.leads | number }}</span>
+          <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 11 L6 8 L11 9.5 L16 5 L21 7 L25 3 L29 2 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 11 L6 8 L11 9.5 L16 5 L21 7 L25 3 L29 2" stroke="#5b4fe5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">Búsquedas</div>
+        <div class="m-row">
+          <span class="m-val">{{ dashboardStats.searches | number }}</span>
+          <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 10 L6 9 L11 6.5 L16 8 L21 5 L25 4.5 L29 3 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 10 L6 9 L11 6.5 L16 8 L21 5 L25 4.5 L29 3" stroke="#5b4fe5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">Teléfonos</div>
+        <div class="m-row">
+          <span class="m-val">{{ dashboardStats.phones | number }}</span>
+          <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 8 L6 10 L11 6 L16 8.5 L21 4.5 L25 6 L29 3.5 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 8 L6 10 L11 6 L16 8.5 L21 4.5 L25 6 L29 3.5" stroke="#5b4fe5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">Emails</div>
+        <div class="m-row">
+          <span class="m-val">{{ dashboardStats.emails | number }}</span>
+          <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 11 L6 7.5 L11 8.5 L16 5.5 L21 6.5 L25 3.5 L29 2.5 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 11 L6 7.5 L11 8.5 L16 5.5 L21 6.5 L25 3.5 L29 2.5" stroke="#5b4fe5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="stmain">
+      <canvas #globeCanvas class="globe-canvas" [class.hide]="chatActive" aria-label="Mapa del mundo"></canvas>
+      <div class="globe-hint" *ngIf="!chatActive">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        Arrastra para girar
+      </div>
+
+      <div class="sthero">
+        <app-search-chat *ngIf="!currentQuery" mode="companies" (searchReady)="onSearchReady($event)" (chatStarted)="onChatStarted()"></app-search-chat>
+      </div>
+
+      <ng-container *ngIf="!chatActive">
+        <div class="res-head" *ngIf="suggestedProspects.length > 0">
+          <span class="t">Personas sugeridas para ti</span>
+        </div>
+        <div class="stresults" *ngIf="suggestedProspects.length > 0">
+          <div class="result rowin" [class.play]="suggestedRevealed" [style.animation-delay.ms]="i * 60" *ngFor="let p of suggestedProspects; let i = index">
+            <div class="res-logo" [style.background]="getAvatarColor(i)">{{ getInitials(p.name) }}</div>
+            <div class="res-main">
+              <div class="res-name">
+                {{ p.name }}
+                <span class="verified2" *ngIf="p.verified">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  verificado
+                </span>
+              </div>
+              <div class="res-meta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                {{ p.role }} · {{ p.company }} · {{ p.city }}
+              </div>
+            </div>
+            <button class="pill-contact" (click)="openSuggestedDetail(p)">Contactar</button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- ═══════════ RESULTADOS ═══════════ -->
+  <div class="results-screen" *ngIf="currentQuery">
+
+    <div class="results-topbar-sticky">
+      <div class="page-head">
+        <h1 class="page-title">Companies</h1>
+      </div>
+
+      <div class="toolbar">
+      <div class="dropdown-wrapper">
+        <button class="tb" (click)="toggleDropdown('view')">
+          <i class="fas fa-th-large"></i> {{ currentViewText }} <i class="fas fa-chevron-down cv"></i>
+        </button>
+        <div class="dropdown-menu" [class.show]="showViewDropdown">
+          <div class="dropdown-item" (click)="changeView('default'); closeAllDropdowns()">{{ "COMPANIES.DEFAULT_VIEW" | translate }}</div>
+          <div class="dropdown-item" (click)="changeView('grid'); closeAllDropdowns()">{{ "COMPANIES.GRID" | translate }}</div>
+          <div class="dropdown-item" (click)="changeView('card'); closeAllDropdowns()">{{ "COMPANIES.CARD" | translate }}</div>
+        </div>
+      </div>
+
+      <button class="tb" (click)="toggleFilters()" *ngIf="filteredResults && filteredResults.length > 0">
+        <i class="fas" [ngClass]="{ 'fa-eye-slash': showFilters, 'fa-filter': !showFilters }"></i>
+        {{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}
+        <span class="fcount" [class.show]="hasActiveFilters">{{ activeFilterCount }}</span>
+      </button>
+
+      <div class="toolbar-local-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Buscar empresas" [(ngModel)]="localFilters.title" (input)="onFilterChange()" />
+      </div>
+
+      <div class="right">
+        <button class="tb" *ngIf="currentSearchId && totalResultsInServer > 0 && !isLoading" (click)="addAllToMyList()" [disabled]="isSavingAll">
+          <span *ngIf="isSavingAll" class="btn-spinner"></span>
+          <span *ngIf="!isSavingAll"><i class="fas fa-plus-circle"></i> {{ 'COMPANIES.ADD_ALL' | translate }} ({{ totalResultsInServer }})</span>
+        </button>
+
+        <div class="dropdown-wrapper">
+          <button class="tb" (click)="toggleDropdown('sort')">
+            <i class="fas fa-sort"></i> {{ "COMPANIES.SORT" | translate }} <i class="fas fa-chevron-down cv"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showSortDropdown">
+            <div class="dropdown-item" (click)="onSortChange('title_asc')">{{ "COMPANIES.NAME_AZ" | translate }}</div>
+            <div class="dropdown-item" (click)="onSortChange('title_desc')">{{ "COMPANIES.NAME_ZA" | translate }}</div>
+            <div class="dropdown-item" (click)="onSortChange('category_asc')">{{ "COMPANIES.CATEGORY_AZ" | translate }}</div>
+            <div class="dropdown-item" (click)="onSortChange('category_desc')">{{ "COMPANIES.CATEGORY_ZA" | translate }}</div>
+            <div class="dropdown-item" (click)="onSortChange('city_asc')">{{ "COMPANIES.CITY_AZ" | translate }}</div>
+            <div class="dropdown-item" (click)="onSortChange('city_desc')">{{ "COMPANIES.CITY_ZA" | translate }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="work">
+      <!-- ═════ FILTROS (rail) ═════ -->
+      <aside class="rail" [class.show]="showFilters" *ngIf="filteredResults && filteredResults.length > 0">
+        <button class="railhide" (click)="toggleFilters()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5m7 10-5-5 5-5"/></svg>
+          Ocultar filtros
+        </button>
+
+        <div class="stat">
+          <button class="on" type="button">
+            <div class="n">{{ totalResultsInServer | number }}</div>
+            <div class="t">Total</div>
+          </button>
+          <button type="button">
+            <div class="n">{{ sessionSavedCount | number }}</div>
+            <div class="t">Guardados</div>
+          </button>
+        </div>
+
+        <div class="facet open" *ngIf="categoryFacetOptions.length > 0">
+          <button class="fhead">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>
+            Categoría
+            <span class="cnt" [class.show]="selectedCategoryFacets.size > 0">{{ selectedCategoryFacets.size }}</span>
+          </button>
+          <div class="fbody">
+            <span class="fc" *ngFor="let v of categoryFacetSelected">
+              {{ v }}
+              <span class="rm" title="Quitar" (click)="toggleCategoryFacet(v)">×</span>
+            </span>
+            <span class="fc ghost" *ngFor="let v of categoryFacetGhost" (click)="toggleCategoryFacet(v)">+ {{ v }}</span>
+          </div>
+        </div>
+
+        <div class="facet open" *ngIf="cityFacetOptions.length > 0">
+          <button class="fhead">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.7 7-12a7 7 0 1 0-14 0c0 5.3 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Ubicación
+            <span class="cnt" [class.show]="selectedCityFacets.size > 0">{{ selectedCityFacets.size }}</span>
+          </button>
+          <div class="fbody">
+            <span class="fc" *ngFor="let v of cityFacetSelected">
+              {{ v }}
+              <span class="rm" title="Quitar" (click)="toggleCityFacet(v)">×</span>
+            </span>
+            <span class="fc ghost" *ngFor="let v of cityFacetGhost" (click)="toggleCityFacet(v)">+ {{ v }}</span>
+          </div>
+        </div>
+
+        <div class="facet open" *ngIf="emailFacetOptions.length > 0">
+          <button class="fhead">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
+            Estado de email
+            <span class="cnt" [class.show]="selectedEmailFacets.size > 0">{{ selectedEmailFacets.size }}</span>
+          </button>
+          <div class="fbody">
+            <span class="fc" *ngFor="let v of emailFacetSelected">
+              {{ v }}
+              <span class="rm" title="Quitar" (click)="toggleEmailFacet(v)">×</span>
+            </span>
+            <span class="fc ghost" *ngFor="let v of emailFacetGhost" (click)="toggleEmailFacet(v)">+ {{ v }}</span>
+          </div>
+        </div>
+
+        <div class="facet" [class.open]="showMoreFilters">
+          <button class="fhead" (click)="toggleMoreFilters()">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            Más filtros
+            <svg class="fch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="fbody more-filters">
+            <div class="filter-input-group">
+              <label>Nombre</label>
+              <input type="text" [(ngModel)]="localFilters.title" (input)="onFilterChange()" placeholder="Filtrar por nombre..." />
+            </div>
+            <div class="filter-input-group">
+              <label>Categoría</label>
+              <input type="text" [(ngModel)]="localFilters.categoryName" (input)="onFilterChange()" placeholder="Filtrar por categoría..." />
+            </div>
+            <div class="filter-input-group">
+              <label>Estado / Provincia</label>
+              <input type="text" [(ngModel)]="localFilters.state" (input)="onFilterChange()" placeholder="Filtrar por estado..." />
+            </div>
+            <div class="filter-input-group">
+              <label>País</label>
+              <input type="text" [(ngModel)]="localFilters.countryCode" (input)="onFilterChange()" placeholder="Filtrar por país..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="railfoot">
+          <button class="clr" (click)="clearAllFilters()" *ngIf="hasActiveFilters">Limpiar todo</button>
+        </div>
+      </aside>
+
+      <!-- ═════ RESULTADOS ═════ -->
+      <section class="res">
+
+        <!-- Resumen del término de búsqueda usado -->
+        <div class="qsummary res-card">
+          <span class="qi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.6L19 9.2l-5.4 1.6L12 16l-1.6-5.2L5 9.2l5.4-1.6L12 2Z"/></svg></span>
+          <span class="qt">{{ currentQuery }}</span>
+          <div class="qactions">
+            <button class="qe" (click)="editSearch()">Editar búsqueda</button>
+            <button class="qe pri" (click)="newSearch()">Nueva búsqueda</button>
+          </div>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Buscando resultados…</p>
+        </div>
+
+        <div class="empty-state" *ngIf="!isLoading && filteredResults.length === 0">
+          <div *ngIf="searchError">
+            <div class="alert alert-danger m-3">{{ searchError }}</div>
+            <app-plans *ngIf="showPlans"></app-plans>
+          </div>
+          <div *ngIf="!searchError">
+            <h3>{{ 'COMPANIES.NO_RESULTS' | translate}}</h3>
+            <p>{{ 'COMPANIES.NO_RESULTS_FOR' | translate}} "{{ currentQuery }}"</p>
+            <p>{{ 'COMPANIES.TRY_ADJUSTING' | translate}}</p>
+          </div>
+        </div>
+
+        <div class="reshd" *ngIf="!isLoading && filteredResults.length > 0">
+          <div class="ct"><b>{{ totalResultsInServer | number }}</b> coincidencias de alto match</div>
+          <div class="act">
+            <button class="btn" (click)="exportToCsv()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              Exportar CSV
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="!isLoading && filteredResults.length > 0" class="res-inner">
+          <!-- Grid View -->
+          <div *ngIf="currentView === 'grid'" class="view-grid res-card">
+            <div class="tablewrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th style="width:34px">
+                      <span class="ck" [class.on]="selectAllChecked" (click)="toggleSelectAll()"></span>
+                    </th>
+                    <th>Empresa</th>
+                    <th>Categoría</th>
+                    <th>Ubicación</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th style="width:110px">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let company of displayResults; let i = index" class="rowin" [class.play]="rowsRevealed" [style.animation-delay.ms]="i * 30" [class.sel]="selectedCompanies.includes(company.id)">
+                    <td><span class="ck" [class.on]="selectedCompanies.includes(company.id)" (click)="toggleCompanySelection(company.id)"></span></td>
+                    <td>
+                      <div class="who">
+                        <span class="clogo" [style.background]="getAvatarColor(company.id)">{{ (company.title || '?').charAt(0) }}</span>
+                        <div style="min-width:0">
+                          <div class="nm open-p" (click)="openDetail(company)">{{ company.title }}</div>
+                          <div class="sub" *ngIf="company.website">{{ company.website }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="cargo">{{ company.categoryName }}</span></td>
+                    <td><span class="cargo">{{ company.city }}<ng-container *ngIf="company.state">, {{ company.state }}</ng-container></span></td>
+                    <td>
+                      <span *ngIf="company.email" class="reveal shown">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
+                        {{ company.email }}
+                      </span>
+                      <span *ngIf="!company.email && company.hasEmailOnFile === false" class="reveal unavailable" title="No tenemos un email registrado para esta empresa">
+                        Email no disponible
+                      </span>
+                      <button *ngIf="!company.email && company.hasEmailOnFile !== false" class="reveal rev-mail" [class.busy]="isRevealingEmail(company.id)" [disabled]="isRevealingEmail(company.id)" (click)="revealEmail(company)">
+                        <svg *ngIf="!isRevealingEmail(company.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
+                        <span class="mini-spin" *ngIf="isRevealingEmail(company.id)"></span>
+                        {{ isRevealingEmail(company.id) ? 'Verificando…' : 'Acceder email' }}
+                      </button>
+                    </td>
+                    <td>
+                      <span *ngIf="company.phoneUnformatted" class="reveal shown">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+                        {{ company.phoneUnformatted }}
+                      </span>
+                      <span *ngIf="!company.phoneUnformatted && company.hasPhoneOnFile === false" class="reveal unavailable" title="No tenemos un teléfono registrado para esta empresa">
+                        Teléfono no disponible
+                      </span>
+                      <button *ngIf="!company.phoneUnformatted && company.hasPhoneOnFile !== false" class="reveal rev-phone" [class.busy]="isRevealingPhone(company.id)" [disabled]="isRevealingPhone(company.id)" (click)="revealPhone(company)">
+                        <svg *ngIf="!isRevealingPhone(company.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+                        <span class="mini-spin" *ngIf="isRevealingPhone(company.id)"></span>
+                        {{ isRevealingPhone(company.id) ? 'Buscando…' : 'Celular' }}
+                      </button>
+                    </td>
+                    <td>
+                      <div class="acts">
+                        <button class="ia" title="Agregar a lista" [disabled]="savingSingleId === company.id" (click)="quickAddToList(company)">
+                          <span class="mini-spin" *ngIf="savingSingleId === company.id"></span>
+                          <svg *ngIf="savingSingleId !== company.id" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+                        <button class="ia" title="Crear secuencia (próximamente)" disabled>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 3 14 9-14 9V3Z"/></svg>
+                        </button>
+                        <button class="ia" title="Ver perfil" (click)="openDetail(company)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pager show">
+              <button class="pg" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <span>{{ currentPage }} / {{ totalPages }}</span>
+              <button class="pg" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <span class="rc">{{ getStartIndex() }}–{{ getEndIndex() }} de {{ getFormattedTotal() }}</span>
+            </div>
+          </div>
+
+          <!-- Card View -->
+          <div *ngIf="currentView === 'card'" style="width:100%;height:100%;display:flex;flex-direction:column;padding:20px;background:#f8fafc;">
+            <div style="margin-bottom:16px;padding:12px;background:white;border-radius:6px;border:1px solid #e2e8f0;">
+              <label style="display:flex;align-items:center;gap:8px;font-weight:500;color:#64748b;">
+                <input type="checkbox" [checked]="selectAllChecked" (change)="toggleSelectAll()" />
+                {{ "COMPANIES.SELECT_ALL" | translate }}
+              </label>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:20px;flex:1;overflow:auto;">
+              <div *ngFor="let company of displayResults; let i = index" class="rowin" [class.play]="rowsRevealed" [style.animation-delay.ms]="i * 30" style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.1);">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;">
+                  <input type="checkbox" [checked]="selectedCompanies.includes(company.id)" (change)="toggleCompanySelection(company.id)" style="margin-top:4px" />
+                  <div style="flex:1">
+                    <h3 style="margin:0 0 8px 0;font-size:16px;font-weight:600;color:#1e293b;cursor:pointer;" (click)="openDetail(company)">{{ company.title }}</h3>
+                    <p class="card-website">{{ company.website }}</p>
+                    <p style="margin:0 0 4px 0;color:#64748b;font-size:14px;">{{ company.categoryName }}</p>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                      <i class="fas fa-map-marker-alt" style="color:#64748b;width:12px;font-size:12px"></i>
+                      <span style="color:#64748b;font-size:12px">{{ company.city }}, {{ company.state }}, {{ company.countryCode }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:8px">
+                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" title="Agregar a lista" [disabled]="savingSingleId === company.id" (click)="quickAddToList(company)"><i class="fas fa-list"></i></button>
+                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" title="Ver perfil" (click)="openDetail(company)"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+              </div>
+            </div>
+            <div style="padding:16px 20px;border-top:1px solid #e2e8f0;background:white;display:flex;justify-content:space-between;align-items:center;margin-top:20px;border-radius:6px;">
+              <div style="color:#64748b;font-size:14px">{{ getStartIndex() }} - {{ getEndIndex() }} of {{ getFormattedTotal() }}</div>
+              <div style="display:flex;gap:8px">
+                <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" style="padding:8px 12px;border:1px solid #e2e8f0;background:white;border-radius:4px;"><i class="fas fa-chevron-left"></i></button>
+                <span style="padding:8px 12px;color:#64748b;font-size:14px">{{ "COMPANIES.PAGE" | translate }} {{ currentPage }} {{ "COMPANIES.OF" | translate }} {{ totalPages }}</span>
+                <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" style="padding:8px 12px;border:1px solid #e2e8f0;background:white;border-radius:4px;"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Default View -->
+          <div *ngIf="currentView === 'default'" style="width:100%;height:100%;display:flex;flex-direction:column;padding:20px;background:white;">
+            <div style="margin-bottom:16px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
+              <label style="display:flex;align-items:center;gap:8px;font-weight:500;color:#64748b;">
+                <input type="checkbox" [checked]="selectAllChecked" (change)="toggleSelectAll()" />
+                {{ "COMPANIES.SELECT_ALL" | translate }}
+              </label>
+            </div>
+            <div style="flex:1;overflow:auto">
+              <div *ngFor="let company of displayResults; let i = index" class="rowin" [class.play]="rowsRevealed" [style.animation-delay.ms]="i * 30" [style.background]="i % 2 === 0 ? '#f8fafc' : ''" style="display:flex;align-items:center;padding:16px;border-bottom:1px solid #e2e8f0;">
+                <input type="checkbox" [checked]="selectedCompanies.includes(company.id)" (change)="toggleCompanySelection(company.id)" style="margin-right:16px" />
+                <div style="flex:1;cursor:pointer;" (click)="openDetail(company)">
+                  <div style="font-weight:500;color:#1e293b;margin-bottom:4px;">{{ company.title }}</div>
+                  <p class="card-website">{{ company.website }}</p>
+                  <div style="color:#64748b;font-size:14px;margin-bottom:2px;">{{ company.categoryName }}</div>
+                  <div style="color:#94a3b8;font-size:12px">{{ company.city }}, {{ company.state }}, {{ company.countryCode }}</div>
+                </div>
+                <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" (click)="openDetail(company)"><i class="fas fa-ellipsis-h"></i></button>
+              </div>
+            </div>
+            <div style="padding:16px 20px;border-top:1px solid #e2e8f0;background:white;display:flex;justify-content:space-between;align-items:center;">
+              <div style="color:#64748b;font-size:14px">{{ getStartIndex() }} - {{ getEndIndex() }} of {{ getFormattedTotal() }}</div>
+              <div style="display:flex;gap:8px">
+                <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" style="padding:8px 12px;border:1px solid #e2e8f0;background:white;border-radius:4px;"><i class="fas fa-chevron-left"></i></button>
+                <span style="padding:8px 12px;color:#64748b;font-size:14px">{{ "COMPANIES.PAGE" | translate }} {{ currentPage }} {{ "COMPANIES.OF" | translate }} {{ totalPages }}</span>
+                <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" style="padding:8px 12px;border:1px solid #e2e8f0;background:white;border-radius:4px;"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Selection Bar (flotante inferior — vive FUERA de cualquier *ngIf para existir desde el
+       primer render; se mueve a <body> por JS en ngAfterViewInit, ver portalFixedElementsToBody
+       — NO TOCAR la lógica de selección) -->
+  <div #selectionBarPortal class="selection-bar" [class.show]="showSelectionBar">
+    <span style="color:#1e293b;font-weight:500">{{ "COMPANIES.ADD_TO_SHORTLIST" | translate }} ({{ selectedCompanies.length }})</span>
+    <div style="display:flex;gap:8px;margin-left:auto">
+      <button (click)="addToMyList()" class="btn-primary">
+        <span *ngIf="isSaving" class="btn-spinner"></span>
+        <span *ngIf="!isSaving">{{ "COMPANIES.ADD_TO_MY_LIST" | translate }}</span>
+      </button>
+      <button (click)="downloadSelected()" style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:6px;cursor:pointer;color:#64748b;"><i class="fas fa-download"></i></button>
+      <button (click)="viewSelected()" style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:6px;cursor:pointer;color:#64748b;"><i class="fas fa-eye"></i></button>
+      <button (click)="closeSelectionBar()" style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:6px;cursor:pointer;color:#64748b;"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <!-- ═════ PANEL DE DETALLE (drawer) ═════ -->
+  <div class="dscrim" [class.on]="detailCompany" (click)="closeDetail()"></div>
+  <aside class="drawer" [class.open]="detailCompany">
+    <ng-container *ngIf="detailCompany as c">
+      <div class="dhead">
+        <span class="pic" [style.background]="getAvatarColor(c.id)">{{ (c.title || '?').charAt(0) }}</span>
+        <div style="min-width:0">
+          <div class="nm">{{ c.title }}</div>
+          <div class="sub">{{ c.categoryName }}</div>
+        </div>
+        <button class="dclose" (click)="closeDetail()">✕</button>
+      </div>
+      <div class="dbody">
+        <div class="dacts">
+          <button class="btn" [disabled]="savingSingleId === c.id" (click)="quickAddToList(c)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Guardar
+          </button>
+          <button class="btn pri" disabled title="Próximamente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 3 14 9-14 9V3Z"/></svg> Secuencia
+          </button>
+        </div>
+
+        <div class="dcard" *ngIf="c.description || c.descriptionMd">
+          <h4>Descripción</h4>
+          <p style="font-size:13px;color:var(--ink-2);line-height:1.5;margin:0">{{ c.description }}</p>
+        </div>
+
+        <div class="dcard">
+          <h4>Contacto</h4>
+          <div class="drow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
+            <span *ngIf="c.email">{{ c.email }}</span>
+            <span *ngIf="!c.email && c.hasEmailOnFile === false" class="reveal unavailable">Email no disponible</span>
+            <button *ngIf="!c.email && c.hasEmailOnFile !== false" class="reveal rev-mail" [class.busy]="isRevealingEmail(c.id)" [disabled]="isRevealingEmail(c.id)" (click)="revealEmail(c)">
+              <span class="mini-spin" *ngIf="isRevealingEmail(c.id)"></span>
+              {{ isRevealingEmail(c.id) ? 'Verificando…' : 'Acceder email' }}
+            </button>
+          </div>
+          <div class="drow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+            <span *ngIf="c.phoneUnformatted">{{ c.phoneUnformatted }}</span>
+            <span *ngIf="!c.phoneUnformatted && c.hasPhoneOnFile === false" class="reveal unavailable">Teléfono no disponible</span>
+            <button *ngIf="!c.phoneUnformatted && c.hasPhoneOnFile !== false" class="reveal rev-phone" [class.busy]="isRevealingPhone(c.id)" [disabled]="isRevealingPhone(c.id)" (click)="revealPhone(c)">
+              <span class="mini-spin" *ngIf="isRevealingPhone(c.id)"></span>
+              {{ isRevealingPhone(c.id) ? 'Buscando…' : 'Celular' }}
+            </button>
+          </div>
+          <div class="drow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.7 7-12a7 7 0 1 0-14 0c0 5.3 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <span>{{ c.address || (c.city + (c.state ? ', ' + c.state : '') + (c.countryCode ? ', ' + c.countryCode : '')) }}</span>
+          </div>
+          <div class="drow" *ngIf="c.website">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></svg>
+            <a [href]="c.website" target="_blank" rel="noopener">{{ c.website }}</a>
+          </div>
+        </div>
+
+        <div class="dcard" *ngIf="detailHours.length > 0">
+          <h4>Horario</h4>
+          <div class="hours-row" *ngFor="let h of detailHours">
+            <span class="hours-day">{{ h.day }}</span>
+            <span class="hours-time" [class.closed]="h.hours === 'Cerrado'">{{ h.hours }}</span>
+          </div>
+        </div>
+        <div class="dcard" *ngIf="detailHours.length === 0 && c.openingHours && c.openingHours !== 'Not specified'">
+          <h4>Horario</h4>
+          <p style="font-size:13px;color:var(--ink-2);margin:0">{{ c.openingHours }}</p>
+        </div>
+      </div>
+    </ng-container>
+  </aside>
+
+  <!-- ═════ MODAL DE CONFIRMACIÓN (agregar 1 / agregar todos / agregar seleccionados) ═════
+       Envuelto en un solo contenedor que se mueve a <body> por JS (ver ngAfterViewInit),
+       para que top:50%/bottom:20px se calculen siempre contra la pantalla, sin importar qué
+       ancestro termine siendo su "contenedor" de posicionamiento fixed. -->
+  <div #confirmModalPortal class="confirm-portal">
+    <div class="confirm-scrim" *ngIf="confirmState" (click)="cancelConfirm()"></div>
+    <div class="confirm-box" *ngIf="confirmState">
+      <p>{{ confirmState.message }}</p>
+      <div class="confirm-lists" *ngIf="confirmState.askLists">
+        <label>Agregar a lista (opcional)</label>
+        <input
+          type="text"
+          class="confirm-list-filter"
+          *ngIf="availableLists.length > 5"
+          [(ngModel)]="confirmListFilter"
+          placeholder="Buscar lista…"
+        />
+        <div class="confirm-lists-options" *ngIf="availableLists.length > 0">
+          <label class="confirm-list-option" *ngFor="let l of filteredAvailableLists">
+            <input type="checkbox" [checked]="confirmSelectedListIds.has(l.id)" (change)="toggleConfirmList(l.id)" />
+            <span>{{ l.name }}</span>
+          </label>
+          <span class="confirm-list-noresults" *ngIf="filteredAvailableLists.length === 0">Sin coincidencias.</span>
+        </div>
+        <span class="hint" *ngIf="availableLists.length === 0">Aún no tienes listas creadas.</span>
+        <input
+          type="text"
+          [(ngModel)]="confirmNewListName"
+          placeholder="o crea una lista nueva…"
+          (keydown.enter)="runConfirmed()"
+        />
+      </div>
+      <div class="confirm-actions">
+        <button class="btn" (click)="cancelConfirm()">Cancelar</button>
+        <button class="btn pri" (click)="runConfirmed()">{{ confirmState.confirmLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>

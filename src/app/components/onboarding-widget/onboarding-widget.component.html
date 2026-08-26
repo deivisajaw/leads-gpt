@@ -1,0 +1,55 @@
+<div class="onboarding-widget-container" *ngIf="!(allStepsCompleted$ | async)">
+  <div class="onboarding-header">
+    <h3>{{ 'ONBOARDING.TITLE' | translate }}</h3>
+    <p>{{ 'ONBOARDING.SUBTITLE' | translate }}</p>
+  </div>
+
+  <div class="onboarding-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress$ | async"></div>
+    </div>
+    <span class="progress-text">{{ progress$ | async }}% {{ 'ONBOARDING.COMPLETED' | translate }}</span>
+  </div>
+
+  <div class="onboarding-carousel-wrapper">
+    <button class="carousel-control prev" (click)="prevSlide()" [disabled]="!steps || steps.length <= 1">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="onboarding-steps-container" #stepsContainer>
+      <div class="onboarding-steps-inner">
+        <div class="step-card" 
+             *ngFor="let step of (onboardingStatus$ | async); let i = index" 
+             [class.completed]="step.isCompleted">
+          <div class="order-item-badge">{{ step.orderItem }}</div>
+          <div class="step-header">
+            <div class="step-icon">
+              <i class="fas" [ngClass]="step.icon"></i>
+            </div>
+            <h4 class="step-name">{{ step.name | translate }}</h4>
+          </div>
+          <div class="step-content">
+            <p>{{ step.description | translate }}</p>
+            <button 
+              class="btn-action" 
+              (click)="navigateToStep(step)" 
+              [disabled]="step.isCompleted">
+              {{ (step.isCompleted ? 'ONBOARDING.STEP_COMPLETED' : 'ONBOARDING.GO_TO_STEP') | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control next" (click)="nextSlide()" [disabled]="!steps || steps.length <= 1">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button class="carousel-play-pause" (click)="togglePlayPause()" 
+            [disabled]="!steps || steps.length <= 1">
+      <i class="fas" [ngClass]="isPlaying ? 'fa-pause' : 'fa-play'"></i>
+    </button>
+  </div>
+</div>
+
+<div class="onboarding-completed-message" *ngIf="allStepsCompleted$ | async">
+  <h3>{{ 'ONBOARDING.ALL_STEPS_COMPLETED_TITLE' | translate }}</h3>
+  <p>{{ 'ONBOARDING.ALL_STEPS_COMPLETED_MESSAGE' | translate }}</p>
+</div>

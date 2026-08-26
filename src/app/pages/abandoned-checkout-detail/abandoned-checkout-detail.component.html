@@ -1,0 +1,135 @@
+<div class="acd-shell">
+
+  <div class="acd-topbar">
+    <button class="acd-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      {{ "ABANDONED_CHECKOUT_DETAIL.BACK" | translate }}
+    </button>
+  </div>
+
+  <!-- ═══════════ HEADER DEL REGISTRO ═══════════ -->
+  <div class="acd-loading" *ngIf="isLoadingHeader">
+    <div class="acd-spinner"></div>
+  </div>
+
+  <div class="acd-header" *ngIf="!isLoadingHeader && abandonedCheckout">
+    <div class="acd-header-left">
+      <span class="acd-shop-icon"><i class="fas fa-cart-shopping"></i></span>
+      <div>
+        <h1>{{ abandonedCheckout.shopifyShopName }}</h1>
+        <div class="acd-meta-row">
+          <span class="acd-status" [ngClass]="'acd-status-' + (abandonedCheckout.abandonedCheckoutStatus | lowercase)">
+            {{ abandonedCheckout.abandonedCheckoutStatus }}
+          </span>
+          <span class="acd-meta" *ngIf="abandonedCheckout.agentName">
+            <i class="fas fa-robot"></i> {{ abandonedCheckout.agentName }}
+          </span>
+          <span class="acd-meta" *ngIf="abandonedCheckout.startDate">
+            <i class="fas fa-calendar"></i> {{ abandonedCheckout.startDate }}
+          </span>
+          <span class="acd-meta" *ngIf="abandonedCheckout.timeZone">
+            <i class="fas fa-clock"></i> {{ abandonedCheckout.timeZone }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="acd-header-right">
+      <div class="acd-stat">
+        <span class="acd-stat-value">{{ totalResults }}</span>
+        <span class="acd-stat-label">{{ "ABANDONED_CHECKOUT_DETAIL.TOTAL_FOLLOWUPS" | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acd-error-banner" *ngIf="!isLoadingHeader && abandonedCheckout?.error">
+    <i class="fas fa-triangle-exclamation"></i>
+    {{ abandonedCheckout?.error }}
+  </div>
+
+  <!-- ═══════════ TOOLBAR DE FOLLOWUPS ═══════════ -->
+  <div class="acd-toolbar">
+    <div class="acd-search">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchContact"
+        (keydown.enter)="onSearch()"
+        [placeholder]="'ABANDONED_CHECKOUT_DETAIL.SEARCH_PLACEHOLDER' | translate"
+      />
+    </div>
+    <select [(ngModel)]="filterType" (change)="onFilterChange()">
+      <option value="">{{ "ABANDONED_CHECKOUT_DETAIL.ALL_TYPES" | translate }}</option>
+      <option value="DAILY">{{ "ABANDONED_CHECKOUT_DETAIL.TYPE_DAILY" | translate }}</option>
+      <option value="WEEKLY">{{ "ABANDONED_CHECKOUT_DETAIL.TYPE_WEEKLY" | translate }}</option>
+      <option value="MONTHLY">{{ "ABANDONED_CHECKOUT_DETAIL.TYPE_MONTHLY" | translate }}</option>
+    </select>
+  </div>
+
+  <!-- ═══════════ TABLA DE FOLLOWUPS ═══════════ -->
+  <div class="acd-content">
+
+    <div class="acd-loading" *ngIf="isLoadingFollowups">
+      <div class="acd-spinner"></div>
+    </div>
+
+    <div class="acd-empty" *ngIf="!isLoadingFollowups && followups.length === 0">
+      <i class="fas fa-inbox"></i>
+      <h3>{{ "ABANDONED_CHECKOUT_DETAIL.EMPTY_TITLE" | translate }}</h3>
+      <p>{{ "ABANDONED_CHECKOUT_DETAIL.EMPTY_SUBTITLE" | translate }}</p>
+    </div>
+
+    <div class="acd-tablewrap" *ngIf="!isLoadingFollowups && followups.length > 0">
+      <table class="acd-tbl">
+        <thead>
+          <tr>
+            <th>{{ "ABANDONED_CHECKOUT_DETAIL.TABLE.CUSTOMER" | translate }}</th>
+            <th>{{ "ABANDONED_CHECKOUT_DETAIL.TABLE.CONTACT" | translate }}</th>
+            <th>{{ "ABANDONED_CHECKOUT_DETAIL.TABLE.TYPE" | translate }}</th>
+            <th>{{ "ABANDONED_CHECKOUT_DETAIL.TABLE.CALL_DATE" | translate }}</th>
+            <th>{{ "ABANDONED_CHECKOUT_DETAIL.TABLE.RESULT" | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let followup of followups">
+            <td class="acd-customer-cell">
+              <span class="acd-avatar">{{ (followup.firstName || '?')[0] }}</span>
+              <div>
+                <div class="acd-customer-name">{{ fullName(followup) }}</div>
+                <div class="acd-customer-country" *ngIf="followup.country">{{ followup.country }}</div>
+              </div>
+            </td>
+            <td>
+              <div *ngIf="followup.email">{{ followup.email }}</div>
+              <div *ngIf="followup.phone">{{ followup.phone }}</div>
+              <span *ngIf="!followup.email && !followup.phone">-</span>
+            </td>
+            <td><span class="acd-type-badge">{{ followup.followupType }}</span></td>
+            <td>{{ formatDate(followup.callDate) }}</td>
+            <td>
+              <span class="acd-result-badge" [class.acd-result-ok]="followup.success" [class.acd-result-fail]="followup.success === false">
+                {{ followup.success === true ? ("ABANDONED_CHECKOUT_DETAIL.SUCCESS" | translate) : (followup.success === false ? ("ABANDONED_CHECKOUT_DETAIL.NO_SUCCESS" | translate) : "-") }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="acd-pagination">
+        <div class="acd-pagination-info">
+          {{ getStartIndex() }} - {{ getEndIndex() }} {{ "ABANDONED_CHECKOUT_DETAIL.OF" | translate }} {{ totalResults }}
+        </div>
+        <div class="acd-pagination-controls">
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span>{{ "ABANDONED_CHECKOUT_DETAIL.PAGE" | translate }} {{ currentPage }} {{ "ABANDONED_CHECKOUT_DETAIL.OF" | translate }} {{ totalPages }}</span>
+          <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

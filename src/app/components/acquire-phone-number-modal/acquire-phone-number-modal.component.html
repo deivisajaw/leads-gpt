@@ -1,0 +1,42 @@
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>{{ 'ACQUIRE_PHONE_NUMBER_MODAL.TITLE' | translate }}</h2>
+      <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-container" *ngIf="isLoading">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+
+         <div class="alert alert-warning">{{ 'ACQUIRE_PHONE_NUMBER_MODAL.LOADING_MESSAGE' | translate }}</div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && availableNumbers.length > 0" class="available-numbers-list">
+        <p>{{ 'ACQUIRE_PHONE_NUMBER_MODAL.SELECT_NUMBER_PROMPT' | translate }}</p>
+        <div class="number-options">
+          <div 
+            *ngFor="let num of availableNumbers" 
+            class="number-option"
+            [class.selected]="selectedNumber === num.phoneNumber"
+            (click)="selectNumber(num.phoneNumber)">
+            {{ num.friendlyName }} ({{ num.phoneNumber }})
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && availableNumbers.length === 0" class="empty-state">
+        <p>{{ 'ACQUIRE_PHONE_NUMBER_MODAL.EMPTY_STATE' | translate }}</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModal()">{{ 'ACQUIRE_PHONE_NUMBER_MODAL.CANCEL_BUTTON' | translate }}</button>
+      <button class="btn-primary" (click)="confirmAcquire()" [disabled]="!selectedNumber">{{ 'ACQUIRE_PHONE_NUMBER_MODAL.CONTINUE_BUTTON' | translate }}</button>
+    </div>
+  </div>
+</div>

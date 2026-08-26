@@ -1,0 +1,344 @@
+.dashboard-container {
+  padding: 2rem;
+  margin: 5px auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-card .plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--primary-blue);
+}
+
+.dashboard-card .status {
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: .2rem;
+  align-self: flex-start;
+  font-size: 0.9rem;
+}
+
+.dashboard-card .status.active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dashboard-card .status.expired {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.dashboard-card .end-date {
+  color: #666;
+  margin-bottom: auto; 
+}
+
+.dashboard-card .credit-balance {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dashboard-card .credit-label {
+  color: #666;
+  margin-bottom: auto; 
+}
+
+.dashboard-card .actions-list a {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.dashboard-card .actions-list a:hover {
+  text-decoration: underline;
+}
+
+.dashboard-card .actions-list i {
+  margin-right: 0.5rem;
+}
+
+.dashboard-card p{
+  padding: 2px 0;
+  font-size: .9rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.member-list {
+  margin-top: 1rem;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-details p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.member-details p strong {
+  color: #333;
+}
+
+.member-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #e0e0e0;
+  color: #333;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  width: 100%;
+}
+
+.action-link:hover {
+  background-color: #d5d5d5;
+}
+
+.action-link:active {
+  transform: translateY(0);
+}
+
+.action-link.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.bg-danger:hover {
+  background-color: #bb2d3b !important;
+  text-decoration: none;
+}
+
+.text-white {
+  color: #fff !important;
+}
+
+/* Styles for Credit History Tables */
+.card.mt-3 {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-blue);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.table th, .table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+  text-align: left;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.status-badge {
+  padding: 0.25em 0.5em;
+  border-radius: 0.25rem;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  display: inline-block;
+}
+
+.status-badge.active {
+  color: #155724;
+  background-color: #d4edda;
+}
+
+.status-badge.inactive {
+  color: #664d03;
+  background-color: #fff3cd;
+}
+
+.status-badge.expired {
+  color: #842029;
+  background-color: #f8d7da;
+}
+
+.positive {
+  color: #28a745; /* Green for positive amounts */
+  font-weight: 600;
+}
+
+.negative {
+  color: #dc3545; /* Red for negative amounts */
+  font-weight: 600;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.pagination-controls button {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-white);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: var(--hover-bg);
+}
+
+.pagination-controls span {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Loading and Empty Messages */
+.loading-banner, .empty-history-message {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.credit-history-section{
+  margin: 10px;
+}
+
+.credit-history-section table{
+  font-size: .8rem;
+}
+
+.table-responsive{
+  overflow-x: auto;
+}

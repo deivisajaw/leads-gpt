@@ -1,0 +1,149 @@
+<div class="page-container">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ 'CONVERSATIONS.PAGE_TITLE' | translate }}</h1>
+      <p>{{ 'CONVERSATIONS.PAGE_SUBTITLE' | translate }}</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" (click)="load()" [disabled]="isLoading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+        {{ 'CONVERSATIONS.ACTION.REFRESH' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== TOOLBAR ===== -->
+  <div class="conv-toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        [placeholder]="'CONVERSATIONS.TOOLBAR.SEARCH' | translate"
+        [value]="searchQuery"
+        (input)="onSearch($event)"
+      />
+    </div>
+    <div class="toolbar-meta" *ngIf="!isLoading && !error">
+      <span class="count-badge">
+        {{ filteredConversations.length }}
+        {{ 'CONVERSATIONS.TOOLBAR.RECORDINGS' | translate }}
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="conv-state" *ngIf="isLoading">
+    <div class="conv-loader"></div>
+    <p>{{ 'CONVERSATIONS.STATE.LOADING' | translate }}</p>
+  </div>
+
+  <!-- ===== ERROR ===== -->
+  <div class="conv-state conv-error" *ngIf="!isLoading && error">
+    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="load()">
+      <i class="fas fa-sync-alt"></i> {{ 'CONVERSATIONS.ACTION.RETRY' | translate }}
+    </button>
+  </div>
+
+  <!-- ===== VACÍO ===== -->
+  <div class="conv-state" *ngIf="!isLoading && !error && filteredConversations.length === 0">
+    <i class="fas fa-film" style="font-size:40px; color:var(--text-muted)"></i>
+    <p>{{ 'CONVERSATIONS.STATE.EMPTY' | translate }}</p>
+  </div>
+
+  <!-- ===== TABLA ===== -->
+  <div class="conv-table-wrap" *ngIf="!isLoading && !error && filteredConversations.length > 0">
+    <table class="conv-table">
+      <thead>
+        <tr>
+          <th class="col-meeting">{{ 'CONVERSATIONS.TABLE.MEETING'      | translate }}</th>
+          <th class="col-date">   {{ 'CONVERSATIONS.TABLE.DATE'         | translate }}</th>
+          <th class="col-host">   {{ 'CONVERSATIONS.TABLE.HOST'         | translate }}</th>
+          <th class="col-parts">  {{ 'CONVERSATIONS.TABLE.PARTICIPANTS' | translate }}</th>
+          <th class="col-status"> {{ 'CONVERSATIONS.TABLE.STATUS'       | translate }}</th>
+          <th class="col-agent">  {{ 'CONVERSATIONS.TABLE.AGENT'        | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let c of filteredConversations"
+          class="conv-row"
+          (click)="goToDetail(c)"
+          [title]="'CONVERSATIONS.TABLE.OPEN_DETAIL' | translate"
+        >
+          <!-- MEETING (thumbnail + título + duración) -->
+          <td class="col-meeting">
+            <div class="meeting-cell">
+              <div class="thumb-wrap">
+                <img *ngIf="c.thumbnailUrl" [src]="c.thumbnailUrl" alt="" class="thumb-img" />
+                <div *ngIf="!c.thumbnailUrl" class="thumb-placeholder">
+                  <i class="fas fa-video"></i>
+                </div>
+                <span class="thumb-duration">{{ svc.formatDuration(c.durationSeconds) }}</span>
+              </div>
+              <div class="meeting-info">
+                <span class="meeting-title">{{ c.title }}</span>
+                <span class="meeting-provider" *ngIf="c.meetProvider">
+                  <i class="fab fa-google" *ngIf="c.meetProvider === 'google_meet'"></i>
+                  <i class="fas fa-video"  *ngIf="c.meetProvider !== 'google_meet'"></i>
+                  {{ c.meetProvider === 'google_meet' ? 'Google Meet' : c.meetProvider }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- DATE -->
+          <td class="col-date">
+            <span class="date-text">{{ svc.formatDate(c.date) }}</span>
+          </td>
+
+          <!-- HOST -->
+          <td class="col-host">
+            <div class="host-cell" *ngIf="c.hostName">
+              <div class="mini-avatar" [style.background]="svc.avatarColor(c.hostName)">
+                {{ svc.getInitials(c.hostName) }}
+              </div>
+              <span>{{ c.hostName }}</span>
+            </div>
+            <span class="no-data" *ngIf="!c.hostName">—</span>
+          </td>
+
+          <!-- PARTICIPANTS (avatar stack) -->
+          <td class="col-parts">
+            <div class="avatar-stack">
+              <div
+                *ngFor="let p of c.participants.slice(0, 3)"
+                class="avatar-chip"
+                [style.background]="svc.avatarColor(p.name)"
+                [title]="p.name"
+              >{{ svc.getInitials(p.name) }}</div>
+              <div class="avatar-more" *ngIf="c.participants.length > 3">
+                +{{ c.participants.length - 3 }}
+              </div>
+            </div>
+          </td>
+
+          <!-- STATUS -->
+          <td class="col-status">
+            <span class="status-chip" [ngClass]="'chip-' + c.status">
+              <span class="status-dot"></span>
+              {{ 'CONVERSATIONS.STATUS.' + c.status.toUpperCase() | translate }}
+            </span>
+          </td>
+
+          <!-- AGENT -->
+          <td class="col-agent">
+            <span class="agent-tag" *ngIf="c.agentName">
+              <i class="fas fa-robot"></i> {{ c.agentName }}
+            </span>
+            <span class="no-data" *ngIf="!c.agentName">—</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

@@ -1,0 +1,28 @@
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="onClose()">
+  <div class="custom-modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ 'ADMIN_USERS.EDIT_PRIORITY_MODAL_TITLE' | translate }}</h2>
+      <button class="close-button" (click)="onClose()" [disabled]="isLoading">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="member">{{ 'ADMIN_USERS.EDIT_PRIORITY_MODAL_MESSAGE' | translate:{memberName: member.fullName || member.email} }}</p>
+
+      <div class="form-group">
+        <label for="newPriority">{{ 'ADMIN_USERS.NEW_PRIORITY_LABEL' | translate }}</label>
+        <input type="number" id="newPriority" [(ngModel)]="newPriority" class="form-control" min="0" [disabled]="isLoading">
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="isLoading" class="loading-indicator">
+        <p>{{ 'COMMON.PROCESSING' | translate }}</p> 
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()" [disabled]="isLoading">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="btn btn-primary" (click)="onSave()" [disabled]="isLoading || newPriority < 0">{{ 'COMMON.SAVE' | translate }}</button>
+    </div>
+  </div>
+</div>

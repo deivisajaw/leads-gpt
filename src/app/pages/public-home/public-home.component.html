@@ -1,0 +1,90 @@
+<section class="hero">
+  <div class="container">
+    <div class="hero-header">
+      <div class="logo-text">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span class="brand-name">LeadsGPT</span>
+      </div>
+      <h2>Encuentra los <span class="highlight">leads perfectos</span> para tu negocio</h2>
+      <p class="subtitle">Descubre personas y empresas relevantes para hacer crecer tu negocio. Nuestra plataforma te ayuda a encontrar los contactos que necesitas de manera r&aacute;pida y eficiente.</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()" class="login-inline">
+      <input type="text" [(ngModel)]="username" name="username" placeholder="Usuario" required />
+      <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#">Ver planes</a>
+      <a class="btn btn-secondary" href="#">Ver Demo</a>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <h2>Todo lo que necesitas para encontrar leads</h2>
+    <p class="subtitle">Herramientas poderosas diseñadas para maximizar tu &eacute;xito en la b&uacute;squeda de oportunidades</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-user"></i> B&uacute;squeda de Personas</h3>
+        <p>Encuentra profesionales y contactos clave para tu negocio</p>
+      </div>
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-building"></i> B&uacute;squeda de Empresas</h3>
+        <p>Descubre empresas potenciales y oportunidades de negocio</p>
+      </div>
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-chart-line"></i> Analytics Avanzados</h3>
+        <p>Obt&eacute;n insights valiosos sobre tus leads y b&uacute;squedas</p>
+      </div>
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-shield-halved"></i> Datos Seguros</h3>
+        <p>Toda tu informaci&oacute;n est&aacute; protegida con los m&aacute;s altos est&aacute;ndares</p>
+      </div>
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-bolt"></i> B&uacute;squeda R&aacute;pida</h3>
+        <p>Resultados instant&aacute;neos con nuestra tecnolog&iacute;a optimizada</p>
+      </div>
+      <div class="feature-card">
+        <h3><i class="fa-solid fa-filter"></i> Filtros Avanzados</h3>
+        <p>Refina tus b&uacute;squedas con criterios espec&iacute;ficos y precisos</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>¿Listo para comenzar?</h2>
+  <p>&uacute;nete a miles de profesionales que ya est&aacute;n encontrando los mejores leads</p>
+  <a class="btn btn-secondary" routerLink="/login">Iniciar Sesi&oacute;n</a>
+</section>
+
+<footer class="footer">
+  <div class="container footer-columns">
+    <div class="footer-col">
+      <h3><i class="fa-solid fa-magnifying-glass"></i> LeadsGPT</h3>
+      <p>La plataforma l&iacute;der para la b&uacute;squeda inteligente de leads y oportunidades de negocio.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Producto</h4>
+      <ul>
+        <li><a href="#">Caracter&iacute;sticas</a></li>
+        <li><a href="#">Precios</a></li>
+        <li><a href="#">API</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Soporte</h4>
+      <ul>
+        <li><a href="#">Ayuda</a></li>
+        <li><a href="#">Contacto</a></li>
+        <li><a href="#">Estado</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="copyright">&copy; 2025 LeadsGPT. Todos los derechos reservados.</p>
+</footer>

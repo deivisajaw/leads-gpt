@@ -1,0 +1,163 @@
+<div class="ac-modal-overlay" *ngIf="visible" (click)="close()">
+  <div class="ac-modal" (click)="$event.stopPropagation()">
+
+    <div class="ac-modal-head">
+      <h2>{{ (editingRecord ? "ABANDONED_CHECKOUTS.EDIT_TITLE" : "ABANDONED_CHECKOUTS.NEW_TITLE") | translate }}</h2>
+      <button class="ac-modal-close" (click)="close()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="ac-modal-body">
+
+      <!-- Datos de Shopify -->
+      <div class="ac-section">
+        <h3>{{ "ABANDONED_CHECKOUTS.SECTION_SHOPIFY" | translate }}</h3>
+
+        <div class="ac-field">
+          <label>{{ "ABANDONED_CHECKOUTS.SHOP_NAME" | translate }} *</label>
+          <input type="text" [(ngModel)]="shopifyShopName" placeholder="mi-tienda.myshopify.com"
+            [class.ac-invalid]="showValidationErrors && !shopifyShopName" />
+        </div>
+
+        <div class="ac-field-row">
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.CLIENT_ID" | translate }}</label>
+            <input type="text" [(ngModel)]="shopifyClientId" />
+          </div>
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.CLIENT_SECRET" | translate }}</label>
+            <input type="password" [(ngModel)]="shopifyClientSecret"
+              [placeholder]="(editingRecord ? 'ABANDONED_CHECKOUTS.CLIENT_SECRET_KEEP' : '') | translate" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Agente -->
+      <div class="ac-section">
+        <h3>{{ "ABANDONED_CHECKOUTS.SECTION_AGENT" | translate }}</h3>
+        <div class="ac-field">
+          <label>{{ "ABANDONED_CHECKOUTS.AGENT" | translate }} *</label>
+          <select [(ngModel)]="selectedAgentId" [class.ac-invalid]="showValidationErrors && !selectedAgentId">
+            <option [ngValue]="null">{{ "ABANDONED_CHECKOUTS.AGENT_PLACEHOLDER" | translate }}</option>
+            <option *ngFor="let agent of availableAgents" [ngValue]="agent.id">{{ agent.name }}</option>
+          </select>
+          <span class="ac-hint" *ngIf="availableAgents.length === 0">{{ "ABANDONED_CHECKOUTS.NO_AGENTS" | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Horario -->
+      <div class="ac-section">
+        <h3>{{ "ABANDONED_CHECKOUTS.SECTION_SCHEDULE" | translate }}</h3>
+
+        <div class="ac-field-row">
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.START_DATE" | translate }} *</label>
+            <input type="date" [(ngModel)]="startDate" [class.ac-invalid]="showValidationErrors && !startDate" />
+          </div>
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.TIMEZONE" | translate }} *</label>
+            <select [(ngModel)]="timezone">
+              <option *ngFor="let tz of availableTimezones" [value]="tz.value">{{ tz.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ac-field-row">
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT1_START" | translate }} *</label>
+            <select [(ngModel)]="startTime">
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT1_END" | translate }} *</label>
+            <select [(ngModel)]="endTime">
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ac-field-row">
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT2_START" | translate }}</label>
+            <select [(ngModel)]="startTime2">
+              <option [ngValue]="null">-</option>
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT2_END" | translate }}</label>
+            <select [(ngModel)]="endTime2">
+              <option [ngValue]="null">-</option>
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ac-field-row">
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT3_START" | translate }}</label>
+            <select [(ngModel)]="startTime3">
+              <option [ngValue]="null">-</option>
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="ac-field">
+            <label>{{ "ABANDONED_CHECKOUTS.SHIFT3_END" | translate }}</label>
+            <select [(ngModel)]="endTime3">
+              <option [ngValue]="null">-</option>
+              <option *ngFor="let t of timeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ac-field">
+          <label>{{ "ABANDONED_CHECKOUTS.DAYS_OF_WEEK" | translate }} *</label>
+          <div class="ac-days-row" [class.ac-invalid-days]="showValidationErrors && !isAnyDaySelected()">
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.monday" /> {{ "ABANDONED_CHECKOUTS.DAY_MON" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.tuesday" /> {{ "ABANDONED_CHECKOUTS.DAY_TUE" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.wednesday" /> {{ "ABANDONED_CHECKOUTS.DAY_WED" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.thursday" /> {{ "ABANDONED_CHECKOUTS.DAY_THU" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.friday" /> {{ "ABANDONED_CHECKOUTS.DAY_FRI" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.saturday" /> {{ "ABANDONED_CHECKOUTS.DAY_SAT" | translate }}</label>
+            <label class="ac-day-chip"><input type="checkbox" [(ngModel)]="weekDays.sunday" /> {{ "ABANDONED_CHECKOUTS.DAY_SUN" | translate }}</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje IA -->
+      <div class="ac-section">
+        <h3>{{ "ABANDONED_CHECKOUTS.SECTION_MESSAGE" | translate }}</h3>
+        <div class="ac-field">
+          <label>{{ "ABANDONED_CHECKOUTS.MESSAGE_PROMPT" | translate }}</label>
+          <textarea rows="4" [(ngModel)]="messageGeneratorPrompt" [placeholder]="'ABANDONED_CHECKOUTS.MESSAGE_PROMPT_PLACEHOLDER' | translate"></textarea>
+        </div>
+        <label class="ac-checkbox-row">
+          <input type="checkbox" [(ngModel)]="skipPromptGeneration" />
+          {{ "ABANDONED_CHECKOUTS.SKIP_PROMPT_GENERATION" | translate }}
+        </label>
+      </div>
+
+      <!-- Estado (solo al editar) -->
+      <div class="ac-section" *ngIf="editingRecord">
+        <h3>{{ "ABANDONED_CHECKOUTS.SECTION_STATUS" | translate }}</h3>
+        <div class="ac-field">
+          <select [(ngModel)]="status">
+            <option value="PLANNED">{{ "ABANDONED_CHECKOUTS.STATUS_PLANNED" | translate }}</option>
+            <option value="IN_PROGRESS">{{ "ABANDONED_CHECKOUTS.STATUS_IN_PROGRESS" | translate }}</option>
+            <option value="STOPED">{{ "ABANDONED_CHECKOUTS.STATUS_STOPPED" | translate }}</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ac-modal-foot">
+      <button class="ac-btn-secondary" (click)="close()">{{ "ABANDONED_CHECKOUTS.CANCEL" | translate }}</button>
+      <button class="ac-btn-primary" (click)="save()" [disabled]="workflowStatus.inProgress">
+        <span *ngIf="!workflowStatus.inProgress">{{ "ABANDONED_CHECKOUTS.SAVE" | translate }}</span>
+        <span *ngIf="workflowStatus.inProgress">{{ workflowStatus.message }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>

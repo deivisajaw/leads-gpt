@@ -1,0 +1,16 @@
+{
+  "/ajawmrp3": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/chatwoot-api": {
+    "target": "https://chat.ajaw.ai",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/chatwoot-api": ""
+    },
+    "secure": true
+  }
+}

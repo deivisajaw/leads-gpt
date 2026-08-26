@@ -1,0 +1,226 @@
+/* Basic modal overlay and content styling, similar to other modals */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.custom-modal-content {
+  background-color: var(--background-white);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 1000px; /* Increased max-width for better table display */
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.modal-body {
+  flex-grow: 1;
+  margin-bottom: 15px;
+  color: var(--text-secondary);
+  display: flex; /* Added for layout of inner content */
+  flex-direction: column; /* Added for layout of inner content */
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+  border: 1px solid var(--primary-blue);
+}
+
+.btn-primary:hover {
+  background-color: blue;
+  border-color: blue;
+}
+
+.btn-secondary {
+  background-color: var(--background-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--text-secondary);
+}
+
+/* Styles for the table container */
+.table-container {
+  overflow-x: auto; /* Allows horizontal scrolling */
+  margin-top: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  flex-grow: 1; /* Allows it to take available space */
+  display: flex; /* To make table fill container */
+  flex-direction: column; /* To make table fill container */
+}
+
+.codes-table {
+  width: 100%;
+  border-collapse: collapse;
+  /* min-width: 900px; ELIMINADO */
+}
+
+.codes-table th,
+.codes-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  /* white-space: nowrap; ELIMINADO */
+}
+
+/* Column Widths */
+.codes-table th:nth-child(1),
+.codes-table td:nth-child(1) { /* Code */
+  width: 150px;
+}
+
+.codes-table th:nth-child(2),
+.codes-table td:nth-child(2) { /* Email */
+  width: 250px;
+}
+
+.codes-table th:nth-child(3),
+.codes-table td:nth-child(3) { /* Status */
+  width: 100px;
+}
+
+.codes-table th:nth-child(4),
+.codes-table td:nth-child(4) { /* Expires At */
+  width: 180px;
+}
+
+.codes-table th:nth-child(5),
+.codes-table td:nth-child(5) { /* Used By */
+  width: 150px;
+}
+
+.codes-table th:nth-child(6),
+.codes-table td:nth-child(6) { /* Used At */
+  width: 180px;
+}
+
+.codes-table tbody {
+  display: block; 
+  max-height: 300px; 
+}
+
+.codes-table thead, .codes-table tbody tr {
+  display: table; /* Ensures proper table layout with tbody scrolling */
+  width: 100%;
+  table-layout: fixed; /* Ensures columns align */
+}
+
+/* Status Badge Styles */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background-color: #ffc107; /* Yellow/Orange */
+  color: #343a40; /* Dark text for contrast */
+}
+
+.status-used {
+  background-color: #28a745; /* Green */
+}
+
+.status-expired {
+  background-color: #dc3545; /* Red */
+}
+
+.status-unknown {
+  background-color: #6c757d; /* Gray */
+}
+
+.code-badge {
+  background-color: var(--primary-blue-light);
+  color: var(--primary-blue);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.no-codes-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.loading-indicator,
+.alert-danger {
+  text-align: center;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+}
+
+.loading-indicator {
+  background-color: #e0f7fa; /* Light blue */
+  color: #00796b; /* Darker blue */
+}
+
+.alert-danger {
+  background-color: #f8d7da; /* Light red */
+  color: #721c24; /* Dark red */
+  border: 1px solid #f5c6cb;
+}

@@ -1,0 +1,221 @@
+<div class="campaign-view-page">
+  <div class="page-container">
+    <!-- Header -->
+    <div class="header">
+      <button class="btn-primary" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver a Campa&ntilde;as
+      </button>
+    </div>
+
+    <!-- Loading and Error States -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando detalles de la campa&ntilde;a...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Campaign Details -->
+    <div *ngIf="campaign && !isLoading">
+      <!-- Hero Card -->
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-main-content">
+            <div class="hero-header">
+              <div class="hero-header-left">
+                <div class="hero-icon-wrapper">
+                  <i class="fas fa-bullhorn hero-icon"></i>
+                </div>
+                <h1 class="hero-title">{{ campaign.name }}</h1>
+              </div>
+              <span 
+                class="hero-badge" 
+                *ngIf="campaign"
+                [ngClass]="{
+                  'status-active': campaign.processed,
+                  'status-inactive': !campaign.processed
+                }"
+              >
+                <span class="badge-dot"></span>
+                <span *ngIf="campaign.processed">Campa&ntilde;a Procesada</span>
+                <span *ngIf="!campaign.processed">Procesamiento Pendiente</span>
+              </span>
+            </div>
+            <div class="hero-tags">
+              <div class="tag">
+                <i [class]="getCampaignTypeIcon(campaign.campaignType)"></i>
+                <span>{{ campaign.campaignType }}</span>
+              </div>
+              <div class="tag">
+                <i class="fas fa-calendar-alt"></i>
+                <span>{{ getCampaignStatusText(campaign.status) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 1 (General Info & Leads Stats) -->
+      <div class="info-grid two-columns">
+        <!-- General Info Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon-wrapper bg-indigo-light">
+                <i class="fas fa-info-circle text-indigo"></i>
+              </div>
+              <h3 class="card-title">Informaci&oacute;n General</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Nombre de Campa&ntilde;a</label>
+              <p class="info-value-box"><i class="fas fa-tag"></i> {{ campaign.name }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Tipo de Campa&ntilde;a</label>
+              <p class="info-value-box">
+                <i [class]="getCampaignTypeIcon(campaign.campaignType)"></i>
+                {{ campaign.campaignType }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Agente Asociado</label>
+              <p class="info-value-box"><i class="fas fa-robot"></i> {{ campaign.agentName || 'N/A' }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Estado</label>
+              <p class="info-value-box"><i class="fas fa-info-circle"></i> {{ getCampaignStatusText(campaign.status) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leads Statistics Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon-wrapper bg-emerald-light">
+                <i class="fas fa-users text-emerald"></i>
+              </div>
+              <h3 class="card-title">Estad&iacute;sticas de Leads</h3>
+            </div>
+            <button *ngIf="campaign.campaignType === 'VOICE'" class="btn-view-recordings" [routerLink]="['/campaigns', campaign.id, 'recordings']">
+              <i class="fas fa-phone-volume"></i> Ver Grabaciones
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Leads Registrados</label>
+              <p class="info-value-box large-text">{{ campaign.registeredLeadsCount }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Leads Conectados</label>
+              <p class="info-value-box large-text">{{ campaign.connectedLeadsCount }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Meetings Programados</label>
+              <p class="info-value-box large-text">{{ campaign.scheduledMeetingsCount }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 2 (Schedule Info) -->
+      <div class="info-grid one-column">
+        <!-- Schedule Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon-wrapper bg-blue-light">
+                <i class="fas fa-clock text-blue"></i>
+              </div>
+              <h3 class="card-title">Programaci&oacute;n</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="info-grid two-columns">
+              <div class="info-item">
+                <label class="info-label">Fecha de Inicio</label>
+                <p class="info-value-box">{{ campaign.startDate | date:'longDate' }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label">Fecha de Fin</label>
+                <p class="info-value-box">{{ campaign.endDate | date:'longDate' }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label">Rango Horario 1</label>
+                <p class="info-value-box">{{ campaign.startTime || 'N/A' }} - {{ campaign.endTime || 'N/A' }}</p>
+              </div>
+              <ng-container *ngIf="campaign.startTime2">
+                <div class="info-item">
+                  <label class="info-label">Rango Horario 2</label>
+                  <p class="info-value-box">{{ campaign.startTime2 }} - {{ campaign.endTime2 }}</p>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="campaign.startTime3">
+                <div class="info-item">
+                  <label class="info-label">Rango Horario 3</label>
+                  <p class="info-value-box">{{ campaign.startTime3 }} - {{ campaign.endTime3 }}</p>
+                </div>
+              </ng-container>
+              <div class="info-item">
+                <label class="info-label">Intervalo (minutos)</label>
+                <p class="info-value-box">{{ campaign.period || 'N/A' }}</p>
+              </div>
+              <div class="info-item" style="grid-column: 1 / -1;">
+                <label class="info-label">Zona Horaria</label>
+                <p class="info-value-box">{{ campaign.timezone || 'N/A' }}</p>
+              </div>
+              <div class="info-item" style="grid-column: 1 / -1;">
+                <label class="info-label">D&iacute;as de la Semana</label>
+                <p class="info-value-box">{{ getDaysOfWeekDisplay(campaign.daysOfWeek) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 3 (Associated Leads) -->
+      <div class="info-grid one-column">
+        <!-- Associated Leads Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon-wrapper bg-purple-light">
+                <i class="fas fa-address-book text-purple"></i>
+              </div>
+              <h3 class="card-title">Leads Asociados ({{ getLeadsCount(campaign.leads) }})</h3>
+            </div>
+            <div class="leads-summary-actions">
+              <!-- Aquí irá el resumen de datos y acciones -->
+              <span class="leads-count-badge">Total: {{ getLeadsCount(campaign.leads) }}</span>
+              <span class="leads-contacted-badge">Contactados: {{ getContactedLeadsCount(campaign.leads) }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div *ngIf="getLeadsCount(campaign.leads) === 0" class="info-value-box small-text">
+              No hay leads asociados a esta campa&ntilde;a.
+            </div>
+            <div *ngIf="getLeadsCount(campaign.leads) > 0" class="leads-list-scroll-area">
+              <div *ngFor="let lead of campaign.leads" class="lead-item-display">
+                <div class="lead-icon">
+                  <i [ngClass]="{'fas fa-user': lead.type === 'people', 'fas fa-building': lead.type === 'company', 'fas fa-file-csv': lead.type === 'csv'}"></i>
+                </div>
+                <div class="lead-details-display">
+                  <p class="lead-name-display">{{ lead.name }}</p>
+                  <p class="lead-contact-display">{{ lead.email || lead.phone }}</p>
+                </div>
+                <div class="lead-status-indicator">
+                  <span *ngIf="lead.contacted" class="status-circle status-green" title="Contactado"></span>
+                  <span *ngIf="!lead.contacted" class="status-circle status-red" title="No Contactado"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

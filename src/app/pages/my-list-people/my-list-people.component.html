@@ -1,0 +1,448 @@
+<div class="page-container screenin">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "MY_LIST_PEOPLE.TITLE" | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <div class="my-list-page">
+    <!-- Header -->
+    <div class="my-list-header">
+      <div class="my-list-header-row-2">
+        <div class="controls-left">
+          <div class="dropdown-wrapper">
+            <div class="dropdown-control" (click)="toggleDropdown('view')">
+              <i class="fas fa-th-large"></i>
+              <span>{{ currentViewText }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" [class.show]="showViewDropdown">
+              <div
+                class="dropdown-item"
+                (click)="changeView('grid'); closeAllDropdowns()"
+              >
+                {{ "MY_LIST_PEOPLE.GRID_VIEW" | translate }}
+              </div>
+              <div
+                class="dropdown-item"
+                (click)="changeView('card'); closeAllDropdowns()"
+              >
+                {{ "MY_LIST_PEOPLE.GRID_VIEW" | translate }}
+              </div>
+            </div>
+          </div>
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              placeholder="{{
+                'MY_LIST_PEOPLE.SEARCH_PLACEHOLDER' | translate
+              }}"
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+            />
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <div class="dropdown-wrapper">
+            <button
+              class="btn-outline dropdown-btn"
+              (click)="toggleDropdown('export')"
+            >
+              {{ "MY_LIST_PEOPLE.EXPORT" | translate }}
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu" [class.show]="showExportDropdown">
+              <div
+                class="dropdown-item"
+                (click)="exportToCSV(); closeAllDropdowns()"
+              >
+                {{ "MY_LIST_PEOPLE.EXPORT_TO_CSV" | translate }}
+              </div>
+              <div
+                class="dropdown-item"
+                (click)="exportToExcel(); closeAllDropdowns()"
+              >
+                {{ "MY_LIST_PEOPLE.EXPORT_TO_EXCEL" | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="my-list-content">
+      <!-- Loading State -->
+      <div
+        *ngIf="isLoading"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 400px;
+          color: #64748b;
+        "
+      >
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5b4fe5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+          "
+        ></div>
+        <p>{{ "MY_LIST_PEOPLE.LOADING_PEOPLE" | translate }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="!isLoading && people.length === 0"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 400px;
+          color: #64748b;
+          text-align: center;
+        "
+      >
+        <div style="font-size: 48px; margin-bottom: 16px; color: #94a3b8">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 style="margin-bottom: 8px; color: #1e293b">
+          {{ "MY_LIST_PEOPLE.EMPTY_LIST_TITLE" | translate }}
+        </h3>
+        <p style="margin-bottom: 24px">
+          {{ "MY_LIST_PEOPLE.EMPTY_LIST_SUBTITLE" | translate }}
+        </p>
+        <button class="btn-primary" routerLink="/people">
+          <i class="fas fa-search"></i>
+          {{ "MY_LIST_PEOPLE.SEARCH_PEOPLE_BUTTON" | translate }}
+        </button>
+      </div>
+
+      <!-- Results Grid View -->
+      <div
+        *ngIf="
+          !isLoading && people.length > 0 && currentView === 'grid'
+        "
+        style="width: 100%"
+      >
+        <div
+          style="
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+          "
+        >
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr style="border-bottom: 1px solid #e2e8f0">
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "MY_LIST_PEOPLE.TABLE_NAME" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 150px;
+                  "
+                >
+                  {{ "MY_LIST_PEOPLE.TABLE_JOB_TITLE" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 120px;
+                  "
+                >
+                  {{ "MY_LIST_PEOPLE.TABLE_LOCATION" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 120px;
+                  "
+                >
+                  {{ "MY_LIST_PEOPLE.TABLE_SAVED_ON" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 120px;
+                  "
+                >
+                  {{ "MY_LIST_PEOPLE.TABLE_ACTIONS" | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let person of people; let i = index"
+                class="rowin"
+                [class.play]="rowsRevealed"
+                [style.animation-delay.ms]="i * 30"
+                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
+                style="border-bottom: 1px solid #e2e8f0; cursor: pointer"
+                (click)="viewPeopleDetails(person.id)"
+              >
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <img
+                      [src]="person.avatar"
+                      [alt]="person.name"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                    />
+                    <div>
+                      <div style="font-weight: 500; color: #1e293b">
+                        {{ person.name }}
+                      </div>
+                      <div
+                        *ngIf="person.email"
+                        style="font-size: 12px; color: #64748b"
+                      >
+                        {{ person.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {{ person.title }}
+                </td>
+                <td>
+                  {{ person.location }}
+                </td>
+                <td>
+                  {{ formatDate(person.savedOn) }}
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <div style="display: flex; gap: 8px">
+                    <button
+                      (click)="viewPeopleDetails(person.id)"
+                      style="
+                        background: none;
+                        border: 1px solid #e2e8f0;
+                        padding: 6px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        color: #64748b;
+                      "
+                      title="{{ 'MY_LIST_PEOPLE.VIEW_DETAILS' | translate }}"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Results Card View -->
+      <div
+        *ngIf="
+          !isLoading && people.length > 0 && currentView === 'card'
+        "
+        style="width: 100%"
+      >
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div
+            *ngFor="let person of people; let i = index"
+            class="rowin"
+            [class.play]="rowsRevealed"
+            [style.animation-delay.ms]="i * 30"
+            style="
+              background: white;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              padding: 20px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              cursor: pointer;
+            "
+            (click)="viewPeopleDetails(person.id)"
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+              "
+            >
+              <img
+                [src]="person.avatar"
+                [alt]="person.name"
+                style="
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                  object-fit: cover;
+                "
+              />
+              <div style="flex: 1">
+                <h3
+                  style="
+                    margin: 0 0 8px 0;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1e293b;
+                  "
+                >
+                  {{ person.name }}
+                </h3>
+                <p style="margin: 0 0 4px 0; color: #64748b; font-size: 14px">
+                  {{ person.title }}
+                </p>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <i
+                    class="fas fa-map-marker-alt"
+                    style="color: #64748b; width: 12px; font-size: 12px"
+                  ></i>
+                  <span style="color: #64748b; font-size: 12px">{{
+                    person.location
+                  }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px">
+                  <i
+                    class="fas fa-calendar"
+                    style="color: #64748b; width: 12px; font-size: 12px"
+                  ></i>
+                  <span style="color: #64748b; font-size: 12px"
+                    >{{ "MY_LIST_PEOPLE.ADDED" | translate }}
+                    {{ formatDate(person.savedOn) }}</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end">
+              <button
+                (click)="viewPeopleDetails(person.id); $event.stopPropagation()"
+                style="
+                  background: #5b4fe5;
+                  color: white;
+                  border: none;
+                  padding: 8px 16px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 12px;
+                  font-weight: 500;
+                "
+              >
+                {{ "MY_LIST_PEOPLE.VIEW_DETAILS" | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div
+        *ngIf="!isLoading && people.length > 0"
+        style="
+          padding: 16px 20px;
+          border-top: 1px solid #e2e8f0;
+          background: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 20px;
+          border-radius: 6px;
+        "
+      >
+        <div style="color: #64748b; font-size: 14px">
+          {{ getStartIndex() }} - {{ getEndIndex() }}
+          {{ "MY_LIST_PEOPLE.OF" | translate }} {{ totalResultsInServer }}
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button
+            (click)="goToPage(currentPage - 1)"
+            [disabled]="currentPage === 1"
+            [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'"
+            [style.color]="currentPage === 1 ? '#94a3b8' : '#64748b'"
+            style="
+              padding: 8px 12px;
+              border: 1px solid #e2e8f0;
+              background: white;
+              border-radius: 4px;
+            "
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span style="padding: 8px 12px; color: #64748b; font-size: 14px"
+            >{{ "MY_LIST_PEOPLE.PAGE" | translate }} {{ currentPage }}
+            {{ "MY_LIST_PEOPLE.OF" | translate }} {{ totalPages }}</span
+          >
+          <button
+            (click)="goToPage(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+            [style.cursor]="
+              currentPage === totalPages ? 'not-allowed' : 'pointer'
+            "
+            [style.color]="currentPage === totalPages ? '#94a3b8' : '#64748b'"
+            style="
+              padding: 8px 12px;
+              border: 1px solid #e2e8f0;
+              background: white;
+              border-radius: 4px;
+            "
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

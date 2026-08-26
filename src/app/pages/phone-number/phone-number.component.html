@@ -1,0 +1,80 @@
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ 'PHONE_NUMBERS.TITLE' | translate }}</h1>
+      <p>{{ 'PHONE_NUMBERS.SUBTITLE' | translate }}</p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <section class="phone-number-manager">
+    <div id="main-view" class="main-view">
+      <div class="header">
+        <h2>{{ '' | translate }}</h2>
+        <button
+          id="request-number-btn"
+          class="btn-primary"
+          (click)="showAcquireModal()"
+          [disabled]="!canRequestNewNumber()"
+          [title]="getNewNumberButtonTooltip()"
+        >
+          <i class="fas fa-plus"></i>
+          <span>{{ 'PHONE_NUMBERS.REQUEST_NEW_BUTTON' | translate }}</span>
+        </button>
+      </div>
+
+      <div
+        *ngIf="alertMessage"
+        class="alert"
+        [ngClass]="{
+          'alert-success': alertMessage.type === 'success',
+          'alert-error': alertMessage.type === 'error'
+        }"
+      >
+        <i
+          class="fas"
+          [ngClass]="{
+            'fa-circle-check': alertMessage.type === 'success',
+            'fa-circle-exclamation': alertMessage.type === 'error'
+          }"
+        ></i>
+        <span>{{ alertMessage.text }}</span>
+      </div>
+
+      <div class="phone-numbers-table">
+        <div class="table-responsive" *ngIf="phoneNumbers && phoneNumbers.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ 'PHONE_NUMBERS.TABLE_HEADER_NUMBER' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let number of phoneNumbers">
+                <td>
+                  <div class="phone-cell">
+                    <span class="phone-cell__icon"><i class="fas fa-phone"></i></span>
+                    <span class="phone-cell__number">{{ number.twilioPhone }}</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" *ngIf="!phoneNumbers || phoneNumbers.length === 0">
+          <div class="empty-state__icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <h3>{{ 'PHONE_NUMBERS.EMPTY_STATE_TITLE' | translate }}</h3>
+          <p>{{ 'PHONE_NUMBERS.EMPTY_STATE_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<app-acquire-phone-number-modal
+  [showModal]="isAcquireModalVisible"
+  (close)="hideAcquireModal()"
+  (acquireNumber)="handleAcquireCompletion($event)" />

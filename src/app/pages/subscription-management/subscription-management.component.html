@@ -1,0 +1,221 @@
+<div *ngIf="userProfile && userProfile.companyProfile && currentSubscription">
+  <div class="page-container">
+    <div class="header-section">
+      <div class="header-left">
+        <h1>{{ "SUB_MGMT.DASHBOARD_TITLE" | translate }}</h1>
+        <p>{{ "SUB_MGMT.DASHBOARD_SUBTITLE" | translate }}</p>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Card de Información de la Compañía -->
+      <div class="dashboard-card">
+        <h3>{{ "SUB_MGMT.COMPANY_INFO" | translate }}</h3>
+        <p>
+          <strong>{{ "SUB_MGMT.COMPANY_NAME" | translate }}:</strong>
+          {{ userProfile.companyProfile.companyName }}
+        </p>
+        <p class="mt-3">
+          <strong class="mr-2"
+            >{{ "SUB_MGMT.COMPANY_STATUS" | translate }}:</strong
+          >
+          <span
+            class="status"
+            [ngClass]="userProfile.companyProfile.companyStatus.toLowerCase()"
+            >{{ userProfile.companyProfile.companyStatus }}</span
+          >
+        </p>
+        <p>
+          <strong
+            >{{ "SUB_MGMT.CREDIT_DISTRIBUTION_MODE" | translate }}:</strong
+          >
+          {{ userProfile.companyProfile.creditDistributionMode }}
+        </p>
+        <p
+          *ngIf="userProfile.companyProfile.minCreditsGuaranteed !== undefined"
+        >
+          <strong>{{ "SUB_MGMT.MIN_CREDITS_GUARANTEED" | translate }}:</strong>
+          {{ userProfile.companyProfile.minCreditsGuaranteed | number }}
+        </p>
+        <button
+          *ngIf="isAdmin"
+          (click)="openEditCompanyInfoModal()"
+          class="btn-primary mt-3"
+        >
+          <i class="fas fa-edit"></i>
+          {{ "SUB_MGMT.EDIT_COMPANY_INFO_BTN" | translate }}
+        </button>
+        <button (click)="goToAdminUsers()" class="btn-primary mt-3">
+          <i class="fas fa-users"></i>
+          {{ "SUB_MGMT.MANAGE_USERS_BTN" | translate }}
+        </button>
+      </div>
+
+      <!-- Card del Plan Actual -->
+      <div class="dashboard-card">
+        <h3>{{ "SUB_MGMT.CURRENT_PLAN" | translate }}</h3>
+        <p class="plan-name">{{ currentSubscription.plan.name }}</p>
+        <p>
+          <strong class="mr-2">{{ "SUB_MGMT.STATUS" | translate }}:</strong> <span class="status" [ngClass]="currentSubscription.status.toLowerCase()"> {{ currentSubscription.status }}</span>
+        </p>
+        <p>
+          <strong>{{ "SUB_MGMT.START_DATE" | translate }}:</strong>
+          {{ currentSubscription.startDate | date : "longDate" }}
+        </p>
+        <p>
+          <strong>{{ "SUB_MGMT.EXPIRES_ON" | translate }}:</strong>
+          {{ currentSubscription.endDate | date : "longDate" }}
+        </p>
+        <p>
+          <strong>{{ "SUB_MGMT.CREDITS_GRANTED" | translate }}:</strong>
+          {{ currentSubscription.credits | number }}
+        </p>
+        <p>
+          <strong>{{ "SUB_MGMT.AMOUNT" | translate }}:</strong> ${{
+            currentSubscription.amount
+          }}
+        </p>
+        <p>
+          <strong>{{ "SUB_MGMT.BILLING_PERIOD" | translate }}:</strong>
+          {{ currentSubscription.billingPeriod }}
+        </p>
+        <button (click)="changePlan()" class="btn-primary mt-3">
+          <i class="fas fa-exchange-alt"></i>
+          {{ "SUB_MGMT.CHANGE_PLAN_BTN" | translate }}
+        </button>
+      </div>
+
+      <!-- Card de Créditos -->
+      <div class="dashboard-card">
+        <h3>{{ "SUB_MGMT.CREDITS" | translate }}</h3>
+        <p class="credit-balance">
+          {{ userProfile.companyProfile.companyCredits | number }}
+        </p>
+        <p class="credit-label">{{ "SUB_MGMT.COMPANY_CREDITS" | translate }}</p>
+        <button (click)="buyMoreCredits()" class="btn-primary">
+          <i class="fas fa-plus-circle"></i>
+          {{ "SUB_MGMT.BUY_CREDITS_BTN" | translate }}
+        </button>
+      </div>
+
+      <!-- Card de Acciones -->
+      <div class="dashboard-card">
+        <h3>{{ "SUB_MGMT.ACTIONS" | translate }}</h3>
+        <div class="actions-list">
+          <button
+            (click)="cancelSubscription()"
+            class="action-link bg-danger text-white"
+          >
+            <i class="fas fa-ban"></i> {{ "SUB_MGMT.CANCEL_LINK" | translate }}
+          </button>
+          <!-- Futuras acciones aquí -->
+        </div>
+      </div>
+    </div>
+
+    <app-edit-company-info-modal
+      *ngIf="showEditCompanyInfoModal"
+      [showModal]="showEditCompanyInfoModal"
+      [companyId]="userProfile.companyProfile.companyId"
+      [currentCompanyName]="userProfile.companyProfile.companyName"
+      [currentCreditDistributionMode]="
+        userProfile.companyProfile.creditDistributionMode
+      "
+      [currentMinCreditsGuaranteed]="
+        userProfile.companyProfile.minCreditsGuaranteed
+      "
+      (close)="onEditCompanyInfoModalClose()"
+      (save)="onEditCompanyInfoModalSave($event)"
+    >
+    </app-edit-company-info-modal>
+
+    <!-- Credit History Section -->
+    <div class="card mt-3 credit-history-section">
+      <h2>{{ 'SUB_MGMT.CREDIT_HISTORY_TITLE' | translate }}</h2>
+
+      <div *ngIf="isLoadingHistory" class="loading-banner">
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+
+      <div *ngIf="!isLoadingHistory && errorHistory" class="alert alert-danger">
+        {{ errorHistory }}
+      </div>
+
+      <div *ngIf="!isLoadingHistory && !errorHistory">
+        <!-- Active Subscription History Table -->
+        <div *ngIf="activeSubscriptionTransactions.length > 0" class="table-responsive">
+          <h3>{{ 'SUB_MGMT.ACTIVE_SUBSCRIPTION_HISTORY' | translate }}</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'SUB_MGMT.HISTORY_DATE' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_TYPE' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_USER' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_AMOUNT' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_REASON' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tx of pagedActiveHistory">
+                <td>{{ tx.transactionDate | date: 'short' }}</td>
+                <td>{{ 'SUB_MGMT.' + tx.transactionType | translate }}</td>
+                <td>{{ tx.affectedMember }}</td>
+                <td [class.positive]="tx.amount > 0" [class.negative]="tx.amount < 0">{{ tx.amount > 0 ? '+' : '' }}{{ tx.amount | number }}</td>
+                <td>{{ tx.reason }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Pagination Controls for Active Subscription -->
+          <div class="pagination-controls" *ngIf="totalPagesActive > 1">
+            <button class="btn btn-secondary" (click)="previousPage('active')" [disabled]="currentPageActive === 1">{{ 'COMMON.PREVIOUS' | translate }}</button>
+            <span>{{ 'COMMON.PAGE' | translate }} {{ currentPageActive }} {{ 'COMMON.OF' | translate }} {{ totalPagesActive }}</span>
+            <button class="btn btn-secondary" (click)="nextPage('active')" [disabled]="currentPageActive === totalPagesActive">{{ 'COMMON.NEXT' | translate }}</button>
+          </div>
+        </div>
+        <div *ngIf="activeSubscriptionTransactions.length === 0 && otherSubscriptionsTransactions.length === 0" class="alert alert-warning text-center">
+          <p>{{ 'SUB_MGMT.NO_HISTORY_FOUND' | translate }}</p>
+        </div>
+
+        <!-- Other Subscriptions History Table -->
+        <div *ngIf="otherSubscriptionsTransactions.length > 0" class="mt-3 table-responsive">
+          <h3>{{ 'SUB_MGMT.OTHER_SUBSCRIPTIONS_HISTORY' | translate }}</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'SUB_MGMT.HISTORY_DATE' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_TYPE' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_USER' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_AMOUNT' | translate }}</th>
+                <th>{{ 'SUB_MGMT.HISTORY_REASON' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tx of pagedOtherHistory">
+                <td>{{ tx.transactionDate | date: 'short' }}</td>
+                <td>{{ 'SUB_MGMT.' + tx.transactionType | translate }}</td>
+                <td>{{ tx.affectedMember }}</td>
+                <td [class.positive]="tx.amount > 0" [class.negative]="tx.amount < 0">{{ tx.amount > 0 ? '+' : '' }}{{ tx.amount | number }}</td>
+                <td>{{ tx.reason }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Pagination Controls for Other Subscriptions -->
+          <div class="pagination-controls" *ngIf="totalPagesOther > 1">
+            <button class="btn btn-secondary" (click)="previousPage('other')" [disabled]="currentPageOther === 1">{{ 'COMMON.PREVIOUS' | translate }}</button>
+            <span>{{ 'COMMON.PAGE' | translate }} {{ currentPageOther }} {{ 'COMMON.OF' | translate }} {{ totalPagesOther }}</span>
+            <button class="btn btn-secondary" (click)="nextPage('other')" [disabled]="currentPageOther === totalPagesOther">{{ 'COMMON.NEXT' | translate }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Credit History Section -->
+
+    <div
+      *ngIf="!userProfile || !userProfile.companyProfile"
+      class="loading-container"
+    >
+      <p>Loading company and subscription data...</p>
+    </div>
+  </div>
+</div>

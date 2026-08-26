@@ -1,0 +1,303 @@
+<div class="sidebar-header">
+  <div class="logo-container">
+    <img
+      src="/images/logo_round.png"
+      alt="Logo"
+      class="logo"
+    />
+    <span class="logo-text">{{ 'ASIDE.LOGO_TEXT' | translate }}</span> 
+  </div>
+  <button class="collapse-btn" id="collapseBtn" (click)="toggleSidebar()" [attr.data-tooltip]="'ASIDE.COLLAPSE_BUTTON_TOOLTIP' | translate">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+</div>
+
+<!-- Navegación principal -->
+<nav class="sidebar-nav">
+  <ul class="nav-list">
+    <!-- Home -->
+    <li
+      class="nav-item"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.data-tooltip]="'ASIDE.HOME_TOOLTIP' | translate"
+      data-page="home"
+    >
+      <a routerLink="/dashboard" class="nav-link">
+        <i class="fas fa-home"></i>
+        <span class="nav-text">{{ 'ASIDE.HOME' | translate }}</span>
+      </a>
+    </li>
+
+    <!-- Search Data Section -->
+    <li class="nav-section">
+      <span class="section-title">{{ 'ASIDE.SEARCH_DATA' | translate }}</span>
+    </li>
+
+    <li
+      class="nav-item"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.data-tooltip]="'ASIDE.PEOPLE_TOOLTIP' | translate"
+      data-page="people"
+      data-stepKey="FIND_LEADS-SAVE_LEAD"
+    >
+      <a routerLink="/people" class="nav-link">
+        <i class="fas fa-search"></i>
+        <span class="nav-text">{{ 'ASIDE.PEOPLE' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [attr.data-tooltip]="'ASIDE.COMPANIES_TOOLTIP' | translate"
+        data-page="companies">
+    
+        <a routerLink="/companies" class="nav-link">
+            <i class="fas fa-building"></i>
+            <span class="nav-text">{{ 'ASIDE.COMPANIES' | translate }}</span>
+        </a>
+    </li>
+
+    <!-- My Lists Section -->
+    <li class="nav-item has-submenu" #myListsSubmenu [attr.data-tooltip]="'ASIDE.LISTS_TOOLTIP' | translate" [class.active]="isSubmenuActive(['/my-list-people', '/my-list-company'])">
+      <a href="#" class="nav-link" (click)="toggleSubmenu($event, myListsSubmenu)">
+        <i class="fas fa-list"></i>
+        <span class="nav-text">{{ 'ASIDE.LISTS' | translate }}</span>
+        <i class="fas fa-chevron-right submenu-arrow"></i>
+      </a>
+      <ul class="submenu">
+        <li class="submenu-item" routerLinkActive="active">
+          <a routerLink="/my-list-people" class="submenu-link" data-page="my-list-people">
+            <i class="fas fa-users"></i>
+            <span>{{ 'ASIDE.MY_LIST_PEOPLE' | translate }}</span>
+          </a>
+        </li>
+        <li class="submenu-item" routerLinkActive="active">
+          <a routerLink="/my-list-company" class="submenu-link" data-page="my-list-company">
+            <i class="fas fa-building"></i>
+            <span>{{ 'ASIDE.MY_LIST_COMPANY' | translate }}</span>
+          </a>
+        </li>
+        <li class="submenu-item" routerLinkActive="active">
+          <a routerLink="/my-lists" class="submenu-link" data-page="my-lists">
+            <i class="fas fa-folder"></i>
+            <span>{{ 'ASIDE.MY_LISTS' | translate }}</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- My search history Section -->
+    <li class="nav-item has-submenu" #mySearchHistorySubmenu [attr.data-tooltip]="'ASIDE.MY_SEARCH_HISTORY_TOOLTIP' |
+      translate" [class.active]="isSubmenuActive(['/my-search-history-peoples', '/my-search-history-companies', '/my-history-search-people-details', '/my-history-search-company-details'])">
+      <a href="#" class="nav-link" (click)="toggleSubmenu($event, mySearchHistorySubmenu)">
+        <i class="fas fa-history"></i>
+        <span class="nav-text">{{ 'ASIDE.MY_SEARCH_HISTORY' | translate }}</span>
+        <i class="fas fa-chevron-right submenu-arrow"></i>
+      </a>
+      <ul class="submenu">
+        <li class="submenu-item" routerLinkActive="active">
+          <a routerLink="/my-search-history-peoples" class="submenu-link" data-page="my-search-history-peoples">
+            <i class="fas fa-users"></i>
+            <span>{{ 'ASIDE.MY_SEARCH_HISTORY_PEOPLES' | translate }}</span>
+          </a>
+        </li>
+        <li class="submenu-item" routerLinkActive="active">
+          <a routerLink="/my-search-history-companies" class="submenu-link" data-page="my-search-history-companies">
+            <i class="fas fa-building"></i>
+            <span>{{ 'ASIDE.MY_SEARCH_HISTORY_COMPANIES' | translate }}</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- Engage Section -->
+   
+    <li class="nav-section">
+      <span class="section-title">{{ 'ASIDE.MARKETING_AI' | translate }}</span>
+    </li>
+
+    <li class="nav-item"  routerLinkActive="active" [attr.data-tooltip]="'ASIDE.CAMPAIGNS_TOOLTIP' | translate" data-page="campaigns" data-stepKey="CREATE_CAMPAIGN">
+      <a routerLink="/campaigns" class="nav-link">
+        <i class="fas fa-paper-plane"></i>
+        <span class="nav-text">{{ 'ASIDE.CAMPAIGNS' | translate }}</span>
+      </a>
+    </li>
+
+    <!--
+    <li class="nav-item"  routerLinkActive="active" [attr.data-tooltip]="'ASIDE.CAMPAIGNS_EMAIL_TOOLTIP' | translate" data-page="emails">
+      <a routerLink="/emails" class="nav-link">
+        <i class="fas fa-envelope"></i>
+        <span class="nav-text">{{ 'ASIDE.EMAILS' | translate }}</span>
+      </a>
+    </li>
+    -->
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.MESSAGES_TOOLTIP' | translate" data-page="messages">
+      <a routerLink="/messages" class="nav-link">
+        <i class="fas fa-comment-alt"></i>
+        <span class="nav-text">{{ 'ASIDE.MESSAGES' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.CALLS_TOOLTIP' | translate" data-page="calls">
+      <a routerLink="/calls" class="nav-link">
+        <i class="fas fa-phone"></i>
+        <span class="nav-text">{{ 'ASIDE.CALLS' | translate }}</span>
+      </a>
+    </li>
+
+    <!--li class="nav-item"  routerLinkActive="active" [attr.data-tooltip]="'ASIDE.ANALYTICS' | translate" data-page="analytics">
+      <a routerLink="/analytics" class="nav-link">
+        <i class="fas fa-chart-line"></i>
+        <span class="nav-text">{{ 'ASIDE.ANALYTICS' | translate }}</span>
+      </a>
+    </li-->
+
+    <!-- AI Agents Section -->
+
+    <li class="nav-section">
+      <span class="section-title">{{ 'ASIDE.AGENTS_AI' | translate }}</span>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.PHONE_NUMBERS_TOOLTIP' | translate" data-page="phone-numbers" data-stepKey="REQUEST_PHONE_NUMBER">
+      <a routerLink="/phone-numbers" class="nav-link">
+        <i class="fas fa-phone"></i>
+        <span class="nav-text">{{ 'ASIDE.PHONE_NUMBERS' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item"  routerLinkActive="active"  [attr.data-tooltip]="'ASIDE.AGENTS_TOOLTIP' | translate" data-page="agents" data-stepKey="CREATE_AGENT">
+      <a routerLink="/agents" class="nav-link">
+        <i class="fas fa-robot"></i>
+        <span class="nav-text">{{ 'ASIDE.AGENTS' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.WORKFLOWS_TOOLTIP' | translate" data-page="workflows">
+      <a routerLink="/workflows" class="nav-link">
+        <i class="fas fa-diagram-project"></i>
+        <span class="nav-text">{{ 'ASIDE.WORKFLOWS' | translate }}</span>
+      </a>
+    </li>
+
+    <!-- Win Deals Section -->
+    <li class="nav-section">
+      <span class="section-title">{{ 'ASIDE.WIN_DEALS' | translate }}</span>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.MEETINGS_TOOLTIP' | translate" data-page="meetings">
+      <a routerLink="/meetings" class="nav-link">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">{{ 'ASIDE.MEETINGS' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.CONVERSATIONS_TOOLTIP' | translate" data-page="conversations">
+      <a routerLink="/conversations" class="nav-link">
+        <i class="fas fa-comments"></i>
+        <span class="nav-text">{{ 'ASIDE.CONVERSATIONS' | translate }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [attr.data-tooltip]="'ASIDE.DEALS_TOOLTIP' | translate" data-page="deals">
+      <a routerLink="/deals" class="nav-link">
+        <i class="fas fa-dollar-sign"></i>
+        <span class="nav-text">{{ 'ASIDE.DEALS' | translate }}</span>
+      </a>
+    </li>
+  
+  </ul>
+</nav>
+
+<!-- Footer del sidebar -->
+<div class="sidebar-footer">
+  <ul class="nav-list">
+    <!-- If is Free User -->
+
+    <li class="nav-item nav-item-upgrade px-3 py-2" *ngIf="authService.hasFreeSubscription">
+        <a routerLink="/plans" class="btn btn-primary-gradient w-100">
+            <i class="fas fa-rocket"></i>
+            {{ 'ASIDE.UPGRADE_PLAN' | translate }}
+        </a>
+    </li>
+
+    <li class="nav-item" 
+        routerLinkActive="active" 
+        [routerLinkActiveOptions]="{ exact: true }" [attr.data-tooltip]="'ASIDE.PLANS_TOOLTIP' | translate"
+        *ngIf="authService.hasNoSubscription || authService.hasFreeSubscription">
+        <a routerLink="/plans" class="nav-link">
+          <i class="fas fa-box"></i>
+          <span class="nav-text">{{ 'ASIDE.PLANS' | translate }}</span>
+        </a>
+    </li>
+
+    <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" *ngIf="authService.hasNoSubscription || authService.hasFreeSubscription" [attr.data-tooltip]="'ASIDE.REDEEM_CODE_TOOLTIP' |
+      translate" data-page="redeem-code">
+        <a routerLink="/redeem-code" class="nav-link">
+          <i class="fas fa-ticket-alt"></i>
+          <span class="nav-text">{{ 'ASIDE.REDEEM_CODE' | translate }}</span>
+        </a>
+    </li>
+
+    <!-- If has Paid Plan -->
+    <ng-container *ngIf="authService.hasAnySubscription">
+      <li class="nav-item has-submenu" #subscriptionSettingsSubmenu [attr.data-tooltip]="'ASIDE.SUBSCRIPTION_SETTINGS_TOOLTIP' | translate" [class.active]="isSubmenuActive(['/admin-users', '/payment-history', '/plans-list', '/my-plan', '/subscription-management'])" data-stepKey="OPEN_SUBSCRIPTION_SETTINGS">
+        <a href="#" class="nav-link" (click)="toggleSubmenu($event, subscriptionSettingsSubmenu)">
+          <i class="fas fa-cog"></i>
+          <span class="nav-text">{{ 'ASIDE.SUBSCRIPTION_SETTINGS' | translate }}</span>
+          <i class="fas fa-chevron-right submenu-arrow"></i>
+        </a>
+        <ul class="submenu">
+          <li class="submenu-item" routerLinkActive="active" *ngIf="authService.isAdmin">
+            <a routerLink="/subscription-management" class="submenu-link" data-page="subscription-management">
+              <i class="fas fa-cogs"></i>
+              <span>{{ 'ASIDE.SUBSCRIPTION' | translate }}</span>
+            </a>
+          </li>
+          <li class="submenu-item" routerLinkActive="active" *ngIf="authService.isAdmin" data-stepKey="ASSIGN_CREDITS">
+            <a routerLink="/admin-users" class="submenu-link" data-page="admin-users">
+              <i class="fas fa-users-cog"></i>
+              <span>{{ 'ASIDE.USERS' | translate }}</span>
+            </a>
+          </li>
+          <li class="submenu-item" routerLinkActive="active" *ngIf="authService.isAdmin">
+            <a routerLink="/payment-history" class="submenu-link" data-page="payment-history">
+              <i class="fas fa-history"></i>
+              <span>{{ 'ASIDE.PAYMENT_HISTORY' | translate }}</span>
+            </a>
+          </li>
+          <li class="submenu-item" routerLinkActive="active"
+           *ngIf="authService.hasAnySubscription">
+            <a routerLink="/my-plan" class="submenu-link" data-page="my-plan">
+              <i class="fas fa-user-check"></i>
+              <span>{{ 'ASIDE.MY_PLAN' | translate }}</span>
+            </a>
+          </li>
+          <li class="submenu-item" routerLinkActive="active" 
+          *ngIf="authService.hasPaidSubscription">
+            <a routerLink="/plans-list" class="submenu-link" data-page="plans-list">
+              <i class="fas fa-boxes"></i>
+              <span>{{ 'ASIDE.PLANS' | translate }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ng-container>
+
+    <li class="nav-item" [attr.data-tooltip]="'ASIDE.USER_PROFILE_TOOLTIP' | translate"data-stepKey="CONFIGURE_PROFILE">
+      <a routerLink="/userconfig" class="nav-link">
+        <i class="fas fa-user-circle"></i>
+        <span class="nav-text">{{ username }}</span>
+      </a>
+    </li>
+
+    <li class="nav-item" [attr.data-tooltip]="'ASIDE.LOGOUT_TOOLTIP' | translate">
+      <a href="#" class="nav-link" (click)="logout($event)">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-text">{{ 'ASIDE.LOGOUT' | translate }}</span>
+      </a>
+    </li>
+  </ul>
+</div>

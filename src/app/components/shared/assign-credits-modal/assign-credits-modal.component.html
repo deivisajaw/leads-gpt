@@ -1,0 +1,25 @@
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="onClose()">
+  <div class="custom-modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ titleKey | translate }}</h2>
+      <button class="close-button" (click)="onClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="member">{{ messageKey | translate:{memberName: member.fullName || member.email} }}</p>
+      <p *ngIf="memberCount > 0">{{ messageKey | translate:{count: memberCount} }}</p>
+
+      <div class="form-group">
+        <label for="creditsToAssign">{{ 'SUB_MGMT.ASSIGN_CREDITS_MODAL_INPUT_LABEL' | translate }}</label>
+        <input type="number" id="creditsToAssign" [(ngModel)]="creditsToAssign" class="form-control" min="0">
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">{{ 'SUB_MGMT.ASSIGN_CREDITS_MODAL_CANCEL' | translate }}</button>
+      <button class="btn btn-primary" (click)="onAssign()" [disabled]="creditsToAssign <= 0 || isLoading">{{ 'SUB_MGMT.ASSIGN_CREDITS_MODAL_ASSIGN_BTN' | translate }}</button>
+    </div>
+  </div>
+</div>

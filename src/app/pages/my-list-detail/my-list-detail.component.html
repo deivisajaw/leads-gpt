@@ -1,0 +1,179 @@
+<div class="lld-list-detail-shell lld-screenin">
+
+  <!-- ═══════════ TOP BAR: volver + nombre + agregar elementos, todo en una fila ═══════════ -->
+  <div class="lld-dtopbar">
+    <button class="lld-dback" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="lld-dtitle-wrap">
+      <h1 class="lld-dtitle">{{ listName }}</h1>
+      <p class="lld-dsub" *ngIf="listDescription">{{ listDescription }}</p>
+    </div>
+    <button class="lld-btn-primary" (click)="openPicker()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      {{ "LIST_DETAIL.ADD_ITEMS" | translate }}
+    </button>
+  </div>
+
+  <!-- ═══════════ TABS + BUSCADOR ═══════════ -->
+  <div class="lld-dtoolbar">
+    <button class="lld-tab-btn" [class.lld-active]="activeTab === 'companies'" (click)="switchTab('companies')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>
+      {{ "LIST_DETAIL.COMPANIES_TAB" | translate }}
+      <span class="lld-tab-count">{{ companiesCount }}</span>
+    </button>
+    <button class="lld-tab-btn" [class.lld-active]="activeTab === 'people'" (click)="switchTab('people')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ "LIST_DETAIL.PEOPLE_TAB" | translate }}
+      <span class="lld-tab-count">{{ peopleCount }}</span>
+    </button>
+
+    <div class="lld-dsearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" placeholder="{{ 'LIST_DETAIL.SEARCH_PLACEHOLDER' | translate }}" />
+    </div>
+  </div>
+
+  <!-- ═══════════ CONTENIDO ═══════════ -->
+  <div class="lld-dcontent">
+
+    <div *ngIf="isLoading" class="lld-loading-state">
+      <div class="lld-spinner"></div>
+      <p>{{ "LIST_DETAIL.LOADING" | translate }}</p>
+    </div>
+
+    <div *ngIf="!isLoading && activeTab === 'companies' && companies.length === 0" class="lld-empty-state">
+      <div class="lld-empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>
+      </div>
+      <h3>{{ "LIST_DETAIL.EMPTY_COMPANIES_TITLE" | translate }}</h3>
+      <p>{{ "LIST_DETAIL.EMPTY_SUBTITLE" | translate }}</p>
+      <button class="lld-btn-primary" (click)="openPicker()">{{ "LIST_DETAIL.ADD_ITEMS" | translate }}</button>
+    </div>
+    <div *ngIf="!isLoading && activeTab === 'people' && people.length === 0" class="lld-empty-state">
+      <div class="lld-empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+      </div>
+      <h3>{{ "LIST_DETAIL.EMPTY_PEOPLE_TITLE" | translate }}</h3>
+      <p>{{ "LIST_DETAIL.EMPTY_SUBTITLE" | translate }}</p>
+      <button class="lld-btn-primary" (click)="openPicker()">{{ "LIST_DETAIL.ADD_ITEMS" | translate }}</button>
+    </div>
+
+    <!-- Tabla empresas -->
+    <div class="lld-res-card" *ngIf="!isLoading && activeTab === 'companies' && companies.length > 0">
+      <div class="lld-tablewrap">
+        <table class="lld-tbl">
+          <thead>
+            <tr>
+              <th>{{ "LIST_DETAIL.TABLE_NAME" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_CATEGORY" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_CITY" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_SAVED_ON" | translate }}</th>
+              <th style="width:70px">{{ "LIST_DETAIL.TABLE_ACTIONS" | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of companies; let i = index" class="lld-rowin" [class.lld-play]="rowsRevealed" [style.animation-delay.ms]="i * 30" (click)="viewCompanyDetails(c.id)">
+              <td>
+                <div class="lld-who">
+                  <span class="lld-clogo">{{ (c.title || '?').charAt(0) }}</span>
+                  <span class="lld-nm">{{ c.title }}</span>
+                </div>
+              </td>
+              <td><span class="lld-cargo">{{ c.categoryName }}</span></td>
+              <td><span class="lld-cargo">{{ c.city }}</span></td>
+              <td><span class="lld-cargo">{{ formatDate(c.savedOn) }}</span></td>
+              <td (click)="$event.stopPropagation()">
+                <button class="lld-row-action" title="{{ 'LIST_DETAIL.REMOVE_FROM_LIST' | translate }}" (click)="removeFromList(c)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla personas -->
+    <div class="lld-res-card" *ngIf="!isLoading && activeTab === 'people' && people.length > 0">
+      <div class="lld-tablewrap">
+        <table class="lld-tbl">
+          <thead>
+            <tr>
+              <th>{{ "LIST_DETAIL.TABLE_NAME" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_JOB_TITLE" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_LOCATION" | translate }}</th>
+              <th>{{ "LIST_DETAIL.TABLE_SAVED_ON" | translate }}</th>
+              <th style="width:70px">{{ "LIST_DETAIL.TABLE_ACTIONS" | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of people; let i = index" class="lld-rowin" [class.lld-play]="rowsRevealed" [style.animation-delay.ms]="i * 30" (click)="viewPeopleDetails(p.id)">
+              <td>
+                <div class="lld-who">
+                  <span class="lld-clogo">{{ (p.name || '?').charAt(0) }}</span>
+                  <span class="lld-nm">{{ p.name }}</span>
+                </div>
+              </td>
+              <td><span class="lld-cargo">{{ p.title }}</span></td>
+              <td><span class="lld-cargo">{{ p.location }}</span></td>
+              <td><span class="lld-cargo">{{ formatDate(p.savedOn) }}</span></td>
+              <td (click)="$event.stopPropagation()">
+                <button class="lld-row-action" title="{{ 'LIST_DETAIL.REMOVE_FROM_LIST' | translate }}" (click)="removeFromList(p)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="lld-pager" *ngIf="!isLoading && totalResultsInServer > itemsPerPage">
+      <button class="lld-pg" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <span>{{ currentPage }} / {{ totalPages }}</span>
+      <button class="lld-pg" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal picker: agregar elementos ya guardados a esta lista -->
+<div class="lld-modal-overlay" *ngIf="showPickerModal" (click)="closePicker()">
+  <div class="lld-picker-card" (click)="$event.stopPropagation()">
+    <h3 class="lld-picker-title">
+      {{ activeTab === 'companies' ? ("LIST_DETAIL.PICKER_TITLE_COMPANIES" | translate) : ("LIST_DETAIL.PICKER_TITLE_PEOPLE" | translate) }}
+    </h3>
+    <p class="lld-picker-subtitle">{{ "LIST_DETAIL.PICKER_SUBTITLE" | translate }}</p>
+
+    <div class="lld-picker-body">
+      <div *ngIf="isLoadingPicker" class="lld-picker-loading">
+        <div class="lld-spinner lld-sm"></div>
+      </div>
+
+      <div *ngIf="!isLoadingPicker && pickerItems.length === 0" class="lld-picker-empty">
+        {{ "LIST_DETAIL.PICKER_EMPTY" | translate }}
+      </div>
+
+      <label class="lld-picker-item" *ngFor="let item of pickerItems">
+        <input type="checkbox" [checked]="pickerSelectedIds.has(item.id)" (change)="togglePickerItem(item.id)" />
+        <span class="lld-picker-item-name">{{ activeTab === 'companies' ? item.title : item.name }}</span>
+        <span class="lld-picker-item-sub">{{ activeTab === 'companies' ? item.city : item.location }}</span>
+      </label>
+    </div>
+
+    <div class="lld-modal-actions">
+      <button class="lld-modal-btn-cancel" (click)="closePicker()" [disabled]="isAddingFromPicker">
+        {{ "LIST_DETAIL.CANCEL" | translate }}
+      </button>
+      <button class="lld-modal-btn-confirm" (click)="confirmPicker()" [disabled]="isAddingFromPicker || pickerSelectedIds.size === 0">
+        <span *ngIf="isAddingFromPicker" class="lld-btn-spinner"></span>
+        <span *ngIf="!isAddingFromPicker">{{ "LIST_DETAIL.ADD_SELECTED" | translate }} ({{ pickerSelectedIds.size }})</span>
+      </button>
+    </div>
+  </div>
+</div>

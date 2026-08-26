@@ -1,0 +1,234 @@
+<div class="legal-page">
+
+  <!-- Header -->
+  <div class="legal-header">
+    <div class="legal-header-inner">
+      <div class="legal-brand">
+        <span class="legal-brand-icon">
+          <i class="fas fa-shield-halved"></i>
+        </span>
+        <div>
+          <h1 class="legal-brand-title">AJAW AI</h1>
+          <p class="legal-brand-sub">Centro Legal</p>
+        </div>
+      </div>
+      <a routerLink="/dashboard" class="legal-back-link">
+        <i class="fas fa-arrow-left"></i> Volver al dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Tab navigation -->
+  <div class="legal-tabs-bar">
+    <div class="legal-tabs">
+      <button
+        class="legal-tab"
+        [class.active]="activeSection === 'terms'"
+        (click)="showSection('terms')"
+      >
+        <i class="fas fa-file-contract"></i>
+        Términos y Condiciones
+      </button>
+      <button
+        class="legal-tab"
+        [class.active]="activeSection === 'privacy'"
+        (click)="showSection('privacy')"
+      >
+        <i class="fas fa-user-shield"></i>
+        Política de Privacidad
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="legal-content">
+
+    <!-- TERMS AND CONDITIONS -->
+    <div class="legal-section" *ngIf="activeSection === 'terms'">
+      <div class="legal-doc-header">
+        <h2><i class="fas fa-file-contract"></i> Términos y Condiciones de Uso</h2>
+        <p class="legal-updated">Última actualización: Junio 2026</p>
+      </div>
+
+      <div class="legal-notice-meta">
+        <i class="fab fa-instagram"></i>
+        <span>Este documento incluye las condiciones específicas para la integración con <strong>Instagram / Meta</strong></span>
+      </div>
+
+      <div class="legal-body">
+
+        <section class="legal-block">
+          <h3>1. Aceptación de los términos</h3>
+          <p>Al crear una cuenta o utilizar los servicios de <strong>AJAW AI</strong> (en adelante, "la Plataforma"), usted acepta quedar vinculado por estos Términos y Condiciones. Si no está de acuerdo con alguna de estas condiciones, le rogamos que no utilice la Plataforma.</p>
+        </section>
+
+        <section class="legal-block">
+          <h3>2. Descripción del servicio</h3>
+          <p>AJAW AI es una plataforma de inteligencia artificial que permite a empresas y profesionales crear y gestionar agentes de IA para automatizar conversaciones de voz, texto, WhatsApp e Instagram.</p>
+        </section>
+
+        <section class="legal-block">
+          <h3>3. Uso de la Plataforma de Instagram / Meta</h3>
+          <p>Al activar la integración con Instagram en AJAW AI, usted reconoce y acepta lo siguiente:</p>
+          <ul>
+            <li>La integración opera a través de la <strong>API de Mensajería de Instagram</strong> (Instagram Messaging API), provista por Meta Platforms, Inc.</li>
+            <li>Usted es el responsable de obtener el consentimiento de sus usuarios antes de iniciar conversaciones automatizadas.</li>
+            <li>El agente de Instagram solo podrá responder mensajes entrantes (INBOUND). No está permitido el envío masivo de mensajes no solicitados.</li>
+            <li>Usted se compromete a cumplir con las <a href="https://developers.facebook.com/policy/" target="_blank" rel="noopener noreferrer">Políticas de la Plataforma de Meta</a> y con las <a href="https://help.instagram.com/581066165581870" target="_blank" rel="noopener noreferrer">Condiciones de Uso de Instagram</a>.</li>
+            <li>AJAW AI puede revocar el acceso a la integración si detecta usos que infrinjan las políticas de Meta o estos términos.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>4. Uso del número de WhatsApp</h3>
+          <p>Al proporcionar un número de WhatsApp para un agente de texto, usted confirma que:</p>
+          <ul>
+            <li>Es el titular o tiene autorización legítima para usar dicho número.</li>
+            <li>El número será utilizado exclusivamente para responder mensajes de clientes que hayan iniciado la conversación voluntariamente.</li>
+            <li>AJAW AI almacenará el número de forma segura y no lo compartirá con terceros sin su consentimiento, salvo obligación legal.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>5. Responsabilidades del usuario</h3>
+          <p>Usted es responsable de:</p>
+          <ul>
+            <li>El contenido generado por sus agentes de IA.</li>
+            <li>Informar a sus usuarios finales sobre la naturaleza automatizada de las respuestas.</li>
+            <li>No usar la Plataforma para actividades ilegales, spam o acoso.</li>
+            <li>Mantener la confidencialidad de sus credenciales de acceso.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>6. Propiedad intelectual</h3>
+          <p>Todos los derechos sobre la tecnología, diseño y nombre de AJAW AI son propiedad exclusiva de sus titulares. El uso de la Plataforma no le otorga ningún derecho sobre dichos elementos.</p>
+        </section>
+
+        <section class="legal-block">
+          <h3>7. Modificaciones</h3>
+          <p>Nos reservamos el derecho de modificar estos Términos en cualquier momento. Los cambios serán notificados con al menos 15 días de antelación mediante aviso en la Plataforma o correo electrónico.</p>
+        </section>
+
+        <section class="legal-block">
+          <h3>8. Contacto</h3>
+          <p>Para cualquier consulta sobre estos Términos, puede contactarnos en:
+            <a href="mailto:legal&#64;ajaw.ai">legal&#64;ajaw.ai</a>
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- PRIVACY POLICY -->
+    <div class="legal-section" *ngIf="activeSection === 'privacy'">
+      <div class="legal-doc-header">
+        <h2><i class="fas fa-user-shield"></i> Política de Privacidad y Tratamiento de Datos</h2>
+        <p class="legal-updated">Última actualización: Junio 2026</p>
+      </div>
+
+      <div class="legal-notice-meta">
+        <i class="fab fa-instagram"></i>
+        <span>Esta política describe cómo gestionamos los datos personales en el contexto de la integración con <strong>Instagram / Meta</strong> y el uso de números de WhatsApp.</span>
+      </div>
+
+      <div class="legal-body">
+
+        <section class="legal-block">
+          <h3>1. Responsable del tratamiento</h3>
+          <p><strong>AJAW AI</strong> es el responsable del tratamiento de los datos personales recabados a través de la Plataforma. Para ejercer sus derechos o plantear dudas, puede contactarnos en
+            <a href="mailto:privacidad&#64;ajaw.ai">privacidad&#64;ajaw.ai</a>.
+          </p>
+        </section>
+
+        <section class="legal-block">
+          <h3>2. Datos que recopilamos</h3>
+          <p>Recopilamos los siguientes datos cuando usted utiliza la Plataforma:</p>
+          <ul>
+            <li><strong>Datos de cuenta:</strong> nombre, correo electrónico, empresa.</li>
+            <li><strong>Datos de agentes:</strong> nombre del agente, instrucciones, número de WhatsApp asociado (cuando corresponda).</li>
+            <li><strong>Datos de integración con Instagram:</strong> ID de cuenta de Instagram, nombre de usuario, token de acceso de larga duración (almacenado cifrado).</li>
+            <li><strong>Datos de conversaciones:</strong> mensajes intercambiados a través de los agentes, según lo permitido por las APIs de Meta y WhatsApp.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>3. Finalidad del tratamiento</h3>
+          <p>Los datos son utilizados exclusivamente para:</p>
+          <ul>
+            <li>Prestar el servicio de agentes de IA conversacional.</li>
+            <li>Conectar su cuenta de Instagram con el agente que usted configure.</li>
+            <li>Enviar y recibir mensajes a través de WhatsApp en nombre del agente configurado.</li>
+            <li>Mejorar el rendimiento y la precisión de los modelos de IA (de forma anonimizada).</li>
+            <li>Cumplir con obligaciones legales y requerimientos de Meta/Instagram.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>4. Protección del número de WhatsApp</h3>
+          <p>El número de WhatsApp que proporciona para su agente de texto:</p>
+          <ul>
+            <li>Se almacena cifrado en nuestros servidores.</li>
+            <li>No se vende, alquila ni comparte con terceros con fines comerciales.</li>
+            <li>Solo se transmite a la API oficial de WhatsApp Business (Meta) para el funcionamiento del agente.</li>
+            <li>Puede solicitar su eliminación en cualquier momento eliminando el agente asociado.</li>
+          </ul>
+        </section>
+
+        <section class="legal-block">
+          <h3>5. Datos de Instagram / Meta</h3>
+          <p>Al conectar su cuenta de Instagram:</p>
+          <ul>
+            <li>Accedemos únicamente a los permisos necesarios: lectura de mensajes entrantes y envío de respuestas (<code>instagram_manage_messages</code>).</li>
+            <li>No accedemos a su contraseña ni a datos no relacionados con la mensajería.</li>
+            <li>Los tokens de acceso se almacenan cifrados y se renuevan automáticamente.</li>
+            <li>Puede revocar el acceso en cualquier momento desde la configuración de su cuenta de Instagram o desde la Plataforma.</li>
+          </ul>
+          <p>El tratamiento de datos en el contexto de la API de Instagram se rige también por la
+            <a href="https://privacycenter.instagram.com/policy/" target="_blank" rel="noopener noreferrer">Política de Privacidad de Instagram</a>
+            y las
+            <a href="https://developers.facebook.com/policy/" target="_blank" rel="noopener noreferrer">Políticas de la Plataforma Meta</a>.
+          </p>
+        </section>
+
+        <section class="legal-block">
+          <h3>6. Conservación de datos</h3>
+          <p>Conservamos sus datos mientras su cuenta esté activa. Al eliminar su cuenta, sus datos personales serán eliminados en un plazo máximo de 30 días, salvo obligación legal de conservación.</p>
+        </section>
+
+        <section class="legal-block">
+          <h3>7. Sus derechos</h3>
+          <p>De acuerdo con la normativa aplicable (incluyendo la Ley 1581 de 2012 de Colombia), usted tiene derecho a:</p>
+          <ul>
+            <li>Acceder a sus datos personales.</li>
+            <li>Rectificar datos incorrectos.</li>
+            <li>Solicitar la eliminación de sus datos.</li>
+            <li>Oponerse o limitar el tratamiento.</li>
+            <li>Portabilidad de datos.</li>
+          </ul>
+          <p>Para ejercer estos derechos, contáctenos en:
+            <a href="mailto:privacidad&#64;ajaw.ai">privacidad&#64;ajaw.ai</a>
+          </p>
+        </section>
+
+        <section class="legal-block">
+          <h3>8. Cambios en esta política</h3>
+          <p>Podemos actualizar esta Política de Privacidad periódicamente. Le notificaremos los cambios significativos por correo electrónico o mediante un aviso destacado en la Plataforma.</p>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="legal-footer">
+    <p>© 2026 AJAW AI. Todos los derechos reservados.</p>
+    <div class="legal-footer-links">
+      <button class="legal-tab-footer" (click)="showSection('terms')" [class.active]="activeSection === 'terms'">Términos</button>
+      <span>·</span>
+      <button class="legal-tab-footer" (click)="showSection('privacy')" [class.active]="activeSection === 'privacy'">Privacidad</button>
+    </div>
+  </div>
+
+</div>

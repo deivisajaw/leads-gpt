@@ -1,0 +1,161 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>{{ deal?.name }}</h2>
+      <button class="close-button" (click)="onClose()">&times;</button>
+    </div>
+
+    <div class="modal-body" *ngIf="deal">
+
+      <!-- ── Columna principal ── -->
+      <div class="main-content">
+
+        <!-- Deal Details -->
+        <div class="detail-section">
+          <h4>{{ 'DEAL_DETAIL_MODAL.DEAL_DETAILS_TITLE' | translate }}</h4>
+          <div class="detail-grid">
+
+            <div class="detail-item">
+              <label>{{ 'DEAL_DETAIL_MODAL.DEAL_NAME_LABEL' | translate }}</label>
+              <p>{{ deal.name }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.description">
+              <label>{{ 'DEAL_DETAIL_MODAL.DESCRIPTION_LABEL' | translate }}</label>
+              <p>{{ deal.description }}</p>
+            </div>
+
+            <div class="detail-item">
+              <label>{{ 'DEAL_DETAIL_MODAL.AMOUNT_LABEL' | translate }}</label>
+              <p>{{ deal.amount | number:'1.2-2' }} USD</p>
+            </div>
+
+            <!-- FIXED: deal.stage eliminado — usar stageLabel + stageColor dinámicos -->
+            <div class="detail-item">
+              <label>{{ 'DEAL_DETAIL_MODAL.CURRENT_STAGE_LABEL' | translate }}</label>
+              <p class="deal-stage"
+                [style.background]="deal.stageColor + '22'"
+                [style.color]="deal.stageColor"
+                [style.border-color]="deal.stageColor + '55'">
+                {{ deal.stageLabel }}
+              </p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.expectedCloseDate">
+              <label>{{ 'DEAL_DETAIL_MODAL.EXPECTED_CLOSE_DATE_LABEL' | translate }}</label>
+              <p>{{ deal.expectedCloseDate | date:'fullDate' }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.ownerUserFullName">
+              <label>{{ 'DEAL_DETAIL_MODAL.OWNER_LABEL' | translate }}</label>
+              <p>{{ deal.ownerUserFullName }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.campaignName">
+              <label>{{ 'DEAL_DETAIL_MODAL.ORIGIN_CAMPAIGN_LABEL' | translate }}</label>
+              <p>{{ deal.campaignName }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Contact Details -->
+        <div class="detail-section">
+          <h4>{{ 'DEAL_DETAIL_MODAL.CONTACT_INFO_TITLE' | translate }}</h4>
+          <div class="detail-grid">
+
+            <div class="detail-item">
+              <label>{{ 'DEAL_DETAIL_MODAL.CONTACT_TYPE_LABEL' | translate }}</label>
+              <p>{{ deal.contact.contactType }}</p>
+            </div>
+
+            <div class="detail-item">
+              <label>{{ 'DEAL_DETAIL_MODAL.NAME_LABEL' | translate }}</label>
+              <p>{{ deal.contact.displayName }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.email">
+              <label>{{ 'DEAL_DETAIL_MODAL.EMAIL_LABEL' | translate }}</label>
+              <p>{{ deal.contact.email }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.phone">
+              <label>{{ 'DEAL_DETAIL_MODAL.PHONE_LABEL' | translate }}</label>
+              <p>{{ deal.contact.phone }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.website">
+              <label>{{ 'DEAL_DETAIL_MODAL.WEBSITE_LABEL' | translate }}</label>
+              <p>{{ deal.contact.website }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.address">
+              <label>{{ 'DEAL_DETAIL_MODAL.ADDRESS_LABEL' | translate }}</label>
+              <p>{{ deal.contact.address }}</p>
+            </div>
+
+            <div class="detail-item"
+              *ngIf="deal.contact.contactType === 'PEOPLE' && deal.contact.jobTitle">
+              <label>{{ 'DEAL_DETAIL_MODAL.JOB_TITLE_LABEL' | translate }}</label>
+              <p>{{ deal.contact.jobTitle }}</p>
+            </div>
+
+            <div class="detail-item"
+              *ngIf="deal.contact.contactType === 'PEOPLE' && deal.contact.associatedCompany">
+              <label>{{ 'DEAL_DETAIL_MODAL.ASSOCIATED_COMPANY_LABEL' | translate }}</label>
+              <p>{{ deal.contact.associatedCompany }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.source">
+              <label>{{ 'DEAL_DETAIL_MODAL.SOURCE_LABEL' | translate }}</label>
+              <p>{{ deal.contact.source }}</p>
+            </div>
+
+            <div class="detail-item" *ngIf="deal.contact.campaignName">
+              <label>{{ 'DEAL_DETAIL_MODAL.CONTACT_ORIGIN_CAMPAIGN_LABEL' | translate }}</label>
+              <p>{{ deal.contact.campaignName }}</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /main-content -->
+
+      <!-- ── Sidebar: Notas ── -->
+      <div class="sidebar-content">
+        <div class="detail-section notes-section">
+          <h4>{{ 'DEAL_DETAIL_MODAL.HISTORY_NOTES_TITLE' | translate }}</h4>
+          <div class="notes-container">
+
+            <div class="add-note-form">
+              <form [formGroup]="noteForm" (ngSubmit)="addNote()">
+                <textarea formControlName="noteText"
+                  placeholder="{{ 'DEAL_DETAIL_MODAL.ADD_NOTE_PLACEHOLDER' | translate }}">
+                </textarea>
+                <button type="submit" [disabled]="noteForm.invalid || isSubmitting">
+                  <span *ngIf="isSubmitting">{{ 'DEAL_DETAIL_MODAL.SAVING_NOTE_BUTTON' | translate }}</span>
+                  <span *ngIf="!isSubmitting">{{ 'DEAL_DETAIL_MODAL.SAVE_NOTE_BUTTON' | translate }}</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="notes-history">
+              <div class="note-item" *ngFor="let note of deal.notes">
+                <p class="note-body">{{ note.note }}</p>
+                <p class="note-meta">
+                  {{ 'DEAL_DETAIL_MODAL.NOTE_META' | translate:{ author: note.author, date: (note.date | date:'medium') } }}
+                </p>
+              </div>
+              <p *ngIf="deal.notes.length === 0" class="no-notes">
+                {{ 'DEAL_DETAIL_MODAL.NO_NOTES_MESSAGE' | translate }}
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /sidebar-content -->
+
+    </div><!-- /modal-body -->
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ 'SUB_MGMT.EDIT_COMPANY_INFO_MODAL_TITLE' | translate }}</h3>
+      <button class="close-button" (click)="onClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="companyForm">
+        <div class="form-group">
+          <label for="companyName">{{ 'SUB_MGMT.COMPANY_NAME' | translate }}</label>
+          <input type="text" id="companyName" formControlName="companyName" class="form-control">
+          <div *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched" class="error-message">
+            {{ 'EDIT_COMPANY_INFO_MODAL.COMPANY_NAME_REQUIRED' | translate }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="creditDistributionMode">{{ 'SUB_MGMT.CREDIT_DISTRIBUTION_MODE' | translate }}</label>
+          <select id="creditDistributionMode" formControlName="creditDistributionMode" class="form-control">
+            <option *ngFor="let mode of creditDistributionModes" [value]="mode">
+              {{ 'SUB_MGMT.CREDIT_DISTRIBUTION_MODE_' + mode | translate }}
+            </option>
+          </select>
+          <div *ngIf="companyForm.get('creditDistributionMode')?.invalid && companyForm.get('creditDistributionMode')?.touched" class="error-message">
+            {{ 'EDIT_COMPANY_INFO_MODAL.CREDIT_DISTRIBUTION_MODE_REQUIRED' | translate }} 
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="minCreditsGuaranteed">{{ 'SUB_MGMT.MIN_CREDITS_GUARANTEED' | translate }}</label>
+          <input type="number" id="minCreditsGuaranteed" formControlName="minCreditsGuaranteed" class="form-control" min="0">
+          <div *ngIf="companyForm.get('minCreditsGuaranteed')?.invalid && companyForm.get('minCreditsGuaranteed')?.touched" class="error-message">
+            {{ 'EDIT_COMPANY_INFO_MODAL.MIN_CREDITS_GUARANTEED_REQUIRED' | translate }} 
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage | translate }}
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="btn btn-primary" (click)="onSave()" [disabled]="companyForm.invalid || isLoading">
+        <i class="fas fa-save"></i> {{ 'COMMON.SAVE' | translate }}</button>
+    </div>
+  </div>
+</div>
+
+<app-loading-modal *ngIf="isLoading"></app-loading-modal>

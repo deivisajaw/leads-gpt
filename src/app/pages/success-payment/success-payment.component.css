@@ -1,0 +1,119 @@
+.success-payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ocupa toda la altura de la ventana */
+  background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Degradado de fondo suave */
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box; /* Incluye padding en el ancho/alto */
+}
+
+.success-card {
+  background-color: #ffffff;
+  border-radius: 15px; /* Bordes más redondeados */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  padding: 50px; /* Más padding */
+  max-width: 550px; /* Un poco más ancho */
+  width: 100%;
+  transform: scale(0.9); /* Pequeña escala inicial para animación */
+  animation: popIn 0.5s ease-out forwards; /* Animación de entrada */
+  border: 1px solid #e0e0e0; /* Borde sutil */
+}
+
+.icon-wrapper {
+  margin-bottom: 30px; /* Más espacio */
+}
+
+.success-icon {
+  color: #28a745; /* Verde de éxito */
+  font-size: 7em; /* Icono más grande */
+  animation: bounceIn 0.8s ease-out; /* Animación de rebote */
+}
+
+h1 {
+  color: #28a745;
+  margin-bottom: 20px;
+  font-size: 2.5em; /* Título más grande */
+  font-weight: 700; /* Más peso */
+}
+
+p {
+  color: #555; /* Color de texto más suave */
+  font-size: 1.2em; /* Fuente más grande */
+  line-height: 1.8; /* Mayor interlineado */
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  background-color: #007bff; /* Azul primario */
+  border-color: #007bff;
+  padding: 12px 30px; /* Más padding */
+  font-size: 1.2em; /* Fuente más grande */
+  margin-top: 30px; /* Más margen superior */
+  border-radius: 8px; /* Bordes más redondeados */
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Keyframe Animations */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0%, 20%, 40%, 60%, 80%, 100% {
+    transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  }
+  0% {
+    opacity: 0;
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+  20% {
+    transform: scale3d(1.1, 1.1, 1.1);
+  }
+  40% {
+    transform: scale3d(0.9, 0.9, 0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: scale3d(1.03, 1.03, 1.03);
+  }
+  80% {
+    transform: scale3d(0.97, 0.97, 0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .success-card {
+    padding: 30px;
+    width: 95%;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  p {
+    font-size: 1em;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    font-size: 1em;
+  }
+}

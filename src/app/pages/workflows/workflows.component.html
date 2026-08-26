@@ -1,0 +1,184 @@
+<div class="wf-shell">
+
+  <div class="wf-topbar">
+    <div class="wf-title-wrap">
+      <h1>{{ "WORKFLOWS.TITLE" | translate }}</h1>
+      <p>{{ "WORKFLOWS.SUBTITLE" | translate }}</p>
+    </div>
+  </div>
+
+    <div class="wf-content">
+
+    <!-- ═══════════ WIDGETS DE MÉTRICAS ═══════════ -->
+    <div class="wf-stats-grid" *ngIf="!isLoading && instances.length > 0">
+      <div class="wf-stat-card">
+        <div class="wf-stat-icon">
+          <i class="fas fa-diagram-project"></i>
+        </div>
+        <div class="wf-stat-info">
+          <span class="wf-stat-value">{{ totalCount }}</span>
+          <span class="wf-stat-label">{{ "WORKFLOWS.STATS.TOTAL" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wf-stat-card">
+        <div class="wf-stat-icon wf-stat-icon-active">
+          <i class="fas fa-toggle-on"></i>
+        </div>
+        <div class="wf-stat-info">
+          <span class="wf-stat-value">{{ activeCount }}</span>
+          <span class="wf-stat-label">{{ "WORKFLOWS.STATS.ACTIVE" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wf-stat-card">
+        <div class="wf-stat-icon wf-stat-icon-paused">
+          <i class="fas fa-toggle-off"></i>
+        </div>
+        <div class="wf-stat-info">
+          <span class="wf-stat-value">{{ pausedCount }}</span>
+          <span class="wf-stat-label">{{ "WORKFLOWS.STATS.PAUSED" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wf-stat-card">
+        <div class="wf-stat-icon wf-stat-icon-error">
+          <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div class="wf-stat-info">
+          <span class="wf-stat-value">{{ errorCount }}</span>
+          <span class="wf-stat-label">{{ "WORKFLOWS.STATS.ERRORS" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wf-stat-card">
+        <div class="wf-stat-icon">
+          <i class="fas fa-arrows-rotate"></i>
+        </div>
+        <div class="wf-stat-info">
+          <span class="wf-stat-value">{{ totalFollowups }}</span>
+          <span class="wf-stat-label">{{ "WORKFLOWS.STATS.FOLLOWUPS" | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ BUSCADOR Y FILTROS ═══════════ -->
+    <div class="wf-toolbar" *ngIf="!isLoading && instances.length > 0">
+      <div class="wf-search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          [placeholder]="'WORKFLOWS.SEARCH_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <select class="wf-filter-select" [(ngModel)]="typeFilter">
+        <option value="all">{{ "WORKFLOWS.FILTERS.ALL_TYPES" | translate }}</option>
+        <option *ngFor="let template of templates" [value]="template.key">
+          {{ template.titleKey | translate }}
+        </option>
+      </select>
+
+      <select class="wf-filter-select" [(ngModel)]="statusFilter">
+        <option value="all">{{ "WORKFLOWS.FILTERS.ALL_STATUS" | translate }}</option>
+        <option value="active">{{ "WORKFLOWS.FILTERS.ACTIVE" | translate }}</option>
+        <option value="paused">{{ "WORKFLOWS.FILTERS.PAUSED" | translate }}</option>
+      </select>
+
+      <button
+        class="wf-clear-btn"
+        *ngIf="searchTerm || typeFilter !== 'all' || statusFilter !== 'all'"
+        (click)="clearFilters()"
+      >
+        <i class="fas fa-xmark"></i>
+        {{ "WORKFLOWS.FILTERS.CLEAR" | translate }}
+      </button>
+    </div>
+
+    <!-- ═══════════ GRID DE INSTANCIAS ═══════════ -->
+    <div class="wf-loading" *ngIf="isLoading">
+      <div class="wf-spinner"></div>
+    </div>
+
+    <div class="wf-empty" *ngIf="!isLoading && instances.length === 0">
+      <i class="fas fa-diagram-project"></i>
+      <h3>{{ "WORKFLOWS.EMPTY_TITLE" | translate }}</h3>
+      <p>{{ "WORKFLOWS.EMPTY_SUBTITLE" | translate }}</p>
+    </div>
+
+    <div class="wf-no-results" *ngIf="!isLoading && instances.length > 0 && filteredInstances.length === 0">
+      <i class="fas fa-filter-circle-xmark"></i>
+      <p>{{ "WORKFLOWS.NO_RESULTS" | translate }}</p>
+    </div>
+
+    <div class="wf-tablewrap" *ngIf="!isLoading && filteredInstances.length > 0">
+      <table class="wf-tbl">
+        <thead>
+          <tr>
+            <th>{{ "WORKFLOWS.TABLE.NAME" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.TYPE" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.STATUS" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.AGENT" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.FOLLOWUPS" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.ACTIVE" | translate }}</th>
+            <th>{{ "WORKFLOWS.TABLE.ACTIONS" | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let instance of filteredInstances" (click)="viewDetails(instance)">
+            <td class="wf-name-cell">
+              {{ instance.name }}
+              <i class="fas fa-triangle-exclamation wf-error-icon" *ngIf="instance.error" [title]="instance.error"></i>
+            </td>
+            <td>{{ templateLabel(instance.workflowType) | translate }}</td>
+            <td><span class="wf-status-badge">{{ instance.status || '-' }}</span></td>
+            <td>{{ instance.agentName || '-' }}</td>
+            <td>{{ instance.followupsCount || 0 }}</td>
+            <td (click)="$event.stopPropagation()">
+              <label class="wf-switch">
+                <input type="checkbox" [checked]="instance.active" (change)="onToggleActive(instance)" />
+                <span class="wf-switch-slider"></span>
+              </label>
+            </td>
+            <td class="wf-actions-cell" (click)="$event.stopPropagation()">
+              <button class="wf-icon-btn" (click)="editInstance(instance, $event)" [title]="'WORKFLOWS.EDIT' | translate">
+                <i class="fas fa-pen"></i>
+              </button>
+              <button class="wf-icon-btn" (click)="viewDetails(instance)" [title]="'WORKFLOWS.VIEW_DETAILS' | translate">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ═══════════ CARDS DE TEMPLATES ═══════════ -->
+    <div class="wf-templates-section">
+      <h2>{{ "WORKFLOWS.TEMPLATES_TITLE" | translate }}</h2>
+      <div class="wf-templates-grid">
+        <div class="wf-template-card" *ngFor="let template of templates" (click)="openTemplate(template)">
+          <div class="wf-template-icon"><i class="fas" [ngClass]="template.icon"></i></div>
+          <div class="wf-template-body">
+            <h3>{{ template.titleKey | translate }}</h3>
+            <p>{{ template.descriptionKey | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <app-abandoned-checkout-form
+    *ngIf="activeTemplateKey === 'ABANDONED_CHECKOUT'"
+    [visible]="isFormVisible"
+    [editingRecord]="editingRecord"
+    (closed)="closeForm()"
+    (saved)="onFormSaved()">
+  </app-abandoned-checkout-form>
+
+  <!-- A futuro: agregar aqui un *ngIf por cada nuevo template, apuntando a su propio
+       componente de formulario -->
+
+</div>

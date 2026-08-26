@@ -1,0 +1,369 @@
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "ADMIN_USERS.TITLE" | translate }}</h1>
+      <p>{{ "ADMIN_USERS.SUBTITLE" | translate }}</p>
+    </div>
+    <div class="header-right">
+      <div class="section-stat">
+        <div class="header-stat">
+          <span class="stat-label">
+            {{ "ADMIN_USERS.COMPANY_CREDITS" | translate }}</span
+          >
+          <span class="stat-value">
+            {{ data?.companyData?.credits ?? 0 | number }}</span
+          >
+        </div>
+        <div class="header-stat">
+          <span class="stat-label">{{
+            "ADMIN_USERS.DISTRIBUTION_MODE" | translate
+          }}</span>
+          <span class="stat-value">{{
+            data?.companyData?.creditDistributionMode ?? "N/A"
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="user-admin-container">
+    <div *ngIf="isLoading" class="alert alert-warning text-center">
+      <p>Loading users...</p>
+    </div>
+
+    <div *ngIf="error" class="error-container">
+      <h3 class="mb-2">Error</h3>
+      <p class="alert alert-danger">{{ error }}</p>
+      <button (click)="fetchData()" class="btn-primary">Retry</button>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error && data">
+      <!-- New Dismissible Notification -->
+      <div
+        *ngIf="notification.show"
+        class="alert"
+        [ngClass]="
+          notification.type === 'success' ? 'alert-success' : 'alert-danger'
+        "
+        role="alert"
+      >
+        {{ notification.message }}
+        <button
+          type="button"
+          class="close-btn"
+          (click)="dismissNotification()"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="admin-toolbar">
+        <div class="search-filters">
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="{{ 'ADMIN_USERS.SEARCH_PLACEHOLDER' | translate }}"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchTermChange()"
+            />
+            <i class="fas fa-filter filter-indicator" *ngIf="searchTerm"></i>
+          </div>
+        </div>
+        <div class="invitation-management-actions">
+          <button class="btn btn-primary" (click)="openInviteUserModal()">
+            <i class="fas fa-user-plus"></i>
+            {{ "ADMIN_USERS.GENERATE_INVITE_CODE" | translate }}
+          </button>
+          <button
+            class="btn btn-secondary"
+            (click)="openViewGeneratedCodesModal()"
+          >
+            <i class="fas fa-list"></i>
+            {{ "ADMIN_USERS.VIEW_GENERATED_CODES" | translate }}
+          </button>
+          <ng-container
+            *ngIf="
+              data.companyData.creditDistributionMode?.trim() ===
+              'AUTO_EQUITABLE'
+            "
+          >
+            <button
+              class="btn btn-primary"
+              (click)="openDistributeCreditsInputModal('equitable')"
+            >
+              <i class="fas fa-hand-holding-usd"></i>
+              {{ "ADMIN_USERS.DISTRIBUTE_EQUITABLE_CREDITS" | translate }}
+            </button>
+          </ng-container>
+          <ng-container
+            *ngIf="
+              data.companyData.creditDistributionMode?.trim() ===
+              'AUTO_RULE_BASED'
+            "
+          >
+            <button
+              class="btn btn-primary"
+              (click)="openDistributeCreditsInputModal('rule-based')"
+            >
+              <i class="fas fa-cogs"></i>
+              {{ "ADMIN_USERS.DISTRIBUTE_RULE_BASED_CREDITS" | translate }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th class="checkbox-col">
+                <input
+                  type="checkbox"
+                  class="table-checkbox"
+                  [checked]="isAllSelected"
+                  (change)="toggleSelectAll()"
+                />
+              </th>
+              <th class="users-col">
+                {{ "ADMIN_USERS.TABLE_HEADER_USERS" | translate }}
+              </th>
+              <th class="permission-col">
+                {{ "ADMIN_USERS.TABLE_HEADER_PERMISSION" | translate }}
+              </th>
+              <th class="credits-col">
+                {{ "ADMIN_USERS.TABLE_HEADER_CREDITS" | translate }}
+              </th>
+               <th class="priority-col">
+                {{ 'ADMIN_USERS.TABLE_HEADER_PRIORITY' | translate }}
+              </th>
+              <th class="status-col">Status</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let member of paginatedMembers"
+              class="user-row"
+              [class.selected]="selection.has(member.id)"
+            >
+              <td class="checkbox-col">
+                <input
+                  type="checkbox"
+                  class="table-checkbox"
+                  [checked]="selection.has(member.id)"
+                  (change)="toggleMemberSelection(member.id)"
+                />
+              </td>
+              <td class="user-info">
+                <div class="user-details">
+                  <div class="user-avatar">
+                    {{ getInitials(member.fullName) }}
+                  </div>
+                  <div class="user-text">
+                    <div class="user-name">{{ member.fullName }}</div>
+                    <div class="user-email">{{ member.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="permission-info">
+                <span
+                  class="permission-badge"
+                  [ngClass]="{ 'admin-badge': member.role === 'ADMIN' }"
+                  >{{ member.role }}</span
+                >
+              </td>
+              <td class="credits-info-2">
+                <div class="credits-status">
+                  <i class="fas fa-coins"></i>
+                  <span>{{ member.creditsAllocated | number }}</span>
+                </div>
+              </td>
+              <td class="priority-col">
+                <span>{{ member.distributionPriority }}</span> 
+              </td>
+              <td class="status-col">
+                <span
+                  class="status-badge"
+                  [ngClass]="
+                    member.isActive ? 'status-active' : 'status-inactive'
+                  "
+                >
+                  {{ member.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+              <td class="actions-col">
+                <button
+                  class="btn btn-sm btn-secondary actions-button"
+                  (click)="toggleActionMenu($event, member)"
+                >
+                  <i class="fas fa-ellipsis-h"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <select
+            class="page-size-select"
+            (change)="onPageSizeChange($event)"
+            [ngModel]="pageSize"
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div class="pagination-controls">
+          <span class="pagination-text"
+            >{{ (currentPage - 1) * pageSize + 1 }} -
+            {{ (currentPage - 1) * pageSize + paginatedMembers.length }} of
+            {{ filteredMembers.length }}
+            <span *ngIf="searchTerm" class="filter-active-text">
+              ({{ "ADMIN_USERS.FILTERED" | translate }})</span
+            >
+          </span>
+          <div class="pagination-buttons">
+            <button
+              class="pagination-btn"
+              (click)="goToPreviousPage()"
+              [disabled]="currentPage === 1"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button
+              class="pagination-btn"
+              (click)="goToNextPage()"
+              [disabled]="
+                currentPage === Math.ceil(filteredMembers.length / pageSize)
+              "
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="floating-footer-bar" *ngIf="selection.size > 0">
+        <button
+          class="btn btn-primary"
+          (click)="
+            openAssignCreditsModal(
+              null,
+              'ASSIGN_BULK',
+              0,
+              'SUB_MGMT.ASSIGN_CREDITS_MODAL_TITLE',
+              'SUB_MGMT.ASSIGN_CREDITS_MODAL_MESSAGE',
+              data.companyData.credits
+            )
+          "
+        >
+          <!-- CAMBIADO -->
+          <i class="fas fa-coins"></i>
+          {{ "ADMIN_USERS.ASSIGN_CREDITS" | translate }} ({{ selection.size }})
+        </button>
+      </div>
+    </ng-container>
+
+    <div
+      #actionMenu
+      class="action-menu"
+      *ngIf="showActionMenu && activeActionMenuMember"
+      [ngStyle]="menuPosition"
+    >
+      <a
+        *ngFor="let option of currentActionMenuOptions"
+        class="action-menu-item"
+        (click)="option.action(activeActionMenuMember)"
+      >
+        <i [class]="option.icon"></i> {{ option.labelKey | translate }}
+      </a>
+    </div>
+
+    <app-assign-credits-modal
+      [showModal]="showAssignCreditsModal"
+      [member]="selectedMemberForCredits"
+      [memberCount]="selection.size"
+      [maxCredits]="maxCredits"
+      [initialCredits]="initialCredits"
+      [titleKey]="modalTitle"
+      [messageKey]="modalMessage"
+      (close)="closeAssignCreditsModal()"
+      (assign)="onCreditsAssigned($event)"
+    >
+    </app-assign-credits-modal>
+
+    <app-invite-user-modal
+      [showModal]="showInviteUserModal"
+      (close)="closeInviteUserModal()"
+      (inviteSuccess)="handleInviteSuccess($event)"
+    >
+    </app-invite-user-modal>
+
+    <app-view-generated-codes-modal
+      [showModal]="showViewGeneratedCodesModal"
+      (close)="closeViewGeneratedCodesModal()"
+    >
+    </app-view-generated-codes-modal>
+
+    <app-distribute-credits-input-modal
+      [showModal]="showDistributeCreditsInputModal"
+      [maxCredits]="data?.companyData?.credits ?? 0"
+      [distributionMode]="distributionModeForConfirmation"
+      [serverError]="distributionError"
+      [isLoading]="isDistributionLoading"
+      (close)="closeDistributeCreditsInputModal()"
+      (distribute)="onCreditsInputDistribute($event)"
+    >
+    </app-distribute-credits-input-modal>
+
+    <app-confirmation-modal
+      [showModal]="showConfirmationModal"
+      [title]="'ADMIN_USERS.CONFIRM_DISTRIBUTION_TITLE'"
+      [message]="
+        'ADMIN_USERS.CONFIRM_DISTRIBUTION_MESSAGE'
+          | translate
+            : {
+                credits: creditsToDistributeForConfirmation,
+                mode: distributionModeForConfirmation
+              }
+      "
+      (confirm)="onConfirmationConfirm()"
+      (cancel)="onConfirmationCancel()"
+    >
+    </app-confirmation-modal>
+
+    <!-- Generic Confirmation Modal for Actions -->
+    <app-confirmation-modal
+      [showModal]="confirmationState.show"
+      [title]="confirmationState.title"
+      [message]="confirmationState.message"
+      [isLoading]="confirmationState.isLoading"
+      [errorMessage]="confirmationState.error"
+      (confirm)="onGenericConfirm()"
+      (cancel)="closeGenericConfirmation()"
+    >
+    </app-confirmation-modal>
+
+    <app-credit-history-modal
+      [showModal]="showCreditHistoryModal"
+      [memberId]="selectedMemberForHistory?.id ?? null"
+      [memberName]="selectedMemberForHistory?.fullName ?? ''"
+      (close)="closeCreditHistoryModal()"
+    >
+    </app-credit-history-modal>
+
+    <app-edit-priority-modal 
+      [showModal]="showEditPriorityModal"
+      [member]="selectedMemberForPriorityEdit"
+      [currentPriority]="selectedMemberForPriorityEdit?.distributionPriority ?? 0"
+      (close)="closeEditPriorityModal()"
+      (save)="onPriorityEdited($event)">
+    </app-edit-priority-modal>
+  </div>
+</div>

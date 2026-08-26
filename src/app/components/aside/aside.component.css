@@ -1,0 +1,22 @@
+.sidebar-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.nav-item.has-submenu .submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.nav-item.has-submenu.open .submenu {
+  max-height: 500px; 
+}
+
+.nav-item.has-submenu .submenu-arrow {
+  transition: transform 0.3s ease-out;
+}
+
+.nav-item.has-submenu.open .submenu-arrow {
+  transform: rotate(90deg); 
+}

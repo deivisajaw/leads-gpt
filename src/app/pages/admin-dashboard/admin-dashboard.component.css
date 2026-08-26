@@ -1,0 +1,266 @@
+:host {
+  display: block;
+  padding: 24px;
+  background-color: var(--background-gray);
+}
+
+.admin-dashboard-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Section 1: Stat Cards Grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Icon Colors */
+.icon-plan { background-color: #6a5acd; } /* SlateBlue */
+.icon-status { background-color: #20b2aa; } /* LightSeaGreen */
+.icon-seats { background-color: #f08080; } /* LightCoral */
+.icon-credits { background-color: #ffab40; } /* Orange */
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+/* Section 2: Performance Charts */
+.performance-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Chart takes 2/3, ROI card takes 1/3 */
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.chart-card, .roi-card {
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card .card-header, .roi-card .card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chart-card .card-title, .roi-card .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chart-card .card-body, .roi-card .card-body {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roi-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--primary-blue); /* Use a prominent color */
+  margin: 0;
+  text-align: center;
+}
+
+.roi-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* Responsive adjustments for charts section */
+@media (max-width: 1024px) {
+  .performance-section {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+  }
+}
+
+/* Section 3: Member Management */
+.member-management-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Forecast card takes 1/3, table takes 2/3 */
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.forecast-card {
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.forecast-card .card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.forecast-card .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.forecast-card .card-body {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.forecast-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.member-credits-card {
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-credits-card .card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.member-credits-card .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.member-credits-card .card-body {
+  padding: 0; /* Table will have its own padding */
+  flex-grow: 1;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th, .table td {
+  padding: 12px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  background-color: var(--background-gray);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Responsive adjustments for member management section */
+@media (max-width: 1024px) {
+  .member-management-section {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+  }
+}

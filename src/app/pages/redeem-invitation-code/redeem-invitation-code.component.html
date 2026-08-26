@@ -1,0 +1,22 @@
+<div class="redeem-container">
+  <h2>{{ 'REDEEM_CODE.TITLE' | translate }}</h2>
+  <p>{{ 'REDEEM_CODE.DESCRIPTION' | translate }}</p>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <div class="form-group">
+    <label for="invitationCode">{{ 'REDEEM_CODE.INPUT_LABEL' | translate }}</label>
+    <input type="text" id="invitationCode" [(ngModel)]="invitationCode" class="form-control" placeholder="{{ 'REDEEM_CODE.INPUT_PLACEHOLDER' | translate }}" [disabled]="isLoading">
+  </div>
+
+  <button class="btn btn-primary" (click)="onRedeemCode()" [attr.disabled]="!isCodeValid || isLoading ? true : null">
+    <span *ngIf="!isLoading">{{ 'REDEEM_CODE.REDEEM_BUTTON' | translate }}</span>
+    <span *ngIf="isLoading">{{ 'REDEEM_CODE.LOADING' | translate }}</span>
+  </button>
+</div>

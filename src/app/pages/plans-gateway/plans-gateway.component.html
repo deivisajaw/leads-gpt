@@ -1,0 +1,12 @@
+<ng-container *ngIf="isProfileLoaded">
+  <!-- If user is ADMIN, show subscription management -->
+  <app-subscription-management *ngIf="isAdmin"></app-subscription-management>
+
+  <!-- If user is NOT ADMIN and DOES NOT have a subscription, show plans to buy -->
+  <app-plans *ngIf="!isAdmin && !hasSubscription"></app-plans>
+</ng-container>
+
+<!-- Optional: Show loading state while user status is being determined -->
+<div *ngIf="!isProfileLoaded">
+  <p>Loading...</p>
+</div>

@@ -1,0 +1,11 @@
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="close-button" (click)="closeModal()"><i class="fas fa-times"></i></button>
+    <h3>{{ 'QR_CODE_MODAL.TITLE' | translate }}</h3> 
+    <p>{{ message }}</p>
+    <div class="qr-code-container">
+      <img [src]="imageUrl" alt="{{ 'QR_CODE_MODAL.QR_CODE_ALT_TEXT' | translate }}" *ngIf="imageUrl" />
+      <div class="spinner" *ngIf="!imageUrl"></div>
+    </div>
+  </div>
+</div>

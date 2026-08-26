@@ -1,0 +1,54 @@
+<div class="onboarding-container" *ngIf="showOverlay">
+  <div class="onboarding-blocking-layer" [ngStyle]="styleTop"></div>
+  <div class="onboarding-blocking-layer" [ngStyle]="styleBottom"></div>
+  <div class="onboarding-blocking-layer" [ngStyle]="styleLeft"></div>
+  <div class="onboarding-blocking-layer" [ngStyle]="styleRight"></div>
+</div>
+
+<div #overlayTooltip 
+     *ngIf="showOverlay" 
+     class="onboarding-tooltip" 
+     [ngStyle]="styleOverlayTooltip">
+  <div class="onboarding-arrow" [ngStyle]="styleOverlayArrow"></div>
+  <button class="tooltip-close-btn" (click)="closeOverlayTemporarily()">
+    <i class="fas fa-times"></i>
+  </button>
+  <div class="tooltip-content-wrapper">
+    <div class="tooltip-text-content">
+      {{ overlayTooltipMessage | translate }}
+    </div>
+    <div class="tooltip-waiting-animation">
+      <div class="pulsing-dot"></div>
+    </div>
+  </div>
+</div>
+
+<div #inPageTooltip 
+     *ngIf="showInPageTooltip" 
+     class="onboarding-tooltip-in-page" 
+     [ngStyle]="styleInPageTooltip">
+  <div class="tooltip-content-wrapper">
+    <div class="tooltip-icon">
+      <i class="fas fa-info-circle"></i>
+    </div>
+    <div class="tooltip-text-content">
+      <div class="tooltip-subtitle" *ngIf="totalSteps > 0">{{ 'ONBOARDING_GUIDE.STEP_COUNT' | translate:{current: currentStepNumber, total: totalSteps} }}</div>
+      <div class="tooltip-message">{{ inPageTooltipMessage | translate }}</div>
+    </div>
+    <div class="tooltip-waiting-animation">
+      <div class="pulsing-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Plans Modal -->
+<div class="plans-modal-overlay" *ngIf="showPlansModal" (click)="closePlansModal()">
+  <div class="plans-modal-container" (click)="$event.stopPropagation()">
+    <button class="plans-modal-close" (click)="closePlansModal()">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="plans-modal-content">
+      <app-plans [hideFreePlan]="true"></app-plans>
+    </div>
+  </div>
+</div>

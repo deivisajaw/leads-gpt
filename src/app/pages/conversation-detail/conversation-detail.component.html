@@ -1,0 +1,223 @@
+<div class="page-container">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-section">
+    <div class="header-left">
+      <div class="breadcrumb">
+        <button class="breadcrumb-back" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          {{ 'CONVERSATIONS.PAGE_TITLE' | translate }}
+        </button>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current">{{ conversation?.title }}</span>
+      </div>
+      <h1>{{ conversation?.title || ('CONVERSATIONS.DETAIL.TITLE' | translate) }}</h1>
+      <p *ngIf="conversation" class="header-sub">
+        {{ svc.formatDate(conversation.date) }}
+      </p>
+    </div>
+    <div class="header-right" *ngIf="conversation">
+      <span class="detail-status-chip chip-{{ conversation.status }}">
+        {{ 'CONVERSATIONS.STATUS.' + conversation.status.toUpperCase() | translate }}
+      </span>
+      <a *ngIf="conversation.meetUrl" [href]="conversation.meetUrl" target="_blank" class="btn-meet">
+        <i class="fab fa-google"></i> Google Meet
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="detail-state" *ngIf="isLoading">
+    <div class="detail-loader"></div>
+    <p>{{ 'CONVERSATIONS.STATE.LOADING' | translate }}</p>
+  </div>
+
+  <!-- ===== ERROR ===== -->
+  <div class="detail-state" *ngIf="!isLoading && error">
+    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <p>{{ error }}</p>
+    <button class="btn-back-error" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> {{ 'CONVERSATIONS.DETAIL.BACK' | translate }}
+    </button>
+  </div>
+
+  <!-- ===== BODY ===== -->
+  <div class="detail-body" *ngIf="!isLoading && !error && conversation">
+
+    <!-- ─── LEFT: video player + speakers ─── -->
+    <div class="detail-left">
+
+      <!-- Video player -->
+      <div class="video-block">
+        <div class="video-player" *ngIf="conversation.recordingUrl">
+          <video controls [src]="conversation.recordingUrl" preload="metadata">
+            {{ 'CONVERSATIONS.DETAIL.VIDEO_UNSUPPORTED' | translate }}
+          </video>
+        </div>
+        <!-- Placeholder cuando no hay grabación aún -->
+        <div class="video-placeholder" *ngIf="!conversation.recordingUrl">
+          <i class="fas fa-video-slash"></i>
+          <p>{{ 'CONVERSATIONS.DETAIL.NO_RECORDING' | translate }}</p>
+          <span>{{ 'CONVERSATIONS.DETAIL.NO_RECORDING_SUB' | translate }}</span>
+        </div>
+
+        <!-- Controles secundarios -->
+        <div class="video-actions">
+          <a *ngIf="conversation.recordingUrl" [href]="conversation.recordingUrl" target="_blank" class="action-btn">
+            <i class="fas fa-external-link-alt"></i> {{ 'CONVERSATIONS.DETAIL.OPEN_DRIVE' | translate }}
+          </a>
+          <span class="duration-pill">
+            <i class="fas fa-clock"></i> {{ svc.formatDuration(conversation.durationSeconds) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Speaker breakdown -->
+      <div class="speakers-block" *ngIf="conversation.participants.length > 0">
+        <div class="speakers-header">
+          <i class="fas fa-waveform-lines"></i>
+          {{ 'CONVERSATIONS.DETAIL.SPEAKERS' | translate }}
+        </div>
+        <div class="speaker-row" *ngFor="let p of conversation.participants">
+          <div class="speaker-avatar" [style.background]="svc.avatarColor(p.name)">
+            {{ svc.getInitials(p.name) }}
+          </div>
+          <div class="speaker-info">
+            <div class="speaker-name-row">
+              <span class="speaker-name">{{ p.name }}</span>
+              <span class="speaker-time" *ngIf="p.speakingMinutes">
+                {{ 'CONVERSATIONS.DETAIL.SPOKE' | translate }}
+                {{ p.speakingPercent }}% · {{ p.speakingMinutes }}m
+              </span>
+            </div>
+            <div class="speaker-bar-bg" *ngIf="p.speakingPercent">
+              <div class="speaker-bar-fill"
+                [style.width.%]="p.speakingPercent"
+                [style.background]="svc.avatarColor(p.name)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── RIGHT: tabbed insights ─── -->
+    <div class="detail-right">
+
+      <div class="insights-panel">
+
+        <!-- Tab bar -->
+        <div class="insights-tabs">
+          <button
+            class="ins-tab"
+            [class.active]="activeTab === 'summary'"
+            (click)="setTab('summary')">
+            {{ 'CONVERSATIONS.DETAIL.TAB.SUMMARY' | translate }}
+          </button>
+          <button
+            class="ins-tab"
+            [class.active]="activeTab === 'transcript'"
+            (click)="setTab('transcript')">
+            {{ 'CONVERSATIONS.DETAIL.TAB.TRANSCRIPT' | translate }}
+          </button>
+          <button
+            class="ins-tab"
+            [class.active]="activeTab === 'participants'"
+            (click)="setTab('participants')">
+            {{ 'CONVERSATIONS.DETAIL.TAB.PARTICIPANTS' | translate }}
+          </button>
+        </div>
+
+        <!-- ── TAB: Summary ── -->
+        <div class="tab-content" *ngIf="activeTab === 'summary'">
+
+          <!-- Ask AI pill (decorativo por ahora) -->
+          <div class="ask-ai-banner">
+            <i class="fas fa-sparkles"></i>
+            {{ 'CONVERSATIONS.DETAIL.ASK_AI' | translate }}
+          </div>
+
+          <!-- Resumen principal -->
+          <div class="summary-section" *ngIf="conversation.summary">
+            <h4 class="section-title">{{ 'CONVERSATIONS.DETAIL.SUMMARY_TITLE' | translate }}</h4>
+            <p class="summary-text">{{ conversation.summary }}</p>
+          </div>
+
+          <div class="empty-tab" *ngIf="!conversation.summary">
+            <i class="fas fa-file-alt"></i>
+            <p>{{ 'CONVERSATIONS.DETAIL.NO_SUMMARY' | translate }}</p>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="next-steps-section" *ngIf="conversation.nextSteps && conversation.nextSteps.length > 0">
+            <h4 class="section-title">{{ 'CONVERSATIONS.DETAIL.NEXT_STEPS' | translate }}</h4>
+            <div class="next-step-owner" *ngFor="let block of conversation.nextSteps">
+              <div class="owner-row">
+                <div class="owner-avatar" [style.background]="svc.avatarColor(block.ownerName)">
+                  {{ svc.getInitials(block.ownerName) }}
+                </div>
+                <span class="owner-name">{{ block.ownerName }}</span>
+              </div>
+              <ul class="step-list">
+                <li *ngFor="let item of block.items">{{ item }}</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags-row" *ngIf="conversation.tags && conversation.tags.length > 0">
+            <span class="tag-pill" *ngFor="let tag of conversation.tags">#{{ tag }}</span>
+          </div>
+
+        </div>
+
+        <!-- ── TAB: Transcript ── -->
+        <div class="tab-content" *ngIf="activeTab === 'transcript'">
+          <div class="transcript-list" *ngIf="conversation.transcript && conversation.transcript.length > 0">
+            <div class="transcript-item" *ngFor="let seg of conversation.transcript">
+              <div class="seg-avatar"
+                [style.background]="svc.avatarColor(seg.speakerName)"
+                [title]="seg.speakerName">
+                {{ svc.getInitials(seg.speakerName) }}
+              </div>
+              <div class="seg-body">
+                <div class="seg-meta">
+                  <span class="seg-speaker">{{ seg.speakerName }}</span>
+                  <span class="seg-time">{{ svc.formatTimestamp(seg.timestampSeconds) }}</span>
+                </div>
+                <p class="seg-text">{{ seg.text }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="empty-tab" *ngIf="!conversation.transcript || conversation.transcript.length === 0">
+            <i class="fas fa-closed-captioning"></i>
+            <p>{{ 'CONVERSATIONS.DETAIL.NO_TRANSCRIPT' | translate }}</p>
+          </div>
+        </div>
+
+        <!-- ── TAB: Participants ── -->
+        <div class="tab-content" *ngIf="activeTab === 'participants'">
+          <div class="participants-list">
+            <div class="participant-item" *ngFor="let p of conversation.participants">
+              <div class="part-avatar" [style.background]="svc.avatarColor(p.name)">
+                {{ svc.getInitials(p.name) }}
+              </div>
+              <div class="part-info">
+                <span class="part-name">{{ p.name }}</span>
+                <span class="part-email" *ngIf="p.email">{{ p.email }}</span>
+              </div>
+              <div class="part-stats" *ngIf="p.speakingPercent">
+                <span class="part-pct">{{ p.speakingPercent }}%</span>
+                <span class="part-min">{{ p.speakingMinutes }}m</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

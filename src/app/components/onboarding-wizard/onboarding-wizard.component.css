@@ -1,0 +1,288 @@
+:root {
+  --grad: linear-gradient(155deg, #7871FB 0%, #251F95 100%);
+  --indigo: #3E34F9;
+  --indigo-soft: #EEEDFE;
+  --pink: #F9348C;
+  --ink: #1D1D1F;
+  --grey: #6E6E73;
+  --grey-light: #F5F5F7;
+  --grey-border: #E5E5EA;
+  --radius: 16px;
+  --shadow-sm: 0 1px 2px rgba(29,29,31,.04), 0 4px 14px rgba(37,31,149,.06);
+  --shadow-md: 0 8px 30px rgba(37,31,149,.10), 0 2px 8px rgba(29,29,31,.04);
+  --shadow-lg: 0 20px 60px rgba(37,31,149,.18);
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+
+/* Barra de progreso fija superior */
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--grey-light);
+  z-index: 100000;
+}
+#progress .fill {
+  height: 100%;
+  background: var(--indigo);
+  width: 0;
+  transition: width .4s var(--ease-out);
+}
+
+/* Estructura base del paso */
+.step {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.step.active {
+  position: relative !important; 
+  z-index: 10 !important;       /* CAPA SUPERIOR: Preguntas adelante */
+  display: flex !important;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Zona Izquierda Absoluta (Logo arriba, Botón Atrás abajo) */
+.wizard-absolute-left-zone {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  z-index: 10;
+}
+
+#topbar .logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+/* Botón atrás con fondo blanco puro */
+.wizard-back-pill {
+  background: #ffffff !important;
+  border: 1px solid var(--grey-border) !important;
+  padding: 10px 18px !important;
+  border-radius: 30px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.wizard-back-pill:hover {
+  background: var(--grey-light) !important;
+}
+
+/* Zona Derecha Absoluta (Saltar y Contador alineados horizontalmente) */
+.wizard-absolute-right-zone {
+  position: absolute;
+  top: 38px; /* Ajustado para simetría visual con la primera línea del logo */
+  right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.skip {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+  cursor: pointer;
+  transition: color .2s;
+}
+.skip:hover { color: var(--ink); }
+
+.wizard-custom-counter {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+  font-family: 'Inter', sans-serif;
+  background: var(--grey-light);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.q-wrap {
+  width: 100%;
+  max-width: 520px;
+  margin: 80px auto 0; 
+  text-align: left;
+}
+
+.q-eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+/* Punto estrictamente rojo e independiente */
+.q-eyebrow .dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--pink) !important;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Texto de la categoría estrictamente azul */
+.category-text-blue {
+  color: var(--indigo) !important;
+}
+
+.q-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.q-sub {
+  font-size: 16px;
+  color: var(--grey);
+  line-height: 1.4;
+  margin-bottom: 32px;
+}
+
+/* Opciones y Botones */
+.options {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+.options.cols-1 { grid-template-columns: 1fr; }
+
+.opt {
+  width: 100%;
+  min-height: 56px;
+  background: #ffffff;
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease), background .25s var(--ease);
+  box-sizing: border-box;
+  box-shadow: var(--shadow-md);
+}
+
+.opt:hover {
+  border-color: var(--indigo);
+  background: var(--grey-light);
+  transform: translateY(-4px);   
+  box-shadow: var(--shadow-lg);
+}
+.opt.sel {
+  border-color: var(--indigo);
+  background: var(--indigo-soft);
+  box-shadow: 0 0 0 1px var(--indigo);
+}
+
+.opt .lbl {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.opt .chev {
+  margin-left: auto;
+  color: var(--grey);
+  display: flex;
+  align-items: center;
+}
+.opt .ic {
+  margin-right: 16px;
+  color: var(--indigo);
+  font-size: 18px;
+  
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--grey-light); 
+  border: 1px solid var(--grey-border);
+  border-radius: 10px; 
+  flex-shrink: 0; 
+}
+
+/* Estilos para inputs de texto y botones continuar */
+.wizard-input-vertical-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.text-field-input {
+  cursor: text;
+}
+.wizard-next-btn {
+  background: var(--indigo) !important;
+  border: none !important;
+  justify-content: center;
+  color: white !important;
+  font-weight: 600;
+}
+.wizard-next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.wizard-next-btn:hover:not(:disabled) {
+  background: #2b22d4 !important;
+}
+
+/* Overlays adicionales de Carga */
+.wizard-loading-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: #ffffff !important;
+  z-index: 1000000 !important;
+}
+
+#particles-js {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+#particles-js canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#stage {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: #ffffff !important;
+  z-index: 99999 !important;        
+  overflow-y: auto;
+}

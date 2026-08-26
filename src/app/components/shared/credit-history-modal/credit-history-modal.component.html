@@ -1,0 +1,51 @@
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="onClose()">
+  <div class="custom-modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ 'CREDIT_HISTORY.TITLE' | translate}} {{ memberName }}</h2>
+      <button class="close-button" (click)="onClose()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="isLoading" class="alert alert-warning text-center">
+        <p>{{ 'CREDIT_HISTORY.LOADING_HISTORY' | translate}}</p>
+      </div>
+
+      <div *ngIf="error" class="error-container">
+        <p>{{ error }}</p>
+      </div>
+      <div *ngIf="error" class="error-button-container">
+        <button (click)="fetchCreditHistory()">{{ 'CREDIT_HISTORY.RETRY' | translate}}</button>
+      </div>
+
+      <div *ngIf="!isLoading && !error" class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_TYPE' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_DATE' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_AMOUNT' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_REASON' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_MEMBER_BALANCE' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_PLAN' | translate }}</th>
+              <th>{{ 'CREDIT_HISTORY_MODAL.TABLE_HEADER_TRIGGERED_BY' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of historyData">
+              <td>{{ 'SUB_MGMT.' + transaction.transactionType | translate }}</td>
+              <td>{{ transaction.transactionDate | date: 'short' }}</td>
+              <td>{{ transaction.amount }}</td>
+              <td>{{ transaction.reason }}</td>
+              <td>{{ transaction.memberBalanceAfter }}</td>
+              <td>{{ transaction.planName }}</td>
+              <td>{{ transaction.triggeredByUser }}</td>
+            </tr>
+            <tr *ngIf="historyData.length === 0">
+              <td colspan="7" class="no-data">{{ 'CREDIT_HISTORY_MODAL.NO_HISTORY_FOUND' | translate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

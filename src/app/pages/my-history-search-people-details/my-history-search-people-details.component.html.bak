@@ -1,0 +1,295 @@
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "HISTORY_DETAILS.PEOPLE_TITLE" | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <div class="history-details-page-new">
+    <!-- Header principal de la página de detalles -->
+    <div class="history-details-main-header">
+      <div class="history-details-header-row-1">
+        <button class="btn-outline" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          {{ "HISTORY_DETAILS.BACK_TO_HISTORY" | translate }}
+        </button>
+      </div>
+      <div class="history-details-header-row-2">
+        <div class="details-header-info">
+          <h2 *ngIf="searchDetails">{{ searchDetails.searchString }}</h2>
+          <span *ngIf="searchDetails" [ngClass]="getStatusClass(searchDetails.statusSelect)">
+            {{ getStatusText(searchDetails.statusSelect) }}
+          </span>
+          <span *ngIf="searchDetails" class="results-count">
+            {{ searchDetails.resultsNumber }} {{ "HISTORY_DETAILS.RESULTS" | translate }}
+          </span>
+        </div>
+        <div class="controls-right">
+          <div class="dropdown-wrapper">
+            <div class="dropdown-control" (click)="toggleDropdown('sort')">
+              <i class="fas fa-sort"></i>
+              <span>{{ "HISTORY_DETAILS.SORT" | translate }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" [class.show]="showSortDropdown">
+              <div class="dropdown-item" (click)="onSortChange('name_asc')">
+                {{ "HISTORY_DETAILS.NAME_AZ" | translate }}
+              </div>
+              <div class="dropdown-item" (click)="onSortChange('name_desc')">
+                {{ "HISTORY_DETAILS.NAME_ZA" | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="history-details-content-new">
+      <!-- Loading State -->
+      <div
+        *ngIf="isLoading"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+        "
+      >
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5b4fe5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+          "
+        ></div>
+        <p>{{ "HISTORY_DETAILS.LOADING_RESULTS" | translate }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="!isLoading && (!searchDetails || searchDetails.results.length === 0)"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+          text-align: center;
+        "
+      >
+        <div style="font-size: 48px; margin-bottom: 16px; color: #94a3b8">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 style="margin-bottom: 8px; color: #1e293b">
+          {{ "HISTORY_DETAILS.NO_RESULTS_TITLE" | translate }}
+        </h3>
+        <p style="margin-bottom: 24px">
+          {{ "HISTORY_DETAILS.NO_RESULTS_SUBTITLE" | translate }}
+        </p>
+      </div>
+
+      <!-- Results Table (Grid View) -->
+      <div
+        *ngIf="!isLoading && searchDetails && searchDetails.results.length > 0"
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <div style="flex: 1; overflow: auto; background: white">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead
+              style="
+                position: sticky;
+                top: 0;
+                background: #f8fafc;
+                z-index: 10;
+              "
+            >
+              <tr style="border-bottom: 1px solid #e2e8f0">
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #64748b;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    width: 250px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.NAME" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #64748b;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.JOB_TITLE" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #64748b;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.COMPANY" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #64748b;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.LOCATION" | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let people of searchDetails.results; let i = index"
+                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
+                style="border-bottom: 1px solid #e2e8f0"
+              >
+                <td
+                  style="
+                    padding: 12px;
+                    font-weight: 500;
+                    color: #1e293b;
+                    text-decoration: underline;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <img
+                      [src]="people.avatar"
+                      [alt]="people.name"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                    />
+                    <div>
+                      <div
+                        style="
+                          font-weight: 500;
+                          color: #1e293b;
+                          text-decoration: underline;
+                          cursor: pointer;
+                        "
+                      >
+                        {{ people.name }}
+                      </div>
+                      <div
+                        *ngIf="people.email"
+                        style="font-size: 12px; color: #64748b"
+                      >
+                        {{ people.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding: 12px; color: #64748b">
+                  {{ people.jobTitle }}
+                </td>
+                <td style="padding: 12px; color: #64748b">
+                  {{ people.company }}
+                </td>
+                <td style="padding: 12px; color: #64748b">
+                  {{ people.location }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          style="
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div style="color: #64748b; font-size: 14px">
+            {{ getStartIndex() }} - {{ getEndIndex() }} of
+            {{ getFormattedTotal() }}
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button
+              (click)="goToPage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'"
+              [style.color]="currentPage === 1 ? '#94a3b8' : '#64748b'"
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span
+              style="padding: 8px 12px; color: #64748b; font-size: 14px"
+            >
+              {{ "HISTORY_DETAILS.PAGE" | translate }} {{ currentPage }}
+              {{ "HISTORY_DETAILS.OF" | translate }} {{ totalPages }}
+            </span>
+            <button
+              (click)="goToPage(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              [style.cursor]="
+                currentPage === totalPages ? 'not-allowed' : 'pointer'
+              "
+              [style.color]="
+                currentPage === totalPages ? '#94a3b8' : '#64748b'
+              "
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

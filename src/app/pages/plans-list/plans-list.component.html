@@ -1,0 +1,80 @@
+<div class="page-container">
+
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ 'PLANS.PLAN_LIST' | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right">
+      <div class="billing-toggle">
+          <button
+            [class.active]="billingCycle === 'annual'"
+            (click)="setBillingCycle('annual')"
+          >
+            {{ "PLANS.ANNUAL_BILLING" | translate }}
+          </button>
+          <button
+            [class.active]="billingCycle === 'monthly'"
+            (click)="setBillingCycle('monthly')"
+          >
+            {{ "PLANS.MONTHLY_BILLING" | translate }}
+          </button>
+          <span class="save-badge" *ngIf="billingCycle === 'annual'">{{
+            "PLANS.SAVE_20" | translate
+          }}</span>
+        </div>
+    </div>
+  </div>
+
+  <div class="plans-page-container">
+    <div class="plans-scrollable-content">
+      <!-- Main Content -->
+      <div class="plans-content">
+        <!-- Plans Grid -->
+        <div class="plans-grid">
+          <div
+            class="plan-card"
+            *ngFor="let plan of plans"
+            [class.popular]="plan.popular"
+            [class.selected]="plan.id === selectedPlan.id"
+          >
+            <!-- NEW WRAPPER DIV -->
+            <div class="plan-card-main">
+              <div class="popular-badge" *ngIf="plan.popular">
+                {{ "PLANS.MOST_POPULAR" | translate }}
+              </div>
+              <h3>{{ plan.name }}</h3>
+              <p class="plan-description">{{ plan.description }}</p>
+              <div class="price-container">
+                <span class="price-amount">${{ getRoundedPrice(plan) }} USD</span>
+                <span class="price-period">{{
+                  "PLANS.PER_USER_PER_MONTH" | translate
+                }}</span>
+                <span class="price-billing-cycle">{{
+                  billingCycle === "annual"
+                    ? ("PLANS.BILLED_ANNUALLY" | translate)
+                    : ("PLANS.BILLED_MONTHLY" | translate)
+                }}</span>
+                <span class="price-note" *ngIf="plan.note">{{
+                  plan.note | translate
+                }}</span>
+              </div>
+
+              <div class="credits-section">
+                <p>
+                  {{ plan.creditsPerUserPerYear | number }} credits per
+                  user/year
+                </p>
+              </div>
+              <ul class="features-list">
+                <li *ngFor="let feature of plan.features">
+                  <i class="fas fa-check"></i> {{ feature }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

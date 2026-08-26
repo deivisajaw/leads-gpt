@@ -1,0 +1,959 @@
+<div class="page-container">
+
+  <div class="header-section">
+    <div class="header-left">
+      <h1>Campa&ntilde;as</h1>
+      <p></p>
+    </div>
+    <div class="header-right">         
+    </div>
+  </div>
+
+  <div>
+    <div class="campaign-manager">
+      <div id="main-view" class="main-view">
+        <div class="header">
+          <button
+            id="add-campaign-btn"
+            class="btn-primary"
+            (click)="showCampaignModal()"
+          >
+            <i class="fas fa-plus"></i> Agregar Nueva
+          </button>
+        </div>
+
+        <div class="campaigns-table">
+          <div
+            *ngIf="alertMessage"
+            class="alert"
+            [ngClass]="{
+              'alert-success': alertMessage.type === 'success',
+              'alert-error': alertMessage.type === 'error'
+            }"
+          >
+            {{ alertMessage.text }}
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Leads Registrados</th>
+                <th>Leads Conectados</th>
+                <th>Meetings Programados</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Fin</th>
+                <th>Procesado</th>
+                <th>Status</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="campaigns-tbody">
+              <tr *ngFor="let campaign of campaigns">
+                <td>
+                  <a [routerLink]="['/campaigns', campaign.id]" class="campaign-name-link">
+                    {{ campaign.name }}
+                  </a>
+                </td>
+                <td><span [ngClass]="getBadgeClass(campaign.campaignType)">{{ campaign.campaignType }}</span></td>
+                <td>
+                  {{ campaign.registeredLeadsCount }}
+                </td>
+                <td>
+                  {{ campaign.connectedLeadsCount }}
+                </td>
+                <td>
+                  {{ campaign.scheduledMeetingsCount }}
+                </td>
+                <td>{{ campaign.startDate | date : "shortDate" }}</td>
+                <td>{{ campaign.endDate | date : "shortDate" }}</td>
+                <td>
+                  <div class="processed-status">
+                    <span
+                      class="status-circle"
+                      [ngClass]="{
+                        'status-green': campaign.processed,
+                        'status-red': !campaign.processed
+                      }"
+                      [title]="campaign.processed ? 'Procesado' : 'Pendiente'"
+                    ></span>
+                  </div>
+                </td>
+                <td>
+                  <select
+                    class="status-select"
+                    [value]="campaign.status.toLowerCase()"
+                    (change)="changeStatus(campaign, $event)"
+                    [disabled]="isUpdating"
+                  >
+                    <option value="planned">Planeada</option>
+                    <option value="in_progress">En Ejecuci&oacute;n</option>
+                    <option value="finished">Finalizada</option>
+                    <option value="cancelled">Cancelada</option>
+                  </select>
+                  <span *ngIf="isUpdating && updatingCampaignId === campaign.id"
+                    >Cargando...</span
+                  >
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      class="btn-action edit"
+                      (click)="editCampaign(campaign)"
+                      title="Editar"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn-action delete"
+                      (click)="deleteCampaign(campaign.id)"
+                      title="Eliminar"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    <button
+                      class="btn-action view"
+                      [routerLink]="['/campaigns', campaign.id]"
+                      title="Ver Detalles"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div
+            class="empty-state"
+            id="empty-state"
+            *ngIf="!campaigns || campaigns.length === 0"
+          >
+            <p (click)="showCampaignModal()">+ Agregar nueva</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Unificado de Campana -->
+      <div
+        id="campaign-modal"
+        class="modal"
+        [class.active]="isCampaignModalVisible"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>
+              {{
+                editingCampaign
+                  ? "Editar Campa&ntilde;a"
+                  : "Nueva Campa&ntilde;a"
+              }}
+            </h2>
+            <button
+              class="close-btn"
+              id="close-campaign-modal"
+              (click)="hideCampaignModal()"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="steps-sidebar">
+              <div
+                class="step"
+                [class.active]="currentStep === 1"
+                [class.completed]="currentStep > 1"
+                data-step="1"
+              >
+                <div class="step-number">1</div>
+                <span>Selecciona tu tipo de campa&ntilde;a</span>
+              </div>
+              <div
+                class="step"
+                [class.active]="currentStep === 2"
+                data-step="2"
+              >
+                <div class="step-number">2</div>
+                <span>Detalles de la campa&ntilde;a</span>
+              </div>
+            </div>
+
+            <div class="content-area">
+              <!-- Contenido del Paso 1 -->
+              <div
+                id="step-1-content"
+                class="step-content"
+                [class.active]="currentStep === 1"
+              >
+                <h3>Nombre de la campa&ntilde;a</h3>
+                <div class="campaign-name-section">
+                  <div class="form-group">
+                    <label for="campaign-name"
+                      >Nombre de la Campa&ntilde;a *</label
+                    >
+                    <input
+                      type="text"
+                      id="campaign-name"
+                      required
+                      [(ngModel)]="campaignName"
+                    />
+                    <div *ngIf="showValidationErrors && !campaignName && currentStep === 1" class="validation-error">
+                      El nombre de la campaña es requerido.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- NEW: Agent Select -->
+                <div class="form-group">
+                  <label for="agent-select">Agente *</label>
+                  <select
+                    id="agent-select"
+                    required
+                    [(ngModel)]="selectedAgentId"
+                    [compareWith]="compareWithId"
+                  >
+                    <option [ngValue]="null" disabled>Selecciona un agente</option>
+                    <option *ngFor="let agent of availableAgents" [ngValue]="agent.id">
+                      {{ agent.name }}
+                    </option>
+                  </select>
+                  <div *ngIf="showValidationErrors && selectedAgentId === null && currentStep === 1" class="validation-error">
+                    Debe seleccionar un agente.
+                  </div>
+                </div>
+
+                <h3>Selecciona tu tipo de campa&ntilde;a IA *</h3>
+                <p>
+                  Elige el mejor tipo de campa&ntilde;a para optimizar tu
+                  alcance y conectar con creadores de manera efectiva.
+                </p>
+                <div *ngIf="showValidationErrors && !selectedCampaignType && currentStep === 1" class="validation-error">
+                  Debe seleccionar un tipo de campaña.
+                </div>
+
+                <div class="campaign-types">
+                  
+                  <div
+                    class="campaign-type-card"
+                    [class.selected]="selectedCampaignType === 'email'"
+                    (click)="selectCampaignType('email')"
+                    data-type="email"
+                  >
+                    <div class="card-icon"><i class="fas fa-envelope"></i></div>
+                    <h4>Emails IA</h4>
+                    <p>
+                      Crea y env&iacute;a emails personalizados con inteligencia
+                      artificial
+                    </p>
+                    <input
+                      type="radio"
+                      name="campaign-type"
+                      value="email"
+                      [checked]="selectedCampaignType === 'email'"
+                    />
+                  </div>
+                  <div
+                    class="campaign-type-card"
+                    [class.selected]="selectedCampaignType === 'voice'"
+                    (click)="selectCampaignType('voice')"
+                    data-type="voice"
+                  >
+                    <div class="card-icon"><i class="fas fa-phone"></i></div>
+                    <h4>Llamadas de Voz IA</h4>
+                    <p>
+                      Realiza llamadas automatizadas con voz generada por IA
+                    </p>
+                    <input
+                      type="radio"
+                      name="campaign-type"
+                      value="voice"
+                      [checked]="selectedCampaignType === 'voice'"
+                    />
+                  </div>
+                  <div
+                    class="campaign-type-card campaign-type-card-full"
+                    [class.selected]="selectedCampaignType === 'sms'"
+                    (click)="selectCampaignType('sms')"
+                    data-type="sms"
+                  >
+                    <div class="card-icon"><i class="fas fa-sms"></i></div>
+                    <h4>SMS IA</h4>
+                    <p>Env&iacute;a mensajes SMS personalizados usando IA</p>
+                    <input
+                      type="radio"
+                      name="campaign-type"
+                      value="sms"
+                      [checked]="selectedCampaignType === 'sms'"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contenido del Paso 2 -->
+              <div
+                id="step-2-content"
+                class="step-content"
+                [class.active]="currentStep === 2"
+              >
+                <div class="tabs-container">
+                  <div class="tabs">
+                    <button
+                      class="tab"
+                      [class.active]="activeTab === 'leads'"
+                      (click)="switchTab('leads')"
+                      data-tab="leads"
+                    >
+                      Leads
+                    </button>
+                    <button
+                      class="tab"
+                      [class.active]="activeTab === 'schedule'"
+                      (click)="switchTab('schedule')"
+                      data-tab="schedule"
+                    >
+                      Programar
+                    </button>
+                  </div>
+                  <div class="tab-content-wrapper">
+                    <!-- Tab Leads -->
+                    <div
+                      id="leads-tab"
+                      class="tab-content"
+                      [class.active]="activeTab === 'leads'"
+                    >
+                      <h3>Segmentaci&oacute;n</h3>
+                      <div class="content-with-sidebar">
+                        <div class="main-content">
+                          <div class="targeting-section">
+                            <div class="targeting-options">
+                              <label class="radio-option"
+                                ><div class="radio-content-wrapper">
+                                  <input
+                                    type="radio"
+                                    name="targeting"
+                                    value="people"
+                                    (change)="handleTargetingChange('people')"
+                                  /><span>Personas</span>
+                                </div>
+                                <i
+                                  class="fas fa-upload select-leads-icon"
+                                  data-type="people"
+                                  (click)="
+                                    showLeadsSelectionModal(
+                                      'Seleccionar Personas',
+                                      campaignData.people
+                                    )
+                                  "
+                                ></i
+                              ></label>
+                              <label class="radio-option"
+                                ><div class="radio-content-wrapper">
+                                  <input
+                                    type="radio"
+                                    name="targeting"
+                                    value="companies"
+                                    (change)="
+                                      handleTargetingChange('companies')
+                                    "
+                                  /><span>Empresas</span>
+                                </div>
+                                <i
+                                  class="fas fa-upload select-leads-icon"
+                                  data-type="companies"
+                                  (click)="
+                                    showLeadsSelectionModal(
+                                      'Seleccionar Empresas',
+                                      campaignData.companies
+                                    )
+                                  "
+                                ></i
+                              ></label>
+                              <label class="radio-option"
+                                ><div class="radio-content-wrapper">
+                                  <input
+                                    type="radio"
+                                    name="targeting"
+                                    value="both"
+                                    (change)="handleTargetingChange('both')"
+                                  /><span>Personas + Empresas</span>
+                                </div>
+                                <i
+                                  class="fas fa-upload select-leads-icon"
+                                  data-type="both"
+                                  (click)="
+                                    showLeadsSelectionModal(
+                                      'Seleccionar Personas y Empresas',
+                                      {
+                                        people: campaignData.people,
+                                        companies: campaignData.companies
+                                      }
+                                    )
+                                  "
+                                ></i
+                              ></label>
+                              <label class="radio-option">
+                                <div class="radio-content-wrapper">
+                                  <input
+                                    type="radio"
+                                    name="targeting"
+                                    value="csv"
+                                    (change)="handleTargetingChange('csv')"
+                                  /><span>Subir CSV</span>
+                                </div>
+                                <i class="fas fa-upload select-leads-icon"
+                                  data-type="csv"
+                                  (click)="triggerCsvUpload()"
+                                ></i>
+                              </label>
+
+                              <div class="csv-instructions">
+                                <div class="csv-info-box">
+                                  <p class="csv-info-title">
+                                    <i class="fas fa-info-circle"></i> El archivo CSV debe tener las siguientes columnas:
+                                  </p>
+                                  <div class="csv-columns">
+                                    <code>name</code><code>phone</code><code>email</code>
+                                  </div>
+                                  <p class="csv-example-label">Ejemplo de fila:</p>
+                                  <pre class="csv-example-row">Juan Perez,+573001234567,juan&#64;correo.com</pre>
+                                  <p class="csv-delimiter-note">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Importante:</strong> el delimitador debe ser <strong>coma (,)</strong>, no punto y coma (;).
+                                  </p>
+                                  <a href="templates/template_users_campaign.csv" download class="csv-template-link">
+                                    <i class="fas fa-download"></i> Descargar plantilla CSV
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                            <div
+                              class="csv-upload"
+                              id="csv-upload"
+                              style="display: none"
+                            >
+                              <p>
+                                Segmentar cuentas espec&iacute;ficas de
+                                Instagram v&iacute;a subida de CSV
+                              </p>
+                              <div class="uploaded-file">
+                                <i class="fas fa-file"></i> AUTO IG DM FEELING
+                                GIRL
+                              </div>
+                              <button class="btn-primary">
+                                + Subir una Nueva Lista de Leads
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="sidebar">
+                          <div class="leads-preview">
+                            <div class="preview-box" id="leads-preview-box">
+                              <div
+                                *ngIf="selectedLeads.length === 0"
+                                class="preview-empty-message"
+                              >
+                                No hay leads seleccionados
+                              </div>
+                              <table
+                                *ngIf="selectedLeads.length > 0"
+                                class="preview-leads-table"
+                              >
+                                <thead>
+                                  <tr>
+                                    <th>Acci&oacute;n</th>
+                                    <th>Tipo</th>
+                                    <th class="large">Nombre</th>
+                                    <th>Correo</th>
+                                    <th>Tel&eacute;fono</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let lead of selectedLeads">
+                                    <td>
+                                      <button
+                                        class="remove-preview-lead"
+                                        (click)="removeLeadFromPreview(lead.id)"
+                                      >
+                                        <i class="fas fa-times"></i>
+                                      </button>
+                                    </td>
+                                    <td>
+                                      <div class="preview-lead-type-icon">
+                                        <i
+                                          [class]="getLeadTypeIcon(lead.type)"
+                                        ></i>
+                                      </div>
+                                    </td>
+                                    <td class="preview-lead-name">
+                                      {{ lead.name }}
+                                    </td>
+                                    <td class="preview-lead-email">
+                                      {{ lead.email }}
+                                    </td>
+                                    <td class="preview-lead-phone">
+                                      {{ lead.phone }}
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                            <div *ngIf="showValidationErrors && selectedLeads.length === 0 && activeTab === 'leads'" class="validation-error">
+                              Debe seleccionar al menos un lead.
+                            </div>
+                            <div class="preview-actions">
+                              <button
+                                *ngIf="selectedLeads.length > 0"
+                                id="clear-all-leads-preview"
+                                class="btn-secondary"
+                                (click)="clearAllLeads()"
+                              >
+                                Limpiar Todo
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Tab Schedule -->
+                    <div
+                      id="schedule-tab"
+                      class="tab-content"
+                      [class.active]="activeTab === 'schedule'"
+                    >
+                      <div class="schedule-section">
+                        <h3>
+                          ¿Cu&aacute;ndo deber&iacute;a ejecutarse tu
+                          campa&ntilde;a?
+                        </h3>
+                        <div class="form-group">
+                          <label>Zona Horaria *</label>
+                          <select [(ngModel)]="timezone" name="timezone">
+                            <option [ngValue]="null" disabled>Selecciona una zona horaria</option>
+                            <option
+                              *ngFor="let tz of availableTimezones"
+                              [value]="tz.value"
+                            >
+                              {{ tz.label }}
+                            </option>
+
+                          </select>
+                          <div *ngIf="showValidationErrors && !timezone && activeTab === 'schedule'" class="validation-error">
+                            La zona horaria es requerida.
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="start-date">Fecha de Inicio *</label>
+                          <input
+                            type="date"
+                            id="start-date"
+                            [(ngModel)]="startDate"
+                            name="startDate"
+                          />
+                          <div *ngIf="showValidationErrors && !startDate && activeTab === 'schedule'" class="validation-error">
+                            La fecha de inicio es requerida.
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="end-date">Fecha de Fin *</label>
+                          <input
+                            type="date"
+                            id="end-date"
+                            [(ngModel)]="endDate"
+                            name="endDate"
+                          />
+                          <div *ngIf="showValidationErrors && !endDate && activeTab === 'schedule'" class="validation-error">
+                            La fecha de fin es requerida.
+                          </div>
+                        </div>
+
+                        <!-- Time Range 1 -->
+                        <div class="time-range">
+                          <div class="form-group">
+                            <label>Desde (Franja 1) *</label>
+                            <select [(ngModel)]="startTime" name="startTime">
+                              <option [ngValue]="null" disabled>Selecciona una hora</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                            <div *ngIf="showValidationErrors && !startTime && activeTab === 'schedule'" class="validation-error">
+                              La hora de inicio es requerida.
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label>Hasta (Franja 1) *</label>
+                            <select [(ngModel)]="endTime" name="endTime">
+                              <option [ngValue]="null" disabled>Selecciona una hora</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                            <div *ngIf="showValidationErrors && !endTime && activeTab === 'schedule'" class="validation-error">
+                              La hora de fin es requerida.
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Time Range 2 -->
+                        <div class="time-range">
+                          <div class="form-group">
+                            <label>Desde (Franja 2)</label>
+                            <select [(ngModel)]="startTime2" name="startTime2">
+                              <option [ngValue]="null">No seleccionar</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label>Hasta (Franja 2)</label>
+                            <select [(ngModel)]="endTime2" name="endTime2">
+                              <option [ngValue]="null">No seleccionar</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- Time Range 3 -->
+                        <div class="time-range">
+                          <div class="form-group">
+                            <label>Desde (Franja 3)</label>
+                            <select [(ngModel)]="startTime3" name="startTime3">
+                              <option [ngValue]="null">No seleccionar</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label>Hasta (Franja 3)</label>
+                            <select [(ngModel)]="endTime3" name="endTime3">
+                              <option [ngValue]="null">No seleccionar</option>
+                              <option *ngFor="let time of timeOptions" [value]="time">
+                                {{ time }}
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- Interval Field -->
+                        <div class="form-group">
+                          <label for="interval">Intervalo (minutos) *</label>
+                          <input
+                            type="number"
+                            id="interval"
+                            [(ngModel)]="interval"
+                            name="interval"
+                            placeholder="Ej: 60"
+                          />
+                          <div *ngIf="showValidationErrors && (!interval || interval <= 0) && activeTab === 'schedule'" class="validation-error">
+                            El intervalo es requerido y debe ser mayor a 0.
+                          </div>
+                        </div>
+
+                        <div class="days-section">
+                          <h4>D&iacute;as de la semana *</h4>
+                          <div *ngIf="showValidationErrors && !isAnyDaySelected() && activeTab === 'schedule'" class="validation-error">
+                            Debe seleccionar al menos un día de la semana.
+                          </div>
+                          <div class="days-grid">
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.monday"
+                                name="monday"
+                              /><span>Lunes</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.tuesday"
+                                name="tuesday"
+                              /><span>Martes</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.wednesday"
+                                name="wednesday"
+                              /><span>Mi&eacute;rcoles</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.thursday"
+                                name="thursday"
+                              /><span>Jueves</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.friday"
+                                name="friday"
+                              /><span>Viernes</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.saturday"
+                                name="saturday"
+                              /><span>S&aacute;bado</span></label
+                            >
+                            <label class="checkbox-option"
+                              ><input
+                                type="checkbox"
+                                [(ngModel)]="weekDays.sunday"
+                                name="sunday"
+                              /><span>Domingo</span></label
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acciones del Modal -->
+              <div class="modal-actions">
+                <button
+                  class="btn-secondary"
+                  id="back-to-main"
+                  *ngIf="currentStep === 1"
+                  (click)="hideCampaignModal()"
+                >
+                  Atr&aacute;s
+                </button>
+                <button
+                  class="btn-secondary"
+                  id="back-to-step-1"
+                  *ngIf="currentStep === 2"
+                  (click)="goToStep(1)"
+                >
+                  <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <button
+                  class="btn-primary"
+                  id="continue-to-details"
+                  [disabled]="!isStep1Valid()"
+                  *ngIf="currentStep === 1"
+                  (click)="goToStep(2)"
+                >
+                  Detalles de la Campa&ntilde;a →
+                </button>
+                <button
+                  class="btn-primary"
+                  id="publish-campaign"
+                  *ngIf="currentStep === 2"
+                  (click)="showConfirmationModal()"
+                >
+                  Publicar Campa&ntilde;a
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Seleccion de Leads -->
+      <div
+        id="leads-selection-modal"
+        class="modal"
+        [class.active]="isLeadsSelectionModalVisible"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="leads-selection-title">{{ leadsSelectionTitle }}</h2>
+            <button
+              class="close-btn"
+              id="close-leads-modal"
+              (click)="hideLeadsSelectionModal()"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body-leads">
+            <div class="leads-list" id="leads-list">
+              <table class="leads-selection-table">
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <th width="30%">Nombre</th>
+                    <th width="30%">Correo</th>
+                    <th width="30%">Tel&eacute;fono</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="isLeadsObject(leadsToSelect)">
+                    <ng-container *ngIf="leadsToSelect.people">
+                      <tr class="lead-group-header">
+                        <td colspan="4">Personas</td>
+                      </tr>
+                      <tr
+                        *ngFor="let item of leadsToSelect.people; let i = index"
+                        class="lead-option"
+                        [attr.data-lead-id]="item.type + '-' + i"
+                        (click)="toggleLeadSelection(item)"
+                      >
+                        <td>
+                          <input
+                            type="checkbox"
+                            class="lead-checkbox"
+                            [checked]="isLeadSelected(item)"
+                          />
+                        </td>
+                        <td class="lead-name-cell">
+                          {{ item.name }}
+                        </td>
+                        <td class="lead-email-cell">
+                          {{ item.email }}
+                        </td>
+                        <td class="lead-phone-cell">
+                          {{ item.phone }}
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container *ngIf="leadsToSelect.companies">
+                      <tr class="lead-group-header">
+                        <td colspan="4">Empresas</td>
+                      </tr>
+                      <tr
+                        *ngFor="
+                          let item of leadsToSelect.companies;
+                          let i = index
+                        "
+                        class="lead-option"
+                        [attr.data-lead-id]="item.type + '-' + i"
+                        (click)="toggleLeadSelection(item)"
+                      >
+                        <td>
+                          <input
+                            type="checkbox"
+                            class="lead-checkbox"
+                            [checked]="isLeadSelected(item)"
+                          />
+                        </td>
+                        <td class="lead-name-cell">
+                          {{ item.name }}
+                        </td>
+                        <td class="lead-email-cell">
+                          {{ item.email }}
+                        </td>
+                        <td class="lead-phone-cell">
+                          {{ item.phone }}
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                  <ng-container *ngIf="isArray(leadsToSelect)">
+                    <ng-container *ngIf="isArray(leadsToSelect)">
+                      <tr
+                        *ngFor="let item of leadsToSelectArray; let i = index"
+                        class="lead-option"
+                        [attr.data-lead-id]="item.type + '-' + i"
+                        (click)="toggleLeadSelection(item)"
+                      >
+                        <td>
+                          <input
+                            type="checkbox"
+                            class="lead-checkbox"
+                            [checked]="isLeadSelected(item)"
+                          />
+                        </td>
+                        <td class="lead-name-cell">{{ item.name }}</td>
+                        <td class="lead-email-cell">{{ item.email }}</td>
+                        <td class="lead-phone-cell">{{ item.phone }}</td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn-secondary"
+              id="select-all-leads"
+              (click)="selectAllLeads()"
+            >
+              <i class="fas fa-check-double"></i> Seleccionar Todos
+            </button>
+            <button
+              class="btn-secondary"
+              id="deselect-all-leads"
+              (click)="deselectAllLeads()"
+            >
+              <i class="fas fa-times-circle"></i> Deseleccionar Todos
+            </button>
+
+            <button
+              class="btn-primary"
+              id="confirm-leads-selection"
+              (click)="confirmLeadsSelection()"
+            >
+              Confirmar Selecci&oacute;n
+            </button>
+            <button
+              class="btn-secondary"
+              id="cancel-leads-selection"
+              (click)="hideLeadsSelectionModal()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Confirmacion -->
+      <div
+        id="confirmation-modal"
+        class="modal"
+        [class.active]="isConfirmationModalVisible"
+      >
+        <div class="modal-content small">
+          <div class="modal-body">
+            <h3>
+              ¿Est&aacute;s seguro de que quieres guardar los datos de tu
+              campa&ntilde;a?
+            </h3>
+
+            <div class="modal-actions">
+              <button
+                class="btn-secondary"
+                id="cancel-publish"
+                (click)="hideConfirmationModal()"
+              >
+                Volver
+              </button>
+              <button
+                class="btn-primary"
+                id="confirm-publish"
+                (click)="publishCampaign()"
+              >
+                S&iacute;, actualizar campa&ntilde;a
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input
+      type="file"
+      id="csv-file-input"
+      style="display: none"
+      accept=".csv"
+      (change)="handleFileUpload($event)"
+    />
+  </div>
+</div>
+<div *ngIf="workflowStatus.inProgress" class="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg z-50 flex items-center">
+  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+  <span>{{ workflowStatus.message }}</span>
+</div>

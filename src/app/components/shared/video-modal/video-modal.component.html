@@ -1,0 +1,32 @@
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-button" (click)="closeModal()">&times;</button>
+
+    <div class="video-wrapper">
+      <video
+        #welcomeVideo
+        id="welcomeVideo"
+        width="100%"
+        height="auto"
+        controls
+        muted
+        loop
+      >
+        <source [src]="videoUrl" type="video/mp4" />
+        {{ 'VIDEO_MODAL.BROWSER_NOT_SUPPORTED' | translate }} 
+      </video>
+
+      <div class="play-overlay" *ngIf="!isPlaying" (click)="playVideo()">
+        <div class="play-button">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" (click)="onCtaClick()">
+        {{ 'VIDEO_MODAL.FIND_FIRST_LEADS_BUTTON' | translate }} 
+      </button>
+    </div>
+  </div>
+</div>

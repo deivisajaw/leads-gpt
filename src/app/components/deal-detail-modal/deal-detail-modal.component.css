@@ -1,0 +1,89 @@
+/* General Modal Styles */
+:host { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
+
+.modal-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(9, 30, 66, 0.54);
+  display: flex; justify-content: center; align-items: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background-color: #f4f5f7;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(9, 30, 66, 0.25);
+  width: 90%; max-width: 1100px; max-height: 90vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.5rem; border-bottom: 1px solid #dfe1e6;
+  background-color: #ffffff; flex-shrink: 0;
+}
+
+.modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: #172b4d; }
+.close-button { background: none; border: none; font-size: 1.8rem; font-weight: 400; line-height: 1; cursor: pointer; padding: 0; color: #6c757d; }
+
+/* NESTED SCROLL IMPLEMENTATION: Main body scrolls */
+.modal-body {
+  display: flex;
+  flex-direction: row;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  overflow-y: auto; /* The entire body has a primary scrollbar */
+}
+
+.main-content { flex: 1; min-width: 0; }
+
+.sidebar-content { flex: 0 0 380px; min-width: 0; display: flex; flex-direction: column; }
+
+/* Section Styling */
+.detail-section { background-color: #ffffff; border-radius: 5px; border: 1px solid #dfe1e6; margin-bottom: 1.5rem; overflow: hidden; }
+.detail-section:last-child { margin-bottom: 0; }
+
+.detail-section h4 {
+  font-size: 0.9rem; font-weight: 600; color: #092c66;
+  margin: 0; padding: 0.8rem 1rem;
+  background-color: #d9e8ff; /* User-approved color */
+  border-bottom: 1px solid #b8d6ff;
+}
+
+.detail-grid { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
+.detail-item label { display: block; font-size: 0.75rem; font-weight: 600; color: #5e6c84; margin-bottom: 0.3rem; text-transform: uppercase; }
+.detail-item p { margin: 0; font-size: 0.9rem; color: #172b4d; }
+
+/* Stage Badges (Unchanged) */
+.deal-stage { font-weight: 600; padding: 3px 10px; border-radius: 12px; display: inline-block; font-size: 0.75rem !important; text-transform: uppercase; letter-spacing: 0.5px; }
+.stage-NEW, .stage-CONTACTED { background-color: #deebff; color: #0747a6; }
+.stage-PROPOSAL_SENT, .stage-NEGOTIATION { background-color: #fff0b3; color: #975f00; }
+.stage-MEETING_SCHEDULED { background-color: #e6fcff; color: #00687a; }
+.stage-WON { background-color: #e3fcef; color: #006644; }
+.stage-LOST { background-color: #ffebe6; color: #bf2600; }
+
+/* Notes Section Specific Styles */
+.notes-section { flex: 1; display: flex; flex-direction: column; margin-bottom: 0; }
+.notes-container { display: flex; flex-direction: column; height: 100%; }
+.add-note-form { padding: 1rem; border-bottom: 1px solid #dfe1e6; }
+
+.add-note-form textarea { width: 100%; padding: 0.75rem; border: 1px solid #dfe1e6; border-radius: 4px; font-size: 0.9rem; min-height: 70px; margin-bottom: 0.5rem; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.add-note-form textarea:focus { outline: none; border-color: #5b4fe5; box-shadow: 0 0 0 2px rgba(91, 79, 229, 0.2); }
+.add-note-form button { display: block; margin-left: auto; padding: 0.5rem 1rem; background-color: #5b4fe5; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
+.add-note-form button:disabled { background-color: #a5adba; cursor: not-allowed; }
+
+/* NESTED SCROLL IMPLEMENTATION: Notes history scrolls independently */
+.notes-history {
+  padding: 1rem;
+  overflow-y: auto;      /* Enable independent scroll for notes */
+  max-height: 45vh;      /* Set a max height to trigger the scrollbar */
+}
+
+.note-item { background-color: #f7f8fa; border: 1px solid #dfe1e6; border-left: 3px solid #5b4fe5; border-radius: 4px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; }
+.note-body { margin: 0 0 0.5rem 0; font-size: 0.85rem; white-space: pre-wrap; color: #172b4d; }
+.note-meta { margin: 0; font-size: 0.7rem; color: #5e6c84; text-align: right; }
+.no-notes { color: #5e6c84; text-align: center; padding: 1.5rem; font-style: italic; font-size: 0.85rem; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateY(-20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }

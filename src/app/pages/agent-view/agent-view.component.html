@@ -1,0 +1,288 @@
+<div class="agent-view-page">
+  <div class="page-container">
+    <!-- Header -->
+    <div class="header">
+      <button class="btn-primary" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver a Agentes
+      </button>
+      <button
+        *ngIf="agent && agent.processed && agent.agentType && agent.agentType.toLowerCase() === 'voice'"
+        class="btn-primary"
+        (click)="openTestCallModal(agent.id)"
+      >
+        <i class="fas fa-phone"></i> Llamame Ahora
+      </button>
+    </div>
+
+    <!-- Loading and Error States -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando detalles del agente...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Agent Details -->
+    <div *ngIf="agent && !isLoading">
+      <!-- Hero Card -->
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-main-content">
+            <div class="hero-header">
+              <div class="hero-header-left">
+                <div class="hero-icon-wrapper">
+                  <i class="fas fa-robot hero-icon"></i>
+                </div>
+                <h1 class="hero-title">{{ agent.name }}</h1>
+              </div>
+              <span 
+                class="hero-badge" 
+                *ngIf="agent"
+                [ngClass]="{
+                  'status-active': agent.processed,
+                  'status-inactive': !agent.processed
+                }"
+              >
+                <span class="badge-dot"></span>
+                <span *ngIf="agent.processed">Agente Activo</span>
+                <span *ngIf="!agent.processed">Agente Inactivo</span>
+              </span>
+            </div>
+            <div class="hero-tags">
+              <div class="tag">
+                <i class="fas fa-microphone"></i>
+                <span>{{ agent.agentType.toLowerCase() === 'voice' ? 'Agente de Voz' : 'Agente de Texto' }}</span>
+              </div>
+              <div class="tag">
+                <i class="fas fa-globe"></i>
+                <span>{{ agent.language === 'es' ? 'Español' : 'English' }}</span>
+              </div>
+              <div class="tag">
+                <i class="fas fa-shield-alt"></i>
+                <span class="capitalize">{{ agent.agentDirection }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-opening-line">
+            <p class="opening-line-label">LÍNEA DE APERTURA</p>
+            <p class="opening-line-text">"{{ agent.openingLine }}"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 1 (Identidad del Agente - Full Width) -->
+      <div class="info-grid one-column">
+        <!-- Agent Identity Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-indigo-light">
+              <i class="fas fa-robot text-indigo"></i>
+            </div>
+            <h3 class="card-title">Identidad del Agente</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Nombre del Sistema</label>
+              <p class="info-value-box">{{ agent.agentSystemName }}</p>
+            </div>
+            <div class="description-scroll-area">
+              <div class="info-item">
+                <label class="info-label">Propósito</label>
+                <p class="purpose-text">{{ agent.purpose }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label">Descripción</label>
+                <p class="description-text">{{ agent.description || 'No proporcionada' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 2 (Voice Config, Dates, Contact, Google Calendar) -->
+      <div class="info-grid two-columns">
+        <!-- Voice Config Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-purple-light">
+              <i class="fas fa-microphone text-purple"></i>
+            </div>
+            <h3 class="card-title">Configuración de Voz</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Voz Seleccionada</label>
+              <p class="info-value-box bg-purple-extralight">{{ agent.voiceName || 'N/A' }}</p>
+            </div>
+            <div class="info-item" *ngIf="agent.voiceGender">
+              <label class="info-label">Género</label>
+              <p class="info-value-box">
+                <i class="fas" [ngClass]="{'fa-mars': agent.voiceGender === 'MALE', 'fa-venus': agent.voiceGender === 'FEMALE'}"></i>
+                {{ agent.voiceGender === 'MALE' ? 'Masculino' : 'Femenino' }}
+              </p>
+            </div>
+            <div class="info-item" *ngIf="agent.voiceAccent">
+              <label class="info-label">Acento</label>
+              <p class="info-value-box">
+                <i class="fas fa-globe"></i>
+                {{ agent.voiceAccent }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-blue-light">
+              <i class="fas fa-clock text-blue"></i>
+            </div>
+            <h3 class="card-title">Información Temporal</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Creado</label>
+              <p class="info-value-box bg-blue-extralight">{{ agent.createDate | date:'medium' }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Última Actualización</label>
+              <p class="info-value-box">{{ agent.updateDate | date:'medium' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-emerald-light">
+              <i class="fas fa-phone-alt text-emerald"></i>
+            </div>
+            <h3 class="card-title">Canales de Contacto</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">Número WhatsApp</label>
+              <p class="info-value-box large-text bg-emerald-extralight">{{ agent.whatsappNumber || 'N/A' }}</p>
+            </div>
+            <div class="info-item" *ngIf="agent.companyPhoneNumberNumber">
+              <label class="info-label">Teléfono Compañía</label>
+              <p class="info-value-box">
+                <i class="fas fa-phone"></i>
+                {{ agent.companyPhoneNumberNumber }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Mensaje de Correo de Voz</label>
+              <p class="info-value-box small-text">{{ agent.voicemailMessage || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google Calendar Integration Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-pink-light">
+              <i class="fas fa-calendar-alt text-pink"></i>
+            </div>
+            <h3 class="card-title">{{ 'AGENTS.CALENDAR.CARD_TITLE' | translate }}</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <label class="info-label">{{ 'AGENTS.CALENDAR.STATUS_LABEL' | translate }}</label>
+              <p class="info-value-box" [ngClass]="hasCalendarIntegration ? 'calendar-connected-box' : 'calendar-disconnected-box'">
+                <i class="fas" [ngClass]="{'fa-calendar-check': hasCalendarIntegration, 'fa-calendar-times': !hasCalendarIntegration}"></i>
+                {{ hasCalendarIntegration ? ('AGENTS.CALENDAR.CONNECTED' | translate) : ('AGENTS.CALENDAR.NOT_CONNECTED' | translate) }}
+              </p>
+            </div>
+            <!-- Polling in progress indicator -->
+            <div class="info-item" *ngIf="isCalendarPolling">
+              <div class="calendar-polling-inline">
+                <div class="polling-dot-spinner"></div>
+                <span>{{ 'AGENTS.CALENDAR.POLLING_MESSAGE' | translate }}</span>
+                <button class="polling-cancel-btn" (click)="stopCalendarPolling()" [title]="'AGENTS.CALENDAR.CANCEL_POLLING' | translate">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <!-- Connect button - only when not connected and not polling -->
+            <div class="info-item" *ngIf="!hasCalendarIntegration && !isCalendarPolling">
+              <button class="btn-connect-calendar" (click)="openCalendarIntegrationModal()">
+                <i class="fab fa-google"></i>
+                {{ 'AGENTS.CALENDAR.CONNECT_BUTTON' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid 3 (Instructions and Prompt) -->
+      <div class="info-grid two-columns">
+        <!-- Instructions Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-orange-light">
+              <i class="fas fa-list-ol text-orange"></i>
+            </div>
+            <h3 class="card-title">Instrucciones de Comportamiento</h3>
+          </div>
+          <pre class="pre-box">{{ agent.instructions }}</pre>
+        </div>
+
+        <!-- System Prompt Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon-wrapper bg-violet-light">
+              <i class="fas fa-terminal text-violet"></i>
+            </div>
+            <h3 class="card-title">Prompt del Sistema</h3>
+          </div>
+          <pre class="pre-box">{{ agent.prompt }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Call Modal -->
+  <div id="test-call-modal" class="modal" [class.active]="isTestCallModalVisible">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h2>Probar Agente AI</h2>
+        <button class="close-btn" (click)="closeTestCallModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Ingresa los detalles de contacto para probar tu agente AI.</p>
+        <div class="form-group">
+          <label for="contact-phone">Número de Contacto *</label>
+          <input type="text" id="contact-phone" [(ngModel)]="testCallContactPhone" required />
+          <div *ngIf="showTestCallValidationErrors && !testCallContactPhone" class="validation-error">
+            El número de contacto es requerido.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contact-name">Nombre de Contacto *</label>
+          <input type="text" id="contact-name" [(ngModel)]="testCallContactName" required />
+          <div *ngIf="showTestCallValidationErrors && !testCallContactName" class="validation-error">
+            El nombre de contacto es requerido.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email de Contacto (Opcional)</label>
+          <input type="email" id="contact-email" [(ngModel)]="testCallContactEmail" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeTestCallModal()">Cancelar</button>
+          <button class="btn-primary" [disabled]="!isTestCallFormValid() || isTestCallLoading" (click)="triggerTestCall()">
+            <span *ngIf="isTestCallLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{ isTestCallLoading ? 'Llamando...' : 'Llamame' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>

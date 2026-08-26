@@ -1,0 +1,231 @@
+.phone-number-manager {
+  margin: 0 auto;
+  padding: 20px;
+
+  --pn-primary: var(--primary-color, #5b4fe5);
+  --pn-primary-hover: #4c40c3;
+  --pn-primary-soft: #ede9fe;
+  --pn-bg: var(--background-white, #ffffff);
+  --pn-bg-subtle: #f8f8fc;
+  --pn-text-primary: var(--text-primary, #1e1b2e);
+  --pn-text-secondary: #6b7280;
+  --pn-border: #e9e8f2;
+  --pn-shadow: var(--shadow, 0 1px 3px rgba(16, 12, 60, 0.06));
+  --pn-success-bg: #d1fae5;
+  --pn-success-text: #065f46;
+  --pn-success-border: #34d399;
+  --pn-error-bg: #fee2e2;
+  --pn-error-text: #991b1b;
+  --pn-error-border: #ef4444;
+}
+
+.main-view {
+  background: var(--pn-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--pn-shadow);
+}
+
+.main-view .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.main-view .header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pn-text-primary);
+}
+
+/* ==========================================================================
+   Boton principal
+   ========================================================================== */
+.main-view .header .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--pn-primary);
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(91, 79, 229, 0.25);
+}
+
+.main-view .header .btn-primary i {
+  font-size: 12px;
+}
+
+.main-view .header .btn-primary:hover:not(:disabled) {
+  background-color: var(--pn-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 79, 229, 0.32);
+}
+
+.main-view .header .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.main-view .header .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Alertas
+   ========================================================================== */
+.alert {
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.alert-success {
+  background-color: var(--pn-success-bg);
+  color: var(--pn-success-text);
+  border: 1px solid var(--pn-success-border);
+}
+
+.alert-error {
+  background-color: var(--pn-error-bg);
+  color: var(--pn-error-text);
+  border: 1px solid var(--pn-error-border);
+}
+
+/* ==========================================================================
+   Tabla
+   ========================================================================== */
+.table-responsive {
+  overflow-x: auto;
+  border: 1px solid var(--pn-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background-color: var(--pn-primary);
+  color: #fff;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 14px 20px;
+}
+
+tbody tr {
+  border-top: 1px solid var(--pn-border);
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+  background-color: var(--pn-bg-subtle);
+}
+
+tbody td {
+  padding: 14px 20px;
+  font-size: 14px;
+  color: var(--pn-text-primary);
+}
+
+.phone-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.phone-cell__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pn-primary-soft);
+  color: var(--pn-primary);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.phone-cell__number {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   Empty state
+   ========================================================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
+  border: 1px solid var(--pn-border);
+  border-radius: 10px;
+  background: var(--pn-bg-subtle);
+}
+
+.empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--pn-primary-soft);
+  color: var(--pn-primary);
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pn-text-primary);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--pn-text-secondary);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 640px) {
+  .main-view {
+    padding: 16px;
+  }
+
+  .main-view .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .main-view .header .btn-primary {
+    justify-content: center;
+  }
+}

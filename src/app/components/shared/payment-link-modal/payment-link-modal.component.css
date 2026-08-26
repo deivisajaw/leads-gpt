@@ -1,0 +1,168 @@
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente oscuro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002; /* Asegura que esté por encima del modal de carga */
+  backdrop-filter: blur(5px); /* Efecto de desenfoque */
+  -webkit-backdrop-filter: blur(5px); /* Compatibilidad Safari */
+}
+
+.custom-modal-content {
+  background: linear-gradient(135deg, #ffffff, #f8f8f8); /* Degradado sutil */
+  padding: 30px;
+  border-radius: 12px; /* Bordes más redondeados */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
+  max-width: 550px; /* Un poco más ancho */
+  width: 90%;
+  position: relative;
+  transform: translateY(-20px); /* Pequeño desplazamiento para animación */
+  animation: slideIn 0.4s ease-out forwards; /* Animación de entrada */
+  border: 1px solid #e0e0e0; /* Borde sutil */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0; /* Borde más definido */
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.8em; /* Título más grande */
+  color: #34495e; /* Color de texto más oscuro */
+  font-weight: 700; /* Más peso */
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2em; /* Icono de cierre más grande */
+  cursor: pointer;
+  color: #95a5a6; /* Color más suave */
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #34495e;
+}
+
+.modal-body {
+  margin-bottom: 30px;
+}
+
+/* General paragraph styling for messages */
+.modal-body p {
+  margin-bottom: 15px;
+  line-height: 1.7;
+  font-size: 1.1em;
+  display: flex; /* Para alinear icono y texto */
+  align-items: flex-start; /* Alineación superior para el icono */
+}
+
+.modal-body .icon-left {
+  margin-right: 10px; /* Espacio entre icono y texto */
+  font-size: 1.2em; /* Tamaño del icono */
+  flex-shrink: 0; /* Evita que el icono se encoja */
+}
+
+/* Specific styles for message types */
+.message-info {
+  color: #34495e; /* Color de texto general para información */
+  margin-top: 20px;
+}
+
+.message-info .icon-left {
+  color: #28a745; /* Icono verde para éxito/información */
+}
+
+.message-warning {
+  color: #e67e22; /* Color de texto para advertencia */
+  font-weight: 600; /* Más peso para el mensaje de advertencia */
+  padding: 10px;
+  background-color: #fef3e6; /* Fondo suave para advertencia */
+  border-left: 4px solid #e67e22; /* Borde izquierdo para destacar */
+  border-radius: 4px;
+  font-size: 0.8em!important; 
+}
+
+.message-warning .icon-left {
+  color: #e67e22; /* Icono naranja para advertencia */
+}
+
+/* CORRECTED LINK STYLES */
+.modal-body a {
+  display: inline; /* Para que se comporte como un link normal en línea */
+  word-break: break-all;
+  color: #007bff; /* Azul estándar de enlace */
+  text-decoration: underline; /* Subrayado para que parezca un link */
+  font-weight: normal; /* Peso normal de fuente */
+  margin-top: 0; /* Eliminar margen superior */
+  margin-bottom: 0; /* Eliminar margen inferior */
+  padding: 0; /* Eliminar padding */
+  background-color: transparent; /* Fondo transparente */
+  border-radius: 0; /* Sin bordes redondeados */
+  transition: none; /* Sin transición de fondo */
+}
+
+.modal-body a:hover {
+  color: #0056b3; /* Azul más oscuro al pasar el ratón */
+  background-color: transparent; /* Asegurar fondo transparente al pasar el ratón */
+}
+/* END CORRECTED LINK STYLES */
+
+.modal-footer {
+  text-align: right;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .custom-modal-content {
+    padding: 20px;
+    /* font-size: 1.5em;  Removed this line as it was causing issues */
+  }
+  .modal-header h2 {
+    font-size: 1.5em;
+  }
+  .modal-body p {
+    font-size: 1em;
+  }
+}

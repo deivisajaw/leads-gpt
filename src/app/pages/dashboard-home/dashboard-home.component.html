@@ -1,0 +1,407 @@
+<div class="dashboard-page">
+  <ng-container *ngIf="dashboardData; else loadingOrError">
+    <div class="user-header">
+      <div class="user-header-left">
+        <h1 class="welcome-title">
+          {{ "DASHBOARD.WELCOME" | translate: { name: username } }} 👋
+        </h1>
+        <p class="welcome-subtitle">
+          {{ "DASHBOARD.FOCUS_SUBTITLE" | translate }}
+        </p>
+      </div>
+
+      <div class="user-header-right">
+        <div class="header-metrics">
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.ACTIVE_DEALS_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.activeDeals | number
+            }}</span>
+          </div>
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.CREDITS_AVAILABLE_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.creditsAvailable | number
+            }}</span>
+          </div>
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.DEALS_WON_30D_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.dealsWonLast30Days | number
+            }}</span>
+          </div>
+          <!-- Nuevas métricas placeholder para probar el layout -->
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.LEADS_FOUND_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.totalLeadsFound | number
+            }}</span>
+          </div>
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.LEADS_SAVED_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.totalLeadsSaved | number
+            }}</span>
+          </div>
+          <div class="header-metric-item">
+            <span class="metric-title">{{
+              "DASHBOARD.ACTIVE_CAMPAIGNS_SHORT" | translate
+            }}</span>
+            <span class="metric-value">{{
+              dashboardData.activeCampaigns | number
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboarding-band" *ngIf="!(hideOnboarding$ | async)">
+      <app-onboarding-widget></app-onboarding-widget>
+    </div>
+
+    <!-- ── DEAL METRICS SECTION ───────────────────────────────────────────── -->
+    <div class="deals-section" *ngIf="dashboardData.dealMetrics as dm">
+
+      <!-- KPI row -->
+      <div class="deal-kpis">
+
+        <div class="deal-kpi-card deal-kpi-card--won">
+          <div class="deal-kpi-icon"><i class="fas fa-trophy"></i></div>
+          <div class="deal-kpi-body">
+            <span class="deal-kpi-value">{{ dm.totalWonAmount | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span class="deal-kpi-label">{{ "DASHBOARD.DEALS_WON_AMOUNT" | translate }}</span>
+            <span class="deal-kpi-sub">{{ dm.wonDealsCount | number }} {{ "DASHBOARD.DEALS_COUNT" | translate }}</span>
+          </div>
+        </div>
+
+        <div class="deal-kpi-card deal-kpi-card--open">
+          <div class="deal-kpi-icon"><i class="fas fa-spinner"></i></div>
+          <div class="deal-kpi-body">
+            <span class="deal-kpi-value">{{ dm.totalOpenAmount | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span class="deal-kpi-label">{{ "DASHBOARD.DEALS_OPEN_AMOUNT" | translate }}</span>
+            <span class="deal-kpi-sub">{{ dm.openDealsCount | number }} {{ "DASHBOARD.DEALS_COUNT" | translate }}</span>
+          </div>
+        </div>
+
+        <div class="deal-kpi-card deal-kpi-card--contacts">
+          <div class="deal-kpi-icon"><i class="fas fa-user-clock"></i></div>
+          <div class="deal-kpi-body">
+            <span class="deal-kpi-value">{{ dm.pendingContactsCount | number }}</span>
+            <span class="deal-kpi-label">{{ "DASHBOARD.PENDING_CONTACTS" | translate }}</span>
+            <span class="deal-kpi-sub">{{ "DASHBOARD.PENDING_CONTACTS_SUB" | translate }}</span>
+          </div>
+        </div>
+
+        <div class="deal-kpi-card deal-kpi-card--avg">
+          <div class="deal-kpi-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="deal-kpi-body">
+            <span class="deal-kpi-value">{{ dm.avgDealAmount | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span class="deal-kpi-label">{{ "DASHBOARD.AVG_DEAL_AMOUNT" | translate }}</span>
+            <span class="deal-kpi-sub">{{ "DASHBOARD.AVG_DEAL_AMOUNT_SUB" | translate }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Chart + Stage breakdown -->
+      <div class="deal-detail-row">
+
+        <!-- Bar chart: amount per open stage -->
+        <div class="card deal-chart-card">
+          <div class="card-header">
+            <h3 class="card-title">{{ "DASHBOARD.DEAL_AMOUNT_BY_STAGE" | translate }}</h3>
+          </div>
+          <div class="card-body">
+            <canvas
+              *ngIf="dealBarChartData.datasets[0]?.data?.length > 0"
+              baseChart
+              [data]="dealBarChartData"
+              [options]="dealBarChartOptions"
+              [type]="dealBarChartType">
+            </canvas>
+            <div *ngIf="!dealBarChartData.datasets[0]?.data?.length" class="no-activity">
+              {{ "DASHBOARD.NO_DEAL_DATA" | translate }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage breakdown list -->
+        <div class="card deal-stage-card">
+          <div class="card-header">
+            <h3 class="card-title">{{ "DASHBOARD.DEALS_BY_STAGE" | translate }}</h3>
+          </div>
+          <div class="card-body deal-stage-list-body">
+            <ng-container *ngIf="dm.stageBreakdown && dm.stageBreakdown.length > 0; else noStages">
+              <div *ngFor="let stage of dm.stageBreakdown" class="stage-row">
+                <div class="stage-dot" [style.background]="stage.stageColor || '#5b4fe5'"></div>
+                <div class="stage-info">
+                  <span class="stage-name">{{ stage.stageLabel }}</span>
+                  <span class="stage-type-badge stage-type-badge--{{ stage.stageType }}">
+                    {{ "DASHBOARD.STAGE_TYPE_" + (stage.stageType | uppercase) | translate }}
+                  </span>
+                </div>
+                <div class="stage-numbers">
+                  <span class="stage-count">{{ stage.count | number }}</span>
+                  <span class="stage-amount">{{ stage.totalAmount | currency:'USD':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noStages>
+              <div class="no-activity">{{ "DASHBOARD.NO_DEAL_DATA" | translate }}</div>
+            </ng-template>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- ── END DEAL METRICS SECTION ──────────────────────────────────────── -->
+
+    <div class="panel-layout">
+      <div class="left-panel">
+        <div class="card">
+          <div class="card-header tab-header">
+            <button
+              class="tab-btn"
+              [class.active]="activityTab === 'deals'"
+              (click)="activityTab = 'deals'"
+            >
+              <i class="fas fa-handshake"></i>
+              {{ "DASHBOARD.RECENT_DEALS" | translate }}
+            </button>
+            <button
+              class="tab-btn"
+              [class.active]="activityTab === 'notes'"
+              (click)="activityTab = 'notes'"
+            >
+              <i class="fas fa-sticky-note"></i>
+              {{ "DASHBOARD.RECENT_NOTES" | translate }}
+            </button>
+          </div>
+          <div class="card-body">
+            <div *ngIf="activityTab === 'deals'">
+              <div
+                *ngIf="
+                  dashboardData.recentDeals &&
+                    dashboardData.recentDeals.length > 0;
+                  else noRecentDeals
+                "
+                class="activity-list"
+              >
+                <div
+                  *ngFor="let deal of dashboardData.recentDeals"
+                  class="activity-item"
+                >
+                  <div class="activity-details">
+                    <div class="activity-message">
+                      {{ deal.name }} ({{ deal.contactName }})
+                    </div>
+                    <div class="activity-time">
+                      {{ formatDate(deal.date) }} -
+                      <span
+                        class="badge"
+                        [ngClass]="getStageClass(deal.stage)"
+                        >{{ deal.stage }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noRecentDeals
+                ><div class="no-activity">
+                  {{ "DASHBOARD.NO_RECENT_DEALS" | translate }}
+                </div></ng-template
+              >
+            </div>
+            <div *ngIf="activityTab === 'notes'">
+              <div
+                *ngIf="
+                  dashboardData.recentNotes &&
+                    dashboardData.recentNotes.length > 0;
+                  else noRecentNotes
+                "
+                class="activity-list"
+              >
+                <div
+                  *ngFor="let note of dashboardData.recentNotes"
+                  class="activity-item"
+                >
+                  <div class="activity-details">
+                    <div class="activity-message">
+                      {{ note.noteSnippet }} ({{ note.dealName }})
+                    </div>
+                    <div class="activity-time">
+                      {{ formatDate(note.date) }} - {{ note.author }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noRecentNotes
+                ><div class="no-activity">
+                  {{ "DASHBOARD.NO_RECENT_NOTES" | translate }}
+                </div></ng-template
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              {{ "DASHBOARD.QUICK_ACTIONS" | translate }}
+            </h3>
+          </div>
+          <div class="card-body quick-actions-panel">
+            <button (click)="goToCompany()" class="quick-action-btn">
+              <i class="fas fa-building"></i>
+              {{ "DASHBOARD.NEW_AI_SEARCH" | translate }}
+            </button>
+            <button (click)="goToPeople()" class="quick-action-btn">
+              <i class="fas fa-users"></i>
+              {{ "DASHBOARD.NEW_LINKEDIN_SEARCH" | translate }}
+            </button>
+            <button (click)="goToDeals()" class="quick-action-btn">
+              <i class="fas fa-plus-circle"></i>
+              {{ "DASHBOARD.ADD_NEW_DEAL" | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Derecho: Panorama General -->
+      <div class="right-panel">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              {{ "DASHBOARD.CONVERSION_FUNNEL" | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <canvas
+              *ngIf="
+                dashboardData.conversionFunnel &&
+                dashboardData.conversionFunnel.length > 0
+              "
+              baseChart
+              [data]="funnelChartData"
+              [options]="funnelChartOptions"
+              [type]="funnelChartType"
+            ></canvas>
+            <div
+              *ngIf="
+                !dashboardData.conversionFunnel ||
+                dashboardData.conversionFunnel.length === 0
+              "
+              class="no-activity"
+            >
+              {{ "DASHBOARD.NO_FUNNEL_DATA" | translate }}
+            </div>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              {{ "DASHBOARD.CAMPAIGN_PERFORMANCE" | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <canvas
+              *ngIf="
+                dashboardData.campaignPerformance &&
+                dashboardData.campaignPerformance.length > 0
+              "
+              baseChart
+              [data]="barChartData"
+              [options]="barChartOptions"
+              [type]="barChartType"
+            ></canvas>
+            <div
+              *ngIf="
+                !dashboardData.campaignPerformance ||
+                dashboardData.campaignPerformance.length === 0
+              "
+              class="no-activity"
+            >
+              {{ "DASHBOARD.NO_CAMPAIGN_DATA" | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ajaw Academic Section -->
+    <div class="card card-videos" *ngIf="academicVideos$ | async as videos">
+      <div class="card-header">
+        <h3 class="card-title">Ajaw Academic</h3>
+      </div>
+      <div class="card-body">
+        <div *ngIf="videos.length > 0; else noVideos" class="video-grid">
+          <a
+            *ngFor="let video of videos"
+            class="video-card"
+            href="https://www.youtube.com/watch?v={{ video.youtubeId }}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="video-thumbnail">
+              <img
+                src="https://img.youtube.com/vi/{{
+                  video.youtubeId
+                }}/hqdefault.jpg"
+                alt="{{ video.title }}"
+              />
+              <div class="play-icon"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="video-content">
+              <h4 class="video-title">{{ video.title }}</h4>
+              <p class="video-description" [title]="video.description">
+                {{ video.description }}
+              </p>
+            </div>
+          </a>
+        </div>
+        <ng-template #noVideos>
+          <div class="no-activity">
+            {{ "DASHBOARD.NO_ACADEMIC_VIDEOS" | translate }}
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loadingOrError>
+    <div *ngIf="isLoading" class="dashboard-loading">
+      <div class="loading-spinner"></div>
+      <p>{{ "DASHBOARD.LOADING" | translate }}</p>
+    </div>
+
+    <div *ngIf="!isLoading && hasError" class="dashboard-error">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>{{ "DASHBOARD.ERROR_TITLE" | translate }}</h3>
+      <p>{{ "DASHBOARD.ERROR_SUBTITLE" | translate }}</p>
+      <button class="error-retry-btn" (click)="loadDashboardData()">
+        <i class="fas fa-sync-alt"></i>
+        {{ "DASHBOARD.ERROR_RETRY" | translate }}
+      </button>
+    </div>
+  </ng-template>
+</div>
+
+<app-video-modal
+  [showModal]="showWelcomeVideo"
+  [videoUrl]="videoUrl"
+  (close)="closeVideoModal()"
+  (ctaClick)="handleVideoCtaClick()"
+>
+</app-video-modal>

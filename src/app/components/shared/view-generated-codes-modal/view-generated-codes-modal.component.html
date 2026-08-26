@@ -1,0 +1,57 @@
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="onClose()">
+  <div class="custom-modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ 'ADMIN_USERS.VIEW_CODES_MODAL_TITLE' | translate }}</h2>
+      <button class="close-button" (click)="onClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <div *ngIf="isLoading" class="loading-indicator">
+        <p>{{ 'COMMON.LOADING_CODES' | translate }}</p> 
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <ng-container *ngIf="!isLoading && !error">
+        <div *ngIf="codes.length === 0" class="no-codes-message">
+          <p>{{ 'ADMIN_USERS.VIEW_CODES_MODAL_NO_CODES' | translate }}</p>
+        </div>
+
+        <div *ngIf="codes.length > 0" class="table-container">
+          <table class="codes-table">
+            <thead>
+              <tr>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_CODE' | translate }}</th>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_EMAIL' | translate }}</th>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_STATUS' | translate }}</th>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_EXPIRES' | translate }}</th>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_USED_BY' | translate }}</th>
+                <th>{{ 'ADMIN_USERS.VIEW_CODES_HEADER_USED_AT' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let code of codes">
+                <td><span class="code-badge">{{ code.code }}</span></td>
+                <td>{{ code.email }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="code.status ? 'status-' + code.status.toLowerCase() : 'status-unknown'">
+                    {{ code.status || ('COMMON.NA' | translate) }} 
+                  </span>
+                </td>
+                <td>{{ code.expiresAt ? (code.expiresAt | date:'short') : ('COMMON.NA' | translate) }}</td> 
+                <td>{{ code.usedBy || ('COMMON.NA' | translate) }}</td>
+                <td>{{ code.usedAt ? (code.usedAt | date:'short') : ('COMMON.NA' | translate) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">{{ 'ADMIN_USERS.VIEW_CODES_MODAL_CLOSE' | translate }}</button>
+    </div>
+  </div>
+</div>

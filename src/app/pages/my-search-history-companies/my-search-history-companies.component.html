@@ -1,0 +1,271 @@
+<div class="page-container screenin">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "HISTORY.COMPANY_TITLE" | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <div class="history-page-new">
+    <!-- Header principal de toda la página -->
+    <div class="history-main-header">
+      <div class="history-header-row-2">
+        <div class="controls-left">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              [placeholder]="'COMPANIES.SEARCH_PLACEHOLDER' | translate"
+              id="company-history-search-input"
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+            />
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <div class="dropdown-wrapper">
+            <div class="dropdown-control" (click)="toggleDropdown('sort')">
+              <i class="fas fa-sort"></i>
+              <span>{{ "HISTORY.SORT" | translate }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" [class.show]="showSortDropdown">
+              <div class="dropdown-item" (click)="onSortChange('createdOn_desc')">
+                {{ "HISTORY.DATE_DESC" | translate }}
+              </div>
+              <div class="dropdown-item" (click)="onSortChange('createdOn_asc')">
+                {{ "HISTORY.DATE_ASC" | translate }}
+              </div>
+              <div class="dropdown-item" (click)="onSortChange('searchString_asc')">
+                {{ "HISTORY.QUERY_AZ" | translate }}
+              </div>
+              <div class="dropdown-item" (click)="onSortChange('searchString_desc')">
+                {{ "HISTORY.QUERY_ZA" | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="history-content-new">
+      <!-- Loading State -->
+      <div
+        *ngIf="isLoading"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+        "
+      >
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5b4fe5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+          "
+        ></div>
+        <p>{{ "HISTORY.LOADING" | translate }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="!isLoading && filteredHistoryItems.length === 0"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+          text-align: center;
+        "
+      >
+        <div style="font-size: 48px; margin-bottom: 16px; color: #94a3b8">
+          <i class="fas fa-history"></i>
+        </div>
+        <h3 style="margin-bottom: 8px; color: #1e293b">
+          {{ "HISTORY.NO_RESULTS_TITLE" | translate }}
+        </h3>
+        <p style="margin-bottom: 24px">
+          {{ "HISTORY.NO_RESULTS_SUBTITLE" | translate }}
+        </p>
+        <button class="btn-primary" routerLink="/companies">
+          <i class="fas fa-search"></i>
+          {{ "HISTORY.SEARCH_COMPANIES_BUTTON" | translate }}
+        </button>
+      </div>
+
+      <!-- Results Table -->
+      <div
+        *ngIf="!isLoading && filteredHistoryItems.length > 0"
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <div style="flex: 1; overflow: auto; background: white">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead
+              style="
+                position: sticky;
+                top: 0;
+                z-index: 10;
+              "
+            >
+              <tr style="border-bottom: 1px solid #e2e8f0">
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 250px;
+                  "
+                >
+                  {{ "HISTORY.TABLE_HEADERS.QUERY" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 120px;
+                  "
+                >
+                  {{ "HISTORY.TABLE_HEADERS.DATE" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 100px;
+                  "
+                >
+                  {{ "HISTORY.TABLE_HEADERS.ACTIONS" | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of filteredHistoryItems; let i = index"
+                class="rowin"
+                [class.play]="rowsRevealed"
+                [style.animation-delay.ms]="i * 30"
+                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
+                style="border-bottom: 1px solid #e2e8f0; cursor: pointer"
+                (click)="viewDetails(item.id)"
+              >
+                <td
+                  style="
+                    padding: 12px;
+                    font-weight: 500;
+                    color: #1e293b;
+                    text-decoration: underline;
+                  "
+                >
+                  {{ item.searchString }}
+                </td>
+                <td style="padding: 12px;">
+                  {{ formatDate(item.createdOn) }}
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <button
+                    (click)="viewDetails(item.id)"
+                    style="
+                      background: none;
+                      border: 1px solid #e2e8f0;
+                      padding: 6px;
+                      border-radius: 4px;
+                      cursor: pointer;
+                      color: #64748b;
+                    "
+                    title="{{ 'HISTORY.VIEW_DETAILS_BUTTON' | translate }}"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          style="
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div style="color: #64748b; font-size: 14px">
+            {{ getStartIndex() }} - {{ getEndIndex() }} of
+            {{ getFormattedTotal() }}
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button
+              (click)="goToPage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'"
+              [style.color]="currentPage === 1 ? '#94a3b8' : '#64748b'"
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span
+              style="padding: 8px 12px; color: #64748b; font-size: 14px"
+            >
+              {{ "HISTORY.PAGE" | translate }} {{ currentPage }}
+              {{ "HISTORY.OF" | translate }} {{ totalPages }}
+            </span>
+            <button
+              (click)="goToPage(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              [style.cursor]="
+                currentPage === totalPages ? 'not-allowed' : 'pointer'
+              "
+              [style.color]="
+                currentPage === totalPages ? '#94a3b8' : '#64748b'
+              "
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

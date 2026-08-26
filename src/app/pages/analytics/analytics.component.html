@@ -1,0 +1,75 @@
+<div class="page-container">
+
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "ANALYTICS.TITLE" | translate }}</h1>
+      <p>{{ "ANALYTICS.SUBTITLE" | translate }}</p>
+    </div>
+    <div class="header-right">
+      
+    </div>
+  </div>
+
+  <div class="analytics-container">
+
+    <div class="analytics-grid">
+      <!-- Campaign Performance -->
+      <div class="analytics-card">
+          <h2>{{ 'ANALYTICS.CAMPAIGN_PERFORMANCE_TITLE' | translate }}</h2>
+          <div class="card-content chart-container">
+            <canvas baseChart
+              [options]="barChartOptions"
+              [labels]="barChartLabels"
+              [datasets]="barChartData.datasets"
+              [type]="barChartType"
+              [legend]="barChartLegend">
+            </canvas>
+          </div>
+        </div>
+
+      <!-- Conversion Funnel -->
+      <div class="analytics-card">
+        <h2>{{ "ANALYTICS.CONVERSION_FUNNEL_TITLE" | translate }}</h2>
+        <div class="card-content">
+          <div class="funnel-steps">
+            <div
+              *ngFor="let step of conversionFunnel$ | async"
+              class="funnel-step"
+            >
+              <span class="step-name">{{ step.name | translate }}</span>
+              <span class="step-count">{{ step.count | number }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Activity -->
+      <div class="analytics-card full-width">
+          <h2>{{ 'ANALYTICS.SEARCH_ACTIVITY_TITLE' | translate }}</h2>
+          <div class="card-content">
+            <div *ngIf="searchActivityMessage" class="alert alert-warning mt-3">
+              {{ searchActivityMessage }}
+            </div>
+            <table *ngIf="!(searchActivityMessage)" class="analytics-table">
+              <thead>
+                <tr>
+                  <th>{{ 'ANALYTICS.SEARCH_QUERY' | translate }}</th>
+                  <th>{{ 'ANALYTICS.LEADS_FOUND' | translate }}</th>
+                  <th>{{ 'ANALYTICS.LEADS_SAVED' | translate }}</th>
+                  <th>{{ 'ANALYTICS.CREDITS_SPENT' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let activity of (searchActivity$ | async)">
+                  <td>{{ activity.searchString }}</td>
+                  <td>{{ activity.leadsFound }}</td>
+                  <td>{{ activity.leadsSaved }}</td>
+                  <td>{{ activity.creditsSpent }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

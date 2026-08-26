@@ -1,0 +1,231 @@
+:host {
+  --ind: #5b4fe5;
+  --ind-d: #4f46e5;
+  --ind-50: #eef2ff;
+  --ind-100: #e0e7ff;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --muted: #64748b;
+  --hint: #94a3b8;
+  --line: #eef1f6;
+  --line-2: #e2e8f0;
+  --panel: #fbfcfe;
+
+  font-family: Inter, -apple-system, system-ui, sans-serif;
+}
+
+/* ═══════════ MODAL ═══════════ */
+.ac-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.ac-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+}
+
+.ac-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.ac-modal-head h2 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+}
+
+.ac-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.ac-modal-close:hover {
+  background: var(--panel);
+}
+
+.ac-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ac-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--line-2);
+}
+
+/* ═══════════ SECCIONES DEL FORM ═══════════ */
+.ac-section {
+  margin-bottom: 22px;
+}
+
+.ac-section h3 {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.ac-field {
+  margin-bottom: 12px;
+}
+
+.ac-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ac-field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.ac-field input[type="text"],
+.ac-field input[type="password"],
+.ac-field input[type="date"],
+.ac-field select,
+.ac-field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+.ac-field input:focus,
+.ac-field select:focus,
+.ac-field textarea:focus {
+  outline: none;
+  border-color: var(--ind);
+  box-shadow: 0 0 0 3px rgba(91, 79, 229, .12);
+}
+
+.ac-field .ac-invalid {
+  border-color: #dc2626;
+}
+
+.ac-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--hint);
+  margin-top: 6px;
+}
+
+.ac-days-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.ac-invalid-days {
+  outline: 1px solid #dc2626;
+}
+
+.ac-day-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.ac-day-chip input {
+  accent-color: var(--ind);
+}
+
+.ac-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.ac-checkbox-row input {
+  accent-color: var(--ind);
+}
+
+/* ═══════════ BOTONES (usados en el foot del modal) ═══════════ */
+.ac-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ind);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.ac-btn-primary:hover:not(:disabled) {
+  background: var(--ind-d);
+}
+
+.ac-btn-primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.ac-btn-secondary {
+  background: #fff;
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ac-btn-secondary:hover {
+  background: var(--panel);
+}

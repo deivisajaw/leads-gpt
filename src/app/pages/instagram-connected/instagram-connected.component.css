@@ -1,0 +1,309 @@
+/* ── Page shell ─────────────────────────────────────────────────────────── */
+.ig-connected-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 24px;
+}
+
+/* ── Subtle background decoration ──────────────────────────────────────── */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: #5b4fe5;
+  top: -160px;
+  left: -120px;
+}
+
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: #5b4fe5;
+  bottom: -120px;
+  right: -80px;
+}
+
+.blob-3 {
+  width: 260px;
+  height: 260px;
+  background: linear-gradient(135deg, #f09433, #bc1888);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Card ───────────────────────────────────────────────────────────────── */
+.ig-card {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 52px 44px 44px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(91, 79, 229, 0.08), 0 1px 3px rgba(0,0,0,0.06);
+  animation: card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Icon ───────────────────────────────────────────────────────────────── */
+.ig-icon-wrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 28px;
+}
+
+.ig-icon-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  animation: ring-spin 5s linear infinite;
+}
+
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ig-icon {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ig-icon i {
+  font-size: 34px;
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ig-check {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 28px;
+  height: 28px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 3px solid #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: check-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+}
+
+.ig-check.error {
+  background: #ef4444;
+}
+
+.ig-check i {
+  font-size: 11px;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+
+@keyframes check-pop {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Title ──────────────────────────────────────────────────────────────── */
+.ig-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 20px;
+  letter-spacing: -0.4px;
+}
+
+/* ── Account chip ───────────────────────────────────────────────────────── */
+.ig-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 8px 16px 8px 10px;
+  margin-bottom: 20px;
+}
+
+.ig-account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f09433, #dc2743, #bc1888);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ig-account-avatar i {
+  font-size: 15px;
+  color: #fff;
+}
+
+.ig-account-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 1px;
+}
+
+.ig-account-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.ig-account-username {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+/* ── Description ────────────────────────────────────────────────────────── */
+.ig-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.7;
+  margin: 0 0 28px;
+}
+
+/* ── Steps ──────────────────────────────────────────────────────────────── */
+.ig-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.ig-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #475569;
+  animation: step-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ig-step:nth-child(1) { animation-delay: 0.2s; }
+.ig-step:nth-child(2) { animation-delay: 0.35s; }
+.ig-step:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes step-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.ig-step-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ig-step-icon i {
+  font-size: 13px;
+  color: #5b4fe5;
+  background: none;
+  -webkit-text-fill-color: #5b4fe5;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+
+/* ── Button ─────────────────────────────────────────────────────────────── */
+.ig-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 24px;
+  background: #5b4fe5;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(91, 79, 229, 0.3);
+  margin-bottom: 16px;
+}
+
+.ig-btn:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+.ig-btn-secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  box-shadow: none;
+  border: 1px solid #e2e8f0;
+}
+
+.ig-btn-secondary:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* ── Close hint ─────────────────────────────────────────────────────────── */
+.ig-close-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .ig-card {
+    padding: 36px 20px 28px;
+    border-radius: 18px;
+  }
+
+  .ig-title {
+    font-size: 22px;
+  }
+}

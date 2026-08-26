@@ -1,0 +1,246 @@
+.header-section {
+    height: 60px;
+}
+
+@keyframes screenin {
+  from { opacity: 0; transform: translateY(10px); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+.screenin {
+  animation: screenin .5s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes rowin {
+  from { opacity: 0; filter: blur(5px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+.rowin {
+  opacity: 0;
+}
+
+.rowin.play {
+  animation: rowin .5s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+.history-page-new{
+    height: calc(100vh - 65px);
+}
+
+.history-main-header {
+  background: var(--background-white);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+}
+
+.history-header-row-2{
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;
+}
+
+.controls-left, .controls-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 250px; /* Adjust as needed */
+}
+
+.search-bar i {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 12px 8px 36px; /* Adjust padding for icon */
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: var(--background-white);
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(91, 79, 229, 0.2);
+}
+
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-control {
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.dropdown-control i {
+  color: var(--text-muted);
+}
+
+.dropdown-menu {
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  display: none;
+  right: 0; /* Align to the right */
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.history-content-new {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: #f8fafc;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.status-orange {
+  color: #f97316; /* Naranja */
+  font-weight: 500;
+}
+
+.status-green {
+  color: #22c55e; /* Verde */
+  font-weight: 500;
+}
+
+.status-red {
+  color: #ef4444; /* Rojo */
+  font-weight: 500;
+}
+
+.polling-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0; /* Light grey border */
+  border-top: 2px solid var(--primary-blue); /* Blue spinner color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #64748b;
+  text-align: center;
+}
+
+.empty-state .fas {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #94a3b8;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.empty-state p {
+  margin-bottom: 24px;
+}
+
+.empty-state button {
+  background: #5b4fe5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.empty-state button:hover {
+  background: #4a3edc;
+}
+
+.pagination {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  color: #94a3b8;
+}
+
+.pagination span {
+  padding: 8px 12px;
+  color: #64748b;
+  font-size: 14px;
+}

@@ -1,0 +1,952 @@
+<div class="page-container">
+  <!-- ===== HEADER ===== -->
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "DEALS.TITLE" | translate }}</h1>
+      <p>{{ "DEALS.SUBTITLE" | translate }}</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-secondary" (click)="openImportModal()">
+        <i class="fas fa-file-import"></i>
+        {{ "DEALS.ACTION.IMPORT_CSV" | translate }}
+      </button>
+      <button class="btn-primary" (click)="openCreatePanel()">
+        <i class="fas fa-plus"></i>
+        {{ "DEALS.ACTION.CREATE" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== TOOLBAR ===== -->
+  <div class="deals-toolbar">
+    <!-- Search -->
+    <div class="search-box" [class.has-value]="searchQuery">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        [placeholder]="'DEALS.TOOLBAR.SEARCH' | translate"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="applyFilter()"
+      />
+      <button class="search-clear" *ngIf="searchQuery" (click)="clearSearch()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Filter by stage -->
+    <div class="filter-pills" *ngIf="stageConfigs.length > 0">
+      <button
+        class="filter-pill"
+        [class.active]="filterStageId === null"
+        (click)="filterStageId = null; applyFilter()"
+      >
+        All
+      </button>
+      <button
+        *ngFor="let s of stageConfigs; trackBy: trackByStage"
+        class="filter-pill"
+        [class.active]="filterStageId === s.id"
+        [style.--pill-color]="s.color"
+        (click)="
+          filterStageId = filterStageId === s.id ? null : s.id; applyFilter()
+        "
+      >
+        {{ s.label }}
+        <span class="pill-count">{{ (board[s.id] || []).length }}</span>
+      </button>
+    </div>
+
+    <!-- View mode -->
+    <div class="view-toggle">
+      <button
+        [class.active]="viewMode === 'kanban'"
+        (click)="setView('kanban')"
+        title="Kanban"
+      >
+        <i class="fas fa-columns"></i>
+      </button>
+      <button
+        [class.active]="viewMode === 'grid'"
+        (click)="setView('grid')"
+        title="Grid"
+      >
+        <i class="fas fa-table"></i>
+      </button>
+      <button
+        [class.active]="viewMode === 'list'"
+        (click)="setView('list')"
+        title="List"
+      >
+        <i class="fas fa-list"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="deals-state" *ngIf="isLoading">
+    <div class="deals-loader"></div>
+    <p>{{ "DEALS.STATE.LOADING" | translate }}</p>
+  </div>
+
+  <!-- ===== UPDATING OVERLAY ===== -->
+  <div class="updating-badge" *ngIf="isUpdatingStage">
+    <div class="spinner-sm"></div>
+    {{ "DEALS.STATE.UPDATING" | translate }}
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       KANBAN VIEW
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div class="kanban-wrap" *ngIf="!isLoading && viewMode === 'kanban'">
+    <div cdkDropListGroup class="kanban-board">
+      <!-- Column per stage -->
+      <div
+        class="kanban-col"
+        *ngFor="let stage of stageConfigs; trackBy: trackByStage"
+      >
+        <!-- Column header -->
+        <div class="col-header">
+          <div class="col-header-left">
+            <span class="col-dot" [style.background]="stage.color"></span>
+            <span class="col-title">{{ stage.label }}</span>
+            <span class="col-count">{{ (board[stage.id] || []).length }}</span>
+          </div>
+          <span class="col-amount" *ngIf="getTotalAmount(stage.id) > 0">
+            ${{ getTotalAmount(stage.id) | number: "1.0-0" }}
+          </span>
+        </div>
+
+        <!-- Drop list -->
+        <div
+          class="deal-list"
+          [id]="stage.id.toString()"
+          cdkDropList
+          [cdkDropListData]="board[stage.id]"
+          [cdkDropListConnectedTo]="getConnectedList()"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <!-- Deal card -->
+          <div
+            class="deal-card"
+            *ngFor="let deal of board[stage.id]; trackBy: trackByDeal"
+            cdkDrag
+            (click)="openDealModal(deal)"
+          >
+            <div *cdkDragPlaceholder class="drag-placeholder"></div>
+
+            <!-- Card header -->
+            <div class="card-header">
+              <span class="card-title">{{ deal.name }}</span>
+              <span class="card-amount" *ngIf="deal.amount">
+                ${{ deal.amount | number: "1.0-0" }}
+              </span>
+            </div>
+
+            <!-- Company / Contact -->
+            <div class="card-contact">
+              <div class="contact-avatar" [style.background]="'#5b4fe5'">
+                {{ getInitials(deal.contact.displayName || deal.name) }}
+              </div>
+              <div class="contact-info">
+                <span class="contact-name">{{ deal.contact.displayName }}</span>
+                <span
+                  class="contact-sub"
+                  *ngIf="deal.contact?.associatedCompany"
+                >
+                  {{ deal.contact.associatedCompany }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Stage chip -->
+            <div class="card-meta-row">
+              <span
+                class="stage-chip"
+                [style.background]="stage.color + '22'"
+                [style.color]="stage.color"
+              >
+                {{ stage.label }}
+              </span>
+              <span class="card-owner" *ngIf="deal.ownerUserFullName">
+                <i class="fas fa-user"></i> {{ deal.ownerUserFullName }}
+              </span>
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer">
+              <span class="card-date" *ngIf="deal.expectedCloseDate">
+                <i class="fas fa-calendar"></i>
+                {{ deal.expectedCloseDate | date: "dd MMM yyyy" }}
+              </span>
+              <span class="card-campaign" *ngIf="deal.campaignName">
+                <i class="fas fa-bullhorn"></i>
+                {{ deal.campaignName }}
+              </span>
+              <button
+                class="btn-card-delete"
+                (click)="openDeleteConfirm(deal, $event)"
+                [title]="'DEALS.DELETE.TOOLTIP' | translate">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add deal inline button -->
+          <button class="btn-add-deal" (click)="openCreatePanel()">
+            <i class="fas fa-plus"></i>
+            {{ "DEALS.ACTION.ADD_DEAL" | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Add column button -->
+      <div class="kanban-col col-add">
+        <button class="btn-add-col" (click)="openStageModal()">
+          <i class="fas fa-plus"></i>
+          {{ "DEALS.ACTION.ADD_STAGE" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       GRID VIEW
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div class="grid-wrap" *ngIf="!isLoading && viewMode === 'grid'">
+    <!-- Summary bar -->
+    <div class="grid-summary">
+      <span
+        >{{ filteredDeals.length }} {{ "DEALS.GRID.DEALS" | translate }}</span
+      >
+      <span class="summary-sep">·</span>
+      <span>Sum ${{ getTotalAllDeals() | number: "1.0-0" }}</span>
+    </div>
+
+    <div class="grid-table-wrap">
+      <table class="grid-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" /></th>
+            <th class="col-name sortable" (click)="setSort('name')">
+              {{ "DEALS.GRID.COL.NAME" | translate }}
+              <i
+                class="fas"
+                [class.fa-sort-up]="sortField === 'name' && sortDir === 'asc'"
+                [class.fa-sort-down]="
+                  sortField === 'name' && sortDir === 'desc'
+                "
+                [class.fa-sort]="sortField !== 'name'"
+              ></i>
+            </th>
+            <th class="col-company">
+              {{ "DEALS.GRID.COL.COMPANY" | translate }}
+            </th>
+            <th class="col-amount sortable" (click)="setSort('amount')">
+              {{ "DEALS.GRID.COL.AMOUNT" | translate }}
+              <i
+                class="fas"
+                [class.fa-sort-up]="sortField === 'amount' && sortDir === 'asc'"
+                [class.fa-sort-down]="
+                  sortField === 'amount' && sortDir === 'desc'
+                "
+                [class.fa-sort]="sortField !== 'amount'"
+              ></i>
+            </th>
+            <th class="col-stage">{{ "DEALS.GRID.COL.STAGE" | translate }}</th>
+            <th class="col-owner">{{ "DEALS.GRID.COL.OWNER" | translate }}</th>
+            <th class="col-campaign">
+              {{ "DEALS.GRID.COL.CAMPAIGN" | translate }}
+            </th>
+            <th
+              class="col-close sortable"
+              (click)="setSort('expectedCloseDate')"
+            >
+              {{ "DEALS.GRID.COL.CLOSE" | translate }}
+              <i
+                class="fas"
+                [class.fa-sort-up]="
+                  sortField === 'expectedCloseDate' && sortDir === 'asc'
+                "
+                [class.fa-sort-down]="
+                  sortField === 'expectedCloseDate' && sortDir === 'desc'
+                "
+                [class.fa-sort]="sortField !== 'expectedCloseDate'"
+              ></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Empty -->
+          <tr *ngIf="filteredDeals.length === 0">
+            <td colspan="8" class="empty-row">
+              <i class="fas fa-inbox"></i>
+              {{ "DEALS.STATE.EMPTY" | translate }}
+            </td>
+          </tr>
+          <!-- Rows -->
+          <tr
+            *ngFor="
+              let deal of filteredDeals;
+              trackBy: trackByDeal;
+              let i = index
+            "
+            class="grid-row"
+            (click)="openDealModal(deal)"
+          >
+            <td class="col-check" (click)="$event.stopPropagation()">
+              <input type="checkbox" />
+            </td>
+            <td class="col-name">
+              <span class="row-index">{{ i + 1 }}</span>
+              <span class="row-deal-name">{{ deal.name }}</span>
+            </td>
+            <td class="col-company">
+              <div class="row-company" *ngIf="deal.contact">
+                <div class="mini-avatar" [style.background]="'#5b4fe5'">
+                  {{ getInitials(deal.contact.displayName) }}
+                </div>
+                <span>{{
+                  deal.contact.associatedCompany || deal.contact.displayName
+                }}</span>
+              </div>
+            </td>
+            <td class="col-amount">
+              <span class="amount-text" *ngIf="deal.amount"
+                >${{ deal.amount | number: "1.0-0" }}</span
+              >
+              <span class="no-data" *ngIf="!deal.amount">—</span>
+            </td>
+            <td class="col-stage">
+              <span
+                class="stage-chip"
+                [style.background]="
+                  (getStageById(deal.stageConfigId)?.color || '#94a3b8') + '22'
+                "
+                [style.color]="
+                  getStageById(deal.stageConfigId)?.color || '#94a3b8'
+                "
+              >
+                {{ deal.stageLabel }}
+              </span>
+            </td>
+            <td class="col-owner">
+              <div class="owner-cell" *ngIf="deal.ownerUserFullName">
+                <div class="mini-avatar owner-av">
+                  {{ getInitials(deal.ownerUserFullName) }}
+                </div>
+                <span>{{ deal.ownerUserFullName }}</span>
+              </div>
+              <span class="no-data" *ngIf="!deal.ownerUserFullName">—</span>
+            </td>
+            <td class="col-campaign">
+              <span class="campaign-tag" *ngIf="deal.campaignName">{{
+                deal.campaignName
+              }}</span>
+              <span class="no-data" *ngIf="!deal.campaignName">—</span>
+            </td>
+            <td class="col-close">
+              <span class="date-text" *ngIf="deal.expectedCloseDate">
+                {{ deal.expectedCloseDate | date: "MMM d, y" }}
+              </span>
+              <span class="no-data" *ngIf="!deal.expectedCloseDate">—</span>
+            </td>
+            <td class="col-actions">
+              <button
+                class="btn-grid-delete"
+                (click)="openDeleteConfirm(deal, $event)"
+                [title]="'DEALS.DELETE.TOOLTIP' | translate">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Sum row -->
+          <tr class="sum-row" *ngIf="filteredDeals.length > 0">
+            <td colspan="3" class="sum-label">Sum</td>
+            <td class="sum-amount">
+              ${{ getTotalAllDeals() | number: "1.0-0" }}
+            </td>
+            <td colspan="4"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       LIST VIEW
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div class="list-wrap" *ngIf="!isLoading && viewMode === 'list'">
+
+    <!-- Top bar: summary + group toggle -->
+    <div class="list-topbar">
+      <div class="list-summary">
+        <span>{{ filteredDeals.length }} {{ "DEALS.GRID.DEALS" | translate }}</span>
+        <span class="summary-sep">·</span>
+        <span>Sum ${{ getTotalAllDeals() | number: "1.0-0" }}</span>
+      </div>
+      <button
+        class="btn-group-toggle"
+        [class.active]="listGrouped"
+        (click)="listGrouped = !listGrouped"
+      >
+        <i class="fas fa-layer-group"></i>
+        Agrupar por etapa
+      </button>
+    </div>
+
+    <!-- ── FLAT (default) ── -->
+    <ng-container *ngIf="!listGrouped">
+      <div class="list-card">
+
+        <!-- Column headers -->
+        <div class="list-header-row">
+          <div class="list-col list-col-name">Deal / Contacto</div>
+          <div class="list-col list-col-amount">Monto</div>
+          <div class="list-col list-col-stage">Etapa</div>
+          <div class="list-col list-col-owner">Responsable</div>
+          <div class="list-col list-col-campaign">Campaña</div>
+          <div class="list-col list-col-date">Cierre</div>
+          <div class="list-col list-col-actions"></div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="list-empty-group" *ngIf="filteredDeals.length === 0">
+          <i class="fas fa-inbox"></i>
+          {{ "DEALS.STATE.EMPTY" | translate }}
+        </div>
+
+        <!-- Rows -->
+        <ng-container *ngFor="let deal of filteredDeals; trackBy: trackByDeal">
+          <ng-container *ngTemplateOutlet="listRow; context: { deal: deal }"></ng-container>
+        </ng-container>
+
+      </div>
+    </ng-container>
+
+    <!-- ── GROUPED by stage ── -->
+    <ng-container *ngIf="listGrouped">
+      <div
+        class="list-stage-group"
+        *ngFor="let stage of stageConfigs; trackBy: trackByStage"
+        [style.--stage-color]="stage.color"
+      >
+        <!-- Group header -->
+        <div class="list-group-header" (click)="toggleListGroup(stage.id)">
+          <span class="list-group-dot" [style.background]="stage.color"></span>
+          <span class="list-group-title">{{ stage.label }}</span>
+          <span class="list-group-count">{{ getListGroupDeals(stage.id).length }}</span>
+          <span class="list-group-sum" *ngIf="getTotalAmount(stage.id) > 0">
+            ${{ getTotalAmount(stage.id) | number: "1.0-0" }}
+          </span>
+          <span class="list-group-chevron">
+            <i class="fas" [class.fa-chevron-down]="!isGroupCollapsed(stage.id)" [class.fa-chevron-right]="isGroupCollapsed(stage.id)"></i>
+          </span>
+        </div>
+
+        <!-- Group body -->
+        <div class="list-group-body" *ngIf="!isGroupCollapsed(stage.id)">
+
+          <!-- Column headers -->
+          <div class="list-header-row list-header-row--inner">
+            <div class="list-col list-col-name">Deal / Contacto</div>
+            <div class="list-col list-col-amount">Monto</div>
+            <div class="list-col list-col-stage">Etapa</div>
+            <div class="list-col list-col-owner">Responsable</div>
+            <div class="list-col list-col-campaign">Campaña</div>
+            <div class="list-col list-col-date">Cierre</div>
+            <div class="list-col list-col-actions"></div>
+          </div>
+
+          <!-- Empty group -->
+          <div class="list-empty-group" *ngIf="getListGroupDeals(stage.id).length === 0">
+            <i class="fas fa-inbox"></i>
+            {{ "DEALS.STATE.EMPTY" | translate }}
+          </div>
+
+          <ng-container *ngFor="let deal of getListGroupDeals(stage.id); trackBy: trackByDeal">
+            <ng-container *ngTemplateOutlet="listRow; context: { deal: deal }"></ng-container>
+          </ng-container>
+
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <!-- ── Shared row template ── -->
+  <ng-template #listRow let-deal="deal">
+    <div class="list-row" (click)="openDealModal(deal)">
+
+      <!-- Avatar + Name -->
+      <div class="list-col list-col-name">
+        <div class="list-avatar" [style.background]="(getStageById(deal.stageConfigId)?.color || '#5b4fe5') + 'cc'">
+          {{ getInitials(deal.contact?.displayName || deal.name) }}
+        </div>
+        <div class="list-name-block">
+          <span class="list-deal-name">{{ deal.name }}</span>
+          <span class="list-contact-sub" *ngIf="deal.contact?.displayName">
+            {{ deal.contact.displayName }}
+            <ng-container *ngIf="deal.contact?.associatedCompany">· {{ deal.contact.associatedCompany }}</ng-container>
+          </span>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="list-col list-col-amount">
+        <span class="list-amount" *ngIf="deal.amount">${{ deal.amount | number: "1.0-0" }}</span>
+        <span class="list-no-data" *ngIf="!deal.amount">—</span>
+      </div>
+
+      <!-- Stage chip -->
+      <div class="list-col list-col-stage">
+        <span
+          class="stage-chip"
+          [style.background]="(getStageById(deal.stageConfigId)?.color || '#94a3b8') + '22'"
+          [style.color]="getStageById(deal.stageConfigId)?.color || '#94a3b8'"
+        >{{ deal.stageLabel }}</span>
+      </div>
+
+      <!-- Owner -->
+      <div class="list-col list-col-owner">
+        <ng-container *ngIf="deal.ownerUserFullName">
+          <div class="list-owner-avatar">{{ getInitials(deal.ownerUserFullName) }}</div>
+          <span class="list-owner-name">{{ deal.ownerUserFullName }}</span>
+        </ng-container>
+        <span class="list-no-data" *ngIf="!deal.ownerUserFullName">—</span>
+      </div>
+
+      <!-- Campaign -->
+      <div class="list-col list-col-campaign">
+        <span class="campaign-tag" *ngIf="deal.campaignName">{{ deal.campaignName }}</span>
+        <span class="list-no-data" *ngIf="!deal.campaignName">—</span>
+      </div>
+
+      <!-- Close date -->
+      <div class="list-col list-col-date">
+        <ng-container *ngIf="deal.expectedCloseDate">
+          <i class="fas fa-calendar-alt list-date-icon"></i>
+          <span class="list-date-text">{{ deal.expectedCloseDate | date: "dd MMM yyyy" }}</span>
+        </ng-container>
+        <span class="list-no-data" *ngIf="!deal.expectedCloseDate">—</span>
+      </div>
+
+      <!-- Actions -->
+      <div class="list-col list-col-actions" (click)="$event.stopPropagation()">
+        <button
+          class="btn-list-delete"
+          (click)="openDeleteConfirm(deal, $event)"
+          [title]="'DEALS.DELETE.TOOLTIP' | translate"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+
+    </div>
+  </ng-template>
+</div>
+<!-- /page-container -->
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CREATE DEAL PANEL (slide-in desde la derecha)
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div
+  class="panel-overlay"
+  *ngIf="showCreatePanel"
+  (click)="closeCreatePanel()"
+></div>
+<div class="create-panel" [class.open]="showCreatePanel">
+  <div class="panel-header">
+    <h3>{{ "DEALS.CREATE.TITLE" | translate }}</h3>
+    <button class="panel-close" (click)="closeCreatePanel()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="panel-body">
+    <!-- Deal name -->
+    <div class="form-group required">
+      <label>{{ "DEALS.CREATE.FIELD.NAME" | translate }}</label>
+      <input
+        type="text"
+        [(ngModel)]="createForm._name"
+        [placeholder]="'DEALS.CREATE.FIELD.NAME_PH' | translate"
+      />
+    </div>
+
+    <!-- Stage -->
+    <div class="form-group required">
+      <label>{{ "DEALS.CREATE.FIELD.STAGE" | translate }}</label>
+      <select [(ngModel)]="createForm._stageConfigId">
+        <option [ngValue]="s.id" *ngFor="let s of stageConfigs">
+          {{ s.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Amount -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.AMOUNT" | translate }}</label>
+      <div class="input-prefix">
+        <span>$</span>
+        <input
+          type="number"
+          [(ngModel)]="createForm._amount"
+          placeholder="0"
+          min="0"
+        />
+      </div>
+    </div>
+
+    <!-- Close date -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.CLOSE_DATE" | translate }}</label>
+      <input type="date" [(ngModel)]="createForm._expectedCloseDate" />
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.DESCRIPTION" | translate }}</label>
+      <textarea
+        [(ngModel)]="createForm._description"
+        rows="3"
+        [placeholder]="'DEALS.CREATE.FIELD.DESCRIPTION_PH' | translate"
+      ></textarea>
+    </div>
+
+    <!-- Campaign (opcional) -->
+    <div class="form-group">
+      <label>
+        {{ "DEALS.CREATE.FIELD.CAMPAIGN" | translate }}
+        <span class="optional-tag">{{ "DEALS.CREATE.OPTIONAL" | translate }}</span>
+      </label>
+      <select [(ngModel)]="createForm._campaignId">
+        <option [ngValue]="undefined">{{ "DEALS.CREATE.FIELD.CAMPAIGN_NONE" | translate }}</option>
+        <option *ngFor="let c of availableCampaigns" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-divider">
+      <span>{{ "DEALS.CREATE.CONTACT_SECTION" | translate }}</span>
+    </div>
+
+    <!-- Contact name -->
+    <div class="form-group required">
+      <label>{{ "DEALS.CREATE.FIELD.CONTACT_NAME" | translate }}</label>
+      <input
+        type="text"
+        [(ngModel)]="createForm._contactData!._displayName"
+        [placeholder]="'DEALS.CREATE.FIELD.CONTACT_NAME_PH' | translate"
+      />
+    </div>
+
+    <!-- Contact type -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.CONTACT_TYPE" | translate }}</label>
+      <select [(ngModel)]="createForm._contactData!._contactType">
+        <option value="PEOPLE">
+          {{ "DEALS.CONTACT_TYPE.PEOPLE" | translate }}
+        </option>
+        <option value="COMPANY">
+          {{ "DEALS.CONTACT_TYPE.COMPANY" | translate }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Contact email -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.CONTACT_EMAIL" | translate }}</label>
+      <input
+        type="email"
+        [(ngModel)]="createForm._contactData!._email"
+        placeholder="email@empresa.com"
+      />
+    </div>
+
+    <!-- Contact phone -->
+    <div class="form-group">
+      <label>{{ "DEALS.CREATE.FIELD.CONTACT_PHONE" | translate }}</label>
+      <input
+        type="tel"
+        [(ngModel)]="createForm._contactData!._phone"
+        placeholder="+1 555 000 0000"
+      />
+    </div>
+
+    <!-- Associated company -->
+    <div
+      class="form-group"
+      *ngIf="createForm._contactData!._contactType === 'PEOPLE'"
+    >
+      <label>{{ "DEALS.CREATE.FIELD.COMPANY" | translate }}</label>
+      <input
+        type="text"
+        [(ngModel)]="createForm._contactData!._associatedCompany"
+        [placeholder]="'DEALS.CREATE.FIELD.COMPANY_PH' | translate"
+      />
+    </div>
+  </div>
+
+  <div class="panel-footer">
+    <button
+      class="btn-cancel"
+      (click)="closeCreatePanel()"
+      [disabled]="isSavingDeal"
+    >
+      {{ "DEALS.ACTION.CANCEL" | translate }}
+    </button>
+    <button
+      class="btn-primary"
+      (click)="submitCreateDeal()"
+      [disabled]="isSavingDeal"
+    >
+      <i class="fas fa-spinner fa-spin" *ngIf="isSavingDeal"></i>
+      <i class="fas fa-check" *ngIf="!isSavingDeal"></i>
+      {{ "DEALS.ACTION.SAVE" | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CREATE STAGE MODAL
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div
+  class="modal-overlay"
+  *ngIf="showStageModal"
+  (click)="closeStageModal()"
+></div>
+<div class="modal-box" *ngIf="showStageModal">
+  <div class="modal-header">
+    <h3>{{ "DEALS.STAGE_MODAL.TITLE" | translate }}</h3>
+    <button class="modal-close" (click)="closeStageModal()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-group required">
+      <label>{{ "DEALS.STAGE_MODAL.NAME" | translate }}</label>
+      <input
+        type="text"
+        [(ngModel)]="stageForm._label"
+        [placeholder]="'DEALS.STAGE_MODAL.NAME_PH' | translate"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>{{ "DEALS.STAGE_MODAL.TYPE" | translate }}</label>
+      <select [(ngModel)]="stageForm._stageType">
+        <option value="open">{{ "DEALS.STAGE_TYPE.OPEN" | translate }}</option>
+        <option value="won">{{ "DEALS.STAGE_TYPE.WON" | translate }}</option>
+        <option value="lost">{{ "DEALS.STAGE_TYPE.LOST" | translate }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>{{ "DEALS.STAGE_MODAL.PROBABILITY" | translate }}</label>
+      <div class="input-suffix">
+        <input
+          type="number"
+          [(ngModel)]="stageForm._probability"
+          min="0"
+          max="100"
+          placeholder="0"
+        />
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>{{ "DEALS.STAGE_MODAL.COLOR" | translate }}</label>
+      <div class="color-row">
+        <input type="color" [(ngModel)]="stageForm._color" />
+        <span class="color-preview" [style.background]="stageForm._color">
+          {{ stageForm._label || "Preview" }}
+        </span>
+      </div>
+    </div>
+
+    <div class="modal-info">
+      <i class="fas fa-info-circle"></i>
+      {{ "DEALS.STAGE_MODAL.INFO" | translate }}
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      class="btn-cancel"
+      (click)="closeStageModal()"
+      [disabled]="isSavingStage"
+    >
+      {{ "DEALS.ACTION.CANCEL" | translate }}
+    </button>
+    <button
+      class="btn-primary"
+      (click)="submitCreateStage()"
+      [disabled]="isSavingStage"
+    >
+      <i class="fas fa-spinner fa-spin" *ngIf="isSavingStage"></i>
+      {{ "DEALS.ACTION.ADD" | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     IMPORT CSV MODAL
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div
+  class="modal-overlay"
+  *ngIf="showImportModal"
+  (click)="!isImporting && closeImportModal()"
+></div>
+<div class="modal-box modal-wide" *ngIf="showImportModal">
+  <div class="modal-header">
+    <h3>{{ "DEALS.IMPORT.TITLE" | translate }}</h3>
+    <button
+      class="modal-close"
+      (click)="closeImportModal()"
+      [disabled]="isImporting"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Format instructions -->
+    <div class="import-instructions">
+      <p class="instructions-title">
+        <i class="fas fa-info-circle"></i>
+        {{ "DEALS.IMPORT.FORMAT_TITLE" | translate }}
+      </p>
+      <div class="csv-format-box">
+        <code
+          >deal_name, contact_name, contact_email, contact_type, amount,
+          stage_code, close_date, campaign_id</code
+        >
+      </div>
+      <ul class="format-rules">
+        <li>{{ "DEALS.IMPORT.RULE_1" | translate }}</li>
+        <li>{{ "DEALS.IMPORT.RULE_2" | translate }}</li>
+        <li>{{ "DEALS.IMPORT.RULE_3" | translate }}</li>
+        <li>{{ "DEALS.IMPORT.RULE_4" | translate }}</li>
+        <li>{{ "DEALS.IMPORT.RULE_5" | translate }}</li>
+      </ul>
+    </div>
+
+    <!-- File input -->
+    <div class="file-drop-zone" [class.has-file]="csvFile">
+      <input
+        type="file"
+        accept=".csv"
+        (change)="onCsvFileSelected($event)"
+        id="csvInput"
+      />
+      <label for="csvInput">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span *ngIf="!csvFile">{{ "DEALS.IMPORT.DROP_FILE" | translate }}</span>
+        <span *ngIf="csvFile" class="file-name">
+          <i class="fas fa-file-csv"></i> {{ csvFile.name }}
+        </span>
+      </label>
+    </div>
+
+    <!-- Preview -->
+    <div class="csv-preview" *ngIf="csvPreviewRows.length > 0">
+      <p class="preview-title">{{ "DEALS.IMPORT.PREVIEW" | translate }}</p>
+      <div class="preview-table-wrap">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th *ngFor="let h of csvPreviewRows[0]">{{ h }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of csvPreviewRows.slice(1)">
+              <td *ngFor="let cell of row">{{ cell }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Import result -->
+    <div
+      class="import-result success"
+      *ngIf="importResult && importResult.imported > 0"
+    >
+      <i class="fas fa-check-circle"></i>
+      {{ importResult.imported }}
+      {{ "DEALS.IMPORT.RESULT_SUCCESS" | translate }}
+    </div>
+    <div class="import-errors" *ngIf="importResult?.errors?.length > 0">
+      <p class="errors-title">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ importResult.errors.length }}
+        {{ "DEALS.IMPORT.RESULT_ERRORS" | translate }}
+      </p>
+      <ul>
+        <li *ngFor="let err of importResult.errors">
+          {{ "DEALS.IMPORT.ROW" | translate }} {{ err.row }}: {{ err.message }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      class="btn-cancel"
+      (click)="closeImportModal()"
+      [disabled]="isImporting"
+    >
+      {{ "DEALS.ACTION.CANCEL" | translate }}
+    </button>
+    <button
+      class="btn-primary"
+      (click)="submitImport()"
+      [disabled]="isImporting || !csvFile"
+    >
+      <i class="fas fa-spinner fa-spin" *ngIf="isImporting"></i>
+      <i class="fas fa-file-import" *ngIf="!isImporting"></i>
+      {{ "DEALS.IMPORT.SUBMIT" | translate }}
+    </button>
+  </div>
+
+  <div class="importing-overlay" *ngIf="isImporting">
+    <div class="importing-card">
+      <div class="importing-spinner"></div>
+      <p class="importing-title">Procesando archivo…</p>
+      <p class="importing-sub">Esto puede tardar unos segundos. Por favor espera.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- DEAL DETAIL MODAL (existente) -->
+<app-deal-detail-modal
+  *ngIf="selectedDeal"
+  [deal]="selectedDeal"
+  (closeModal)="onModalClose()"
+>
+</app-deal-detail-modal>
+
+<!-- ── DELETE CONFIRM MODAL ─────────────────────────────────────────────── -->
+<div class="delete-overlay" *ngIf="dealToDelete" (click)="cancelDelete()">
+  <div class="delete-modal" (click)="$event.stopPropagation()">
+    <div class="delete-modal-icon">
+      <i class="fas fa-trash-alt"></i>
+    </div>
+    <h3 class="delete-modal-title">{{ "DEALS.DELETE.TITLE" | translate }}</h3>
+    <p class="delete-modal-msg">
+      {{ "DEALS.DELETE.CONFIRM_MSG" | translate: { name: dealToDelete.name } }}
+    </p>
+    <div class="delete-modal-actions">
+      <button class="btn-cancel-delete" (click)="cancelDelete()" [disabled]="isDeletingDeal">
+        {{ "DEALS.DELETE.CANCEL" | translate }}
+      </button>
+      <button class="btn-confirm-delete" (click)="confirmDelete()" [disabled]="isDeletingDeal">
+        <span *ngIf="isDeletingDeal" class="btn-spinner-sm"></span>
+        <span *ngIf="!isDeletingDeal">{{ "DEALS.DELETE.CONFIRM" | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

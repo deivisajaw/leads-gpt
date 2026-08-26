@@ -1,0 +1,509 @@
+<div class="recordings-page">
+  <div class="page-container">
+    <!-- Header -->
+    <!--div class="header">
+      <h1 class="page-title">Grabaciones de Company: {{ companyName }}</h1>
+    </|div-->
+
+    <!-- ===== METRICS BLOCK ===== -->
+  <div class="metrics-bar" *ngIf="metrics || isLoadingMetrics">
+
+    <!-- Loading skeleton -->
+    <ng-container *ngIf="isLoadingMetrics">
+      <div class="metric-card skeleton" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-icon"></div>
+        <div class="skeleton-lines">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line long"></div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Metrics loaded -->
+    <ng-container *ngIf="!isLoadingMetrics && metrics">
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--blue">
+          <i class="fas fa-phone"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ metrics.totalCalls | number }}</span>
+          <span class="metric-label">Llamadas totales</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--green">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ metrics.appointmentsSet | number }}</span>
+          <span class="metric-label">Citas agendadas</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--purple">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ formatMs(metrics.avgDurationMs) }}</span>
+          <span class="metric-label">Duración promedio</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--teal">
+          <i class="fas fa-headset"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ metrics.answeredCalls | number }}</span>
+          <span class="metric-label">Llamadas contestadas</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--orange">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ metrics.interestedCalls | number }}</span>
+          <span class="metric-label">Interesados</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--gray">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="metric-body">
+          <span class="metric-value">{{ formatMs(metrics.totalDurationMs) }}</span>
+          <span class="metric-label">Tiempo total en llamadas</span>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+
+  <!-- Loading and Error States -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando grabaciones...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content-wrapper">
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="form-group">
+          <label for="filterContact">Contacto:</label>
+          <input
+            type="text"
+            id="filterContact"
+            #filterContactInput
+            [(ngModel)]="filterContact"
+            (ngModelChange)="onFilterChange()"
+            placeholder="Nombre o Teléfono"
+          />
+        </div>
+        <div class="form-group">
+          <label for="filterOutcome">Resultado:</label>
+          <select
+            id="filterOutcome"
+            [(ngModel)]="filterOutcome"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="">Todos</option>
+            <option value="APPOINTMENT_SET">Cita agendada</option>
+            <option value="INTERESTED">Interesado</option>
+            <option value="CALLBACK_REQUESTED">Solicita rellamada</option>
+            <!-- Add other options as needed -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filterType">Tipo:</label>
+          <select
+            id="filterType"
+            [(ngModel)]="filterType"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="">Todos</option>
+            <option value="inbound">Entrada</option>
+            <option value="outbound">Salida</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage" class="recordings-table-container">
+
+        <!-- Recordings Table -->
+        <div class="table-responsive">
+          <table class="recordings-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="sortable-th" (click)="sortBy('dateTime')">
+                  Fecha/Hora
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('dateTime')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('contactName')">
+                  Contacto
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('contactName')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('contactPhone')">
+                  Tel&eacute;fono
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('contactPhone')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('type')">
+                  Tipo
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('type')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('agentName')">
+                  Agente
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('agentName')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('companyPhoneNumber')">
+                  Tel&eacute;fono Compa&ntilde;&iacute;a
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('companyPhoneNumber')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('outcome')">
+                  Resultado
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('outcome')"></i>
+                </th>
+                <th class="sortable-th" (click)="sortBy('duration')">
+                  Duraci&oacute;n
+                  <i class="fas sort-icon" [ngClass]="getSortIcon('duration')"></i>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let recording of filteredRecordings; trackBy: trackByRecordingId">
+                <td>
+                  <button
+                    class="btn-action view"
+                    (click)="openPanel(recording)"
+                    title="Ver Detalles"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+                <td>{{ recording.dateTime }}</td>
+                <td>
+                  <a
+                    (click)="openPanel(recording); $event.preventDefault()"
+                    class="contact-link"
+                    >{{ recording.contactName }}</a
+                  >
+                </td>
+                <td>{{ recording.contactPhone }}</td>
+                <td>
+                  <span
+                    class="type-badge"
+                    [ngClass]="{
+                      'type-inbound': recording.type === 'inbound',
+                      'type-outbound': recording.type === 'outbound',
+                    }"
+                  >
+                    <i
+                      class="fas"
+                      [ngClass]="{
+                        'fa-arrow-down': recording.type === 'inbound',
+                        'fa-arrow-up': recording.type === 'outbound',
+                      }"
+                    ></i>
+                    {{ recording.type === "inbound" ? "Entrada" : "Salida" }}
+                  </span>
+                </td>
+                <td>{{ recording.agentName }}</td>
+                <td>{{ recording.companyPhoneNumber }}</td>
+                <td>
+                  <span
+                    class="outcome-badge"
+                    [ngClass]="getOutcomeBadgeClass(recording.outcome)"
+                  >
+                    {{ getOutcomeDisplayText(recording.outcome) | translate }}
+                  </span>
+                </td>
+                <td>{{ recording.duration }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div
+          *ngIf="filteredRecordings.length === 0 && !isLoading && !hasMore"
+          class="empty-state"
+        >
+          <p>No hay grabaciones para mostrar.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" *ngIf="totalRecords > 0">
+          <div class="pagination-info">
+            Mostrando {{ startRecord }}–{{ endRecord }} de
+            {{ totalRecords }} registros
+          </div>
+
+          <div class="pagination-controls">
+            <button
+              class="btn-pagination"
+              (click)="prevPage()"
+              [disabled]="currentPage === 1"
+            >
+              Anterior
+            </button>
+
+            <span class="pagination-info">
+              Página {{ currentPage }} de {{ totalPages }}
+            </span>
+
+            <button
+              class="btn-pagination"
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Panel -->
+      <div class="side-panel" [class.open]="isPanelOpen">
+        <div class="panel-content" *ngIf="selectedRecording">
+          <!-- Header con Nombre de Cliente -->
+          <div class="panel-header">
+            <span class="panel-customer-name">{{
+              selectedRecording.contactName
+            }}</span>
+            <button class="close-btn" (click)="closePanel()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M15 5L5 15M5 5L15 15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Reproductor de Audio -->
+          <div class="audio-player">
+            <audio #audioPlayer style="display: none"></audio>
+            <div class="waveform-container">
+              <canvas
+                id="waveform"
+                #waveformCanvas
+                width="450"
+                height="60"
+              ></canvas>
+              <div class="progress-indicator" id="progressIndicator"></div>
+            </div>
+            <div class="audio-controls">
+              <div class="controls-left">
+                <button
+                  class="control-btn play-btn"
+                  (click)="togglePlayPause()"
+                >
+                  <i
+                    class="fas"
+                    [ngClass]="{ 'fa-play': !isPlaying, 'fa-pause': isPlaying }"
+                  ></i>
+                </button>
+                <button class="control-btn secondary-btn" (click)="rewind()">
+                  <i class="fas fa-undo"></i>
+                </button>
+                <button class="control-btn secondary-btn" (click)="forward()">
+                  <i class="fas fa-redo"></i>
+                </button>
+              </div>
+              <div class="time-display">
+                <span>{{ currentTime | formatTime }}</span> /
+                <span>{{ duration | formatTime }}</span>
+              </div>
+              <a
+                [href]="selectedRecording.recordingUrl"
+                download="recording.mp3"
+                target="_blank"
+                class="download-btn"
+                *ngIf="selectedRecording.recordingUrl"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M10 3V13M10 13L6 9M10 13L14 9M4 17H16"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Rating Section (Comentado) -->
+          <!--
+          <div class="rating-section">
+            <span class="rating-text">Rate this conversation</span>
+            <div class="rating-buttons">
+              <button class="rating-btn" (click)="rateConversation('up')"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 9V17H4C3.45 17 3 16.55 3 16V10C3 9.45 3.45 9 4 9H6ZM6 9L9 3H10.5C11.05 3 11.5 3.45 11.5 4V7H15.5C16.33 7 17 7.67 17 8.5V9.5C17 9.78 16.92 10.06 16.77 10.29L14.27 14.79C14.12 15.02 13.86 15.17 13.58 15.17H6V9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+              <button class="rating-btn" (click)="rateConversation('down')"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14 11V3H16C16.55 3 17 3.45 17 4V10C17 10.55 16.55 11 16 11H14ZM14 11L11 17H9.5C8.95 17 8.5 16.55 8.5 16V13H4.5C3.67 13 3 12.33 3 11.5V10.5C3 10.22 3.08 9.94 3.23 9.71L5.73 5.21C5.88 4.98 6.14 4.83 6.42 4.83H14V11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+          -->
+
+          <!-- Tabs Navigation -->
+          <div class="tabs-nav">
+            <button
+              class="tab-btn"
+              [class.active]="activeTab === 'overview'"
+              (click)="setActiveTab('overview')"
+            >
+              Overview
+            </button>
+            <button
+              class="tab-btn"
+              [class.active]="activeTab === 'transcript'"
+              (click)="setActiveTab('transcript')"
+            >
+              Transcript
+            </button>
+          </div>
+
+          <!-- Tab Content: Overview -->
+          <div class="tab-content" [class.active]="activeTab === 'overview'">
+            <div class="info-grid">
+              <div class="info-row">
+                <div class="info-item">
+                  <div class="info-label">Date/Time</div>
+                  <div class="info-value">{{ selectedRecording.dateTime }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Outcome</div>
+                  <div class="info-value">
+                    <span
+                      class="outcome-badge"
+                      [ngClass]="
+                        getOutcomeBadgeClass(selectedRecording.outcome)
+                      "
+                    >
+                      {{
+                        getOutcomeDisplayText(selectedRecording.outcome)
+                          | translate
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="info-item">
+                  <div class="info-label">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      class="inline-icon"
+                    >
+                      <circle
+                        cx="8"
+                        cy="8"
+                        r="6"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <path
+                        d="M8 4V8H11"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                      /></svg
+                    >Duration
+                  </div>
+                  <div class="info-value">{{ selectedRecording.duration }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Type</div>
+                  <div class="info-value">
+                    <span
+                      class="type-badge"
+                      [ngClass]="{
+                        'type-inbound': selectedRecording.type === 'inbound',
+                        'type-outbound': selectedRecording.type === 'outbound',
+                      }"
+                    >
+                      <i
+                        class="fas"
+                        [ngClass]="{
+                          'fa-arrow-down': selectedRecording.type === 'inbound',
+                          'fa-arrow-up': selectedRecording.type === 'outbound',
+                        }"
+                      ></i>
+                      {{
+                        selectedRecording.type === "inbound"
+                          ? "Entrada"
+                          : "Salida"
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="info-item">
+                  <div class="info-label">Contact</div>
+                  <div class="info-value">
+                    {{ selectedRecording.contactName }}
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Agent</div>
+                  <div class="info-value">
+                    {{ selectedRecording.agentName }}
+                  </div>
+                </div>
+              </div>
+              <div class="info-row single">
+                <div class="info-item full-width">
+                  <div class="info-label">Phone Number</div>
+                  <div class="info-value">
+                    {{ selectedRecording.contactPhone }}
+                  </div>
+                </div>
+              </div>
+              <div class="info-row single">
+                <div class="info-item full-width">
+                  <div class="info-label">Campaign</div>
+                  <div class="info-value">
+                    {{ selectedRecording.campaignName }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="summary-section" *ngIf="selectedRecording.summary">
+              <h3 class="section-title">Summary</h3>
+              <div class="summary-content">
+                <p class="summary-text">{{ selectedRecording.summary }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Transcript -->
+          <div class="tab-content" [class.active]="activeTab === 'transcript'">
+            <div
+              class="transcript-container"
+              [innerHTML]="selectedRecording.transcription || '' | safeHtml"
+            >
+              <!-- La transcripción se renderizará aquí -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

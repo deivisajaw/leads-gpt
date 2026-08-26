@@ -1,0 +1,110 @@
+<div class="search-container">
+
+  <!-- HEADER -->
+  <p class="search-greet" *ngIf="!hasStarted">{{ greeting }}</p>
+  <h1 class="search-title">
+    {{ title }}
+  </h1>
+  <p class="search-subtitle" *ngIf="!hasStarted">{{ subtitle }}</p>
+
+  <!-- CHAT (solo si empieza) — estilo "asistente", igual al de referencia -->
+  <div class="sc-agentwrap" *ngIf="hasStarted">
+    <div class="sc-agentscroll">
+      <div class="sc-agentcol">
+        <ng-container *ngFor="let msg of messages; trackBy: trackByIndex">
+          <div
+            class="sc-msg"
+            [class.sc-msg-user]="msg.role === 'user'"
+            [class.sc-msg-ai]="msg.role === 'assistant'"
+          >
+            {{ msg.text }}
+          </div>
+
+          <div class="sc-opts" *ngIf="msg.options?.length">
+            <button
+              *ngFor="let opt of msg.options; trackBy: trackByIndex"
+              class="sc-opt"
+              type="button"
+              [disabled]="isLoading"
+              (click)="selectOption(opt)"
+            >
+              {{ opt }}
+            </button>
+          </div>
+        </ng-container>
+
+        <div *ngIf="isLoading" class="sc-msg sc-msg-ai sc-typing">
+          <span class="sc-typing-dot"></span>
+          <span class="sc-typing-dot"></span>
+          <span class="sc-typing-dot"></span>
+        </div>
+
+        <div #messagesEnd></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT antes de iniciar conversación (sin cambios) -->
+  <div class="input-wrapper" *ngIf="!hasStarted">
+    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input
+      type="text"
+      [(ngModel)]="userInput"
+      (keydown)="onKeyDown($event)"
+      [placeholder]="inputPlaceholder"
+      [disabled]="isLoading"
+    />
+
+    <button
+      class="btn-search"
+      (click)="send()"
+      [disabled]="!userInput.trim() || isLoading"
+    >
+      Buscar
+    </button>
+  </div>
+
+  <!-- Ancla: reserva el espacio del composer en el flujo normal (el composer real se porta
+       a body con position:fixed, ver ngAfterViewInit). -->
+  <div class="sc-composer-anchor" #composerAnchor *ngIf="hasStarted"></div>
+
+  <!-- INPUT durante la conversación — fijo abajo, fondo blanco -->
+  <ng-container *ngIf="hasStarted">
+    <div class="sc-composer-fixed" #composerFixed>
+      <div class="sc-acomposer">
+        <span class="sc-sp2">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.6L19 9.2l-5.4 1.6L12 16l-1.6-5.2L5 9.2l5.4-1.6L12 2Z"/></svg>
+        </span>
+        <input
+          type="text"
+          [(ngModel)]="userInput"
+          (keydown)="onKeyDown($event)"
+          [placeholder]="inputPlaceholder"
+          [disabled]="isLoading"
+        />
+        <button
+          (click)="send()"
+          [disabled]="!userInput.trim() || isLoading"
+          title="Enviar"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>
+        </button>
+      </div>
+      <p class="sc-anote">La IA ajusta la búsqueda según lo que le cuentes — siempre puedes seguir escribiendo para refinarla.</p>
+    </div>
+  </ng-container>
+
+  <!-- SUGERENCIAS RÁPIDAS -->
+  <div class="quick-prompts" *ngIf="!hasStarted">
+    <button
+      *ngFor="let prompt of quickPrompts; trackBy: trackByIndex"
+      class="chip"
+      type="button"
+      [disabled]="isLoading"
+      (click)="usePrompt(prompt)"
+    >
+      {{ prompt.label }}
+    </button>
+  </div>
+
+</div>

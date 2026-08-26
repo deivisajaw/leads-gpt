@@ -1,0 +1,32 @@
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="onClose()">
+  <div class="custom-modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ 'SUB_MGMT.INVITE_USER_MODAL_TITLE' | translate }}</h2>
+      <button class="close-button" (click)="onClose()" [disabled]="isLoading">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>{{ 'SUB_MGMT.INVITE_USER_MODAL_MESSAGE' | translate }}</p>
+      <div class="form-group">
+        <label for="userEmail">{{ 'SUB_MGMT.INVITE_USER_MODAL_EMAIL_LABEL' | translate }}</label>
+        <input type="email" id="userEmail" [(ngModel)]="userEmail" class="form-control" placeholder="{{ 'SUB_MGMT.INVITE_USER_MODAL_EMAIL_PLACEHOLDER' | translate }}" [disabled]="isLoading">
+      </div>
+      <div class="form-group">
+        <label for="expiresAt">{{ 'SUB_MGMT.INVITE_USER_MODAL_EXPIRES_LABEL' | translate }} ({{ 'SUB_MGMT.OPTIONAL' | translate }})</label>
+        <input type="datetime-local" id="expiresAt" [(ngModel)]="expiresAt" class="form-control" [disabled]="isLoading">
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="isLoading" class="loading-indicator">
+        <p>{{ 'COMMON.PROCESSING' | translate }}</p>  
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()" [disabled]="isLoading">{{ 'SUB_MGMT.INVITE_USER_MODAL_CANCEL' | translate }}</button>
+      <button class="btn btn-primary" (click)="onInvite()" [disabled]="!isEmailValid || isLoading">{{ 'SUB_MGMT.INVITE_USER_MODAL_INVITE_BTN' | translate }}</button>
+    </div>
+  </div>
+</div>

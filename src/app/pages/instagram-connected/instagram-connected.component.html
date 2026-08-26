@@ -1,0 +1,87 @@
+<div class="ig-connected-page">
+
+  <!-- Animated background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- SUCCESS STATE -->
+  <div class="ig-card" *ngIf="!hasError">
+
+    <div class="ig-icon-wrap">
+      <div class="ig-icon-ring"></div>
+      <div class="ig-icon">
+        <i class="fab fa-instagram"></i>
+      </div>
+      <div class="ig-check">
+        <i class="fas fa-check"></i>
+      </div>
+    </div>
+
+    <h1 class="ig-title">¡Cuenta conectada!</h1>
+
+    <div class="ig-account" *ngIf="username || name">
+      <div class="ig-account-avatar">
+        <i class="fab fa-instagram"></i>
+      </div>
+      <div class="ig-account-info">
+        <span class="ig-account-name" *ngIf="name">{{ name }}</span>
+        <span class="ig-account-username" *ngIf="username">&#64;{{ username }}</span>
+      </div>
+    </div>
+
+    <p class="ig-desc">
+      Tu cuenta de Instagram ha sido vinculada exitosamente a tu agente de IA en AJAW.
+      A partir de ahora, tu agente podrá responder mensajes automáticamente.
+    </p>
+
+    <div class="ig-steps">
+      <div class="ig-step">
+        <span class="ig-step-icon"><i class="fas fa-robot"></i></span>
+        <span>Tu agente está listo para responder mensajes</span>
+      </div>
+      <div class="ig-step">
+        <span class="ig-step-icon"><i class="fas fa-bolt"></i></span>
+        <span>Las respuestas automáticas ya están activas</span>
+      </div>
+      <div class="ig-step">
+        <span class="ig-step-icon"><i class="fas fa-shield-alt"></i></span>
+        <span>Conexión segura y cifrada</span>
+      </div>
+    </div>
+
+    <a routerLink="/agents" class="ig-btn">
+      <i class="fas fa-arrow-left"></i>
+      Ir a mis agentes
+    </a>
+
+    <p class="ig-close-hint">Puedes cerrar esta ventana de forma segura.</p>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="ig-card ig-card-error" *ngIf="hasError">
+
+    <div class="ig-icon-wrap error">
+      <div class="ig-icon-ring"></div>
+      <div class="ig-icon">
+        <i class="fab fa-instagram"></i>
+      </div>
+      <div class="ig-check error">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+
+    <h1 class="ig-title">Algo salió mal</h1>
+
+    <p class="ig-desc">
+      No pudimos completar la conexión con Instagram. Por favor regresa a tus
+      agentes e intenta conectar nuevamente.
+    </p>
+
+    <a routerLink="/agents" class="ig-btn ig-btn-secondary">
+      <i class="fas fa-arrow-left"></i>
+      Volver a mis agentes
+    </a>
+  </div>
+
+</div>

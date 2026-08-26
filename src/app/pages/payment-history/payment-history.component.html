@@ -1,0 +1,95 @@
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "PAYMENT_HISTORY.TITLE" | translate }}</h1>
+      <p>{{ "PAYMENT_HISTORY.SUBTITLE" | translate }}</p>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <div class="payment-history-container">
+    <div class="section-option"></div>
+
+    <div class="notifications-block">
+
+      <div class="message-loading" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p>{{ "COMMON.LOADING" | translate }}</p>
+      </div>     
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error">
+      <div *ngIf="historyData.length > 0; else noHistory">
+        <div class="details-grid">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_DATE" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_TYPE" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_PLAN" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_AMOUNT" | translate }}</th>
+                  <th>
+                    {{ "PAYMENT_HISTORY.TABLE_CREDITS_AFFECTED" | translate }}
+                  </th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_USERS" | translate }}</th>
+                  <th>
+                    {{ "PAYMENT_HISTORY.TABLE_BILLING_PERIOD" | translate }}
+                  </th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_START_DATE" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_END_DATE" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_DETAILS" | translate }}</th>
+                  <th>{{ "PAYMENT_HISTORY.TABLE_INVOICE" | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of historyData">
+                  <td>{{ record.eventDate | date : "short" }}</td>
+                  <td>
+                    {{ ('PAYMENT_HISTORY.' + record.transactionType) | translate }}
+                  </td>
+                  <td>{{ record.planName }}</td>
+                  <td>{{ record.amount | number : "1.2-2" }}</td>
+                  <td>{{ record.creditsAffected | number }}</td>
+                  <td>{{ record.userNumbers }}</td>
+                  <td>{{ record.billingPeriod }}</td>
+                  <td>{{ record.startDate | date : "mediumDate" }}</td>
+                  <td>{{ record.endDate | date : "mediumDate" }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" (click)="openInfoModal(record.details)">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      (click)="downloadInvoice(record)"
+                    >
+                      <i class="fas fa-download"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <ng-template #noHistory>
+        <p class="empty-history-message">
+          {{ "PAYMENT_HISTORY.NO_RECORDS_FOUND" | translate }}
+        </p>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<app-info-modal
+  *ngIf="showInfoModal"
+  [message]="infoModalMessage"
+  [title]="'PAYMENT_HISTORY.DETAILS_TITLE' | translate"
+  (close)="closeInfoModal()">
+</app-info-modal>

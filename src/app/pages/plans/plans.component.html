@@ -1,0 +1,139 @@
+<div class="plans-page-container">
+  <div class="plans-scrollable-content">
+    <!-- Header -->
+    <div class="plans-header">
+       
+      <div class="plans-header-title">
+        <h1>{{ 'PLANS.TITLE' | translate }}</h1>
+        <p>{{ 'PLANS.SUBTITLE' | translate }}</p>
+      </div>     
+
+      <div class="billing-toggle">
+        <button 
+          [class.active]="billingCycle === 'annual'" 
+          (click)="setBillingCycle('annual')">
+          {{ 'PLANS.ANNUAL_BILLING' | translate }}
+        </button>
+        <button 
+          [class.active]="billingCycle === 'monthly'" 
+          (click)="setBillingCycle('monthly')">
+          {{ 'PLANS.MONTHLY_BILLING' | translate }}
+        </button>
+        <span class="save-badge" *ngIf="billingCycle === 'annual'">{{ 'PLANS.SAVE_20' | translate }}</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="plans-content">
+      <!-- User Selector -->
+      <div class="section-header">
+        <h2>1. Edition & Users</h2>
+        <div class="user-selector">
+          <label>{{ 'PLANS.HOW_MANY_USERS' | translate }}</label>
+          <div class="user-counter">
+            <button (click)="decrementUsers()" [disabled]="users <= 1 || isFreePlanSelected">-</button>
+            <input type="number" [(ngModel)]="users" (change)="updateUsers()" [disabled]="isFreePlanSelected">
+            <button (click)="incrementUsers()" [disabled]="isFreePlanSelected">+</button>
+          </div>
+        </div>
+      </div>
+      <p class="promo-text">{{ 'PLANS.PAYING_TEAMS_BOOK' | translate }}</p>
+
+      <!-- Plans Grid -->
+      <div class="plans-grid">
+        <div class="plan-card" *ngFor="let plan of visiblePlans" [class.popular]="plan.popular" [class.selected]="plan.id === selectedPlan.id">
+          <!-- NEW WRAPPER DIV -->
+          <div class="plan-card-main">
+            <div class="popular-badge" *ngIf="plan.popular">{{ 'PLANS.MOST_POPULAR' | translate }}</div>
+            <h3>{{ plan.name }}</h3>
+            <p class="plan-description">{{ plan.description }}</p>
+            <div class="price-container">
+              <span class="price-amount">${{ getRoundedPrice(plan) }} USD</span>
+              <span class="price-period">{{ 'PLANS.PER_USER_PER_MONTH' | translate }}</span>
+              <span class="price-billing-cycle">{{ billingCycle === 'annual' ? ('PLANS.BILLED_ANNUALLY' | translate) : ('PLANS.BILLED_MONTHLY' | translate) }}</span>
+              <span class="price-note" *ngIf="plan.note">{{ plan.note | translate }}</span>
+            </div>
+            <button 
+              class="select-button"
+              [ngClass]="getButtonClass(plan)"
+              (click)="selectPlan(plan)">
+              {{ getButtonText(plan) | translate }}
+            </button>
+            <div class="credits-section">
+              <p>{{ plan.creditsPerUserPerYear | number }} credits per user/year</p>
+            </div>
+            <ul class="features-list">
+              <li *ngFor="let feature of plan.features">
+                <i class="fas fa-check"></i> {{ feature }}
+              </li>
+            </ul>
+          </div>
+          <!-- The link is now a direct child of .plan-card, outside the new wrapper -->
+          <a class="compare-link">{{ 'PLANS.SHOW_PLAN_COMPARISON' | translate }} <i class="fas fa-chevron-down"></i></a>
+        </div>
+      </div>
+
+      <!-- Credits Explanation -->
+      <div class="credits-explainer-card">
+        <div class="credits-explainer-content">
+          <h2>{{ 'PLANS.WHAT_ARE_CREDITS' | translate }}</h2>
+          <p>{{ 'PLANS.CREDITS_EXPLANATION' | translate }}</p>
+          <button class="learn-more-btn">{{ 'PLANS.LEARN_MORE' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="faq-section">
+        <h2>{{ 'PLANS.FAQ_TITLE' | translate }}</h2>
+        <div class="faq-item" *ngFor="let faq of faqs; let i = index" (click)="toggleFaq(i)">
+          <div class="faq-question">
+            <span>{{ faq.q | translate }}</span>
+            <i class="fas" [ngClass]="faq.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </div>
+          <div class="faq-answer" [class.open]="faq.open">
+            <p>{{ faq.a | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Footer -->
+  <div class="sticky-footer" *ngIf="selectedPlan && !isFreePlanSelected">
+    <div class="footer-summary">
+      <h4>{{ 'PLANS.FOOTER_SUMMARY' | translate }}</h4>
+      <p>{{ selectedPlan.name | translate }}</p>
+    </div>
+    <div class="footer-details">
+      <div class="detail-item">
+        <span class="label">{{ 'PLANS.FOOTER_SEATS' | translate }}</span>
+        <span class="value">{{ users }} user{{ users > 1 ? 's' : '' }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">{{ 'PLANS.FOOTER_BILLED' | translate }}</span>
+        <span class="value">{{ billingCycle === 'annual' ? ('PLANS.BILLED_ANNUALLY' | translate) : ('PLANS.BILLED_MONTHLY' | translate) }}</span>
+      </div>
+      <div class="detail-item total">
+        <span class="label">{{ 'PLANS.FOOTER_DUE_TODAY' | translate }}</span>
+        <span class="value">${{ Math.round(totalCost) }} USD*</span>
+      </div>
+    </div>
+    <div class="footer-action">
+      <button
+        class="upgrade-btn"
+        (click)="redirectToPayment()"
+        [disabled]="showLoadingModal"> <!-- Button disabled only when loading -->
+        {{ 'PLANS.FOOTER_UPGRADE_BUTTON' | translate }}
+      </button>
+      <p class="taxes-note">{{ 'PLANS.FOOTER_TAXES_NOTE' | translate }}</p>
+    </div>
+  </div>
+
+  <app-payment-link-modal
+    *ngIf="showPaymentModal && paymentLinkToShow"
+    [paymentUrl]="paymentLinkToShow"
+    (close)="showPaymentModal = false">
+  </app-payment-link-modal>
+
+  <app-loading-modal *ngIf="showLoadingModal"></app-loading-modal>
+</div>

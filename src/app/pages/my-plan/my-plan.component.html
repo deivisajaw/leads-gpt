@@ -1,0 +1,142 @@
+<div class="page-container">
+
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ 'MY_PLAN.TITLE' | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right">
+      <button *ngIf="planData && planData.isMember !== false && !leaveSuccessMessage" class="btn btn-danger" (click)="onLeaveTeam()">{{ 'MY_PLAN.LEAVE_TEAM_BUTTON' | translate }} <i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </div>
+
+  <div class="my-plan-container">
+    
+    <div class="section-option">
+      
+    </div>
+
+    <div class="notifications-block">
+      
+      <div *ngIf="!isLoading && error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div *ngIf="!isLoading && leaveSuccessMessage" class="alert alert-success">
+        {{ leaveSuccessMessage }}
+      </div>
+
+      <div *ngIf="isLoading" class="loading-banner">
+        <p>{{ 'MY_PLAN.LOADING' | translate }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error && !leaveSuccessMessage">
+     
+      <div *ngIf="planData">
+        
+        <div *ngIf="planData.isMember === false">
+          <p>{{ 'MY_PLAN.NOT_A_MEMBER' | translate }}</p>
+        </div>
+
+        <div *ngIf="planData.isMember !== false">
+          
+          <div class="details-grid">
+            <div class="card">
+              <h2>{{ 'MY_PLAN.YOUR_DETAILS_TITLE' | translate }}</h2>
+              <p><strong>{{ 'MY_PLAN.ROLE' | translate }}:</strong> {{ planData.member?.role }}</p>
+              <p><strong>{{ 'MY_PLAN.STATUS' | translate }}:</strong> <span class="status-badge" [class.active]="planData.member?.isActive">{{ (planData.member?.isActive ? 'ACTIVE' : 'INACTIVE') | translate }}</span></p>
+              <p><strong>{{ 'MY_PLAN.CREDITS_ALLOCATED' | translate }}:</strong> {{ planData.member?.creditsAllocated | number }}</p>
+            </div>
+            <div class="card">
+              <h2>{{ 'MY_PLAN.COMPANY_DETAILS_TITLE' | translate }}</h2>
+              <p><strong>{{ 'MY_PLAN.COMPANY_NAME' | translate }}:</strong> {{ planData.company?.name }}</p>
+              <p><strong>{{ 'MY_PLAN.COMPANY_CREDITS' | translate }}:</strong> {{ planData.company?.credits | number }}</p>
+              <p><strong>{{ 'MY_PLAN.DISTRIBUTION_MODE' | translate }}:</strong> {{ 'MY_PLAN.'+ planData.company?.creditDistributionMode | translate }}</p>
+              <p><strong>{{ 'MY_PLAN.MIN_GUARANTEED' | translate }}:</strong> {{ planData.company?.minCreditsGuaranteed | number }}</p>
+            </div>
+          </div>
+
+          <!-- Subscription and Plan Details -->
+          <div class="card" *ngIf="planData.subscription">
+            <h2>{{ 'MY_PLAN.SUBSCRIPTION_DETAILS_TITLE' | translate }}</h2>
+            <div class="details-grid-3-col">
+                <div>
+                    <p><strong>{{ 'MY_PLAN.PLAN_NAME' | translate }}:</strong> {{ planData.plan?.name }}</p>
+                    <p><strong>{{ 'MY_PLAN.SUBSCRIPTION_STATUS' | translate }}:</strong> <span class="status-badge" [class.active]="planData.subscription?.status === 'ACTIVE'">{{ planData.subscription?.status }}</span></p>
+                    <p><strong>{{ 'MY_PLAN.BILLING_PERIOD' | translate }}:</strong> {{ ('MY_PLAN.' + (planData.subscription?.billingPeriod || '')) | translate }}</p>
+                </div>
+                <div>
+                    <p><strong>{{ 'MY_PLAN.START_DATE' | translate }}:</strong> {{ planData.subscription?.startDate | date: 'mediumDate' }}</p>
+                    <p><strong>{{ 'MY_PLAN.END_DATE' | translate }}:</strong> {{ planData.subscription?.endDate | date: 'mediumDate' }}</p>
+                    <p><strong>{{ 'MY_PLAN.USERS_IN_PLAN' | translate }}:</strong> {{ planData.subscription?.userNumbers }}</p>
+                </div>
+                 <div>
+                    <p><strong>{{ 'MY_PLAN.PLAN_PRICE' | translate }}:</strong> {{ (planData.subscription?.billingPeriod == 'ANNUAL' ? planData.plan?.pricePerYear : planData.plan?.pricePerMonth) | number:'1.2-2' }}</p>
+                    <p><strong>{{ 'MY_PLAN.PLAN_CREDITS' | translate }}:</strong> {{ (planData.subscription?.billingPeriod == 'ANNUAL' ? planData.plan?.creditsPerUserPerYear : planData.plan?.creditsPerUserPerMonth) | number }}</p>
+                </div>
+            </div>
+            <p><strong>{{ 'MY_PLAN.PLAN_DESCRIPTION' | translate }}:</strong> {{ planData.plan?.description }}</p>
+          </div>
+
+          <!-- Credit History -->
+          <div class="card mt-3" *ngIf="planData.creditHistory">
+            <h2>{{ 'MY_PLAN.CREDIT_HISTORY_TITLE' | translate }}</h2>
+            <div *ngIf="pagedCreditHistory.length > 0; else noHistory">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ 'MY_PLAN.HISTORY_DATE' | translate }}</th>
+                    <th>{{ 'MY_PLAN.HISTORY_TYPE' | translate }}</th>
+                    <th>{{ 'MY_PLAN.HISTORY_AMOUNT' | translate }}</th>
+                    <th>{{ 'MY_PLAN.HISTORY_BALANCE_AFTER' | translate }}</th>
+                    <th>{{ 'MY_PLAN.HISTORY_TRIGGERED_BY' | translate }}</th>
+                    <th>{{ 'MY_PLAN.HISTORY_REASON' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let tx of pagedCreditHistory">
+                    <td>{{ tx.transactionDate | date: 'short' }}</td>
+                    <td>{{ 'MY_PLAN.'+ tx.transactionType | translate }}</td>
+                    <td [class.positive]="tx.amount > 0" [class.negative]="tx.amount < 0">{{ tx.amount > 0 ? '+' : '' }}{{ tx.amount | number }}</td>
+                    <td>{{ tx.memberBalanceAfter | number }}</td>
+                    <td>{{ tx.triggeredBy }}</td>
+                    <td>{{ tx.reason }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- Pagination Controls -->
+              <div class="pagination-controls" *ngIf="totalPages >= 1">
+                <button class="btn btn-secondary" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'COMMON.PREVIOUS' | translate }}</button>
+                <span>{{ 'COMMON.PAGE' | translate }} {{ currentPage }} {{ 'COMMON.OF' | translate }} {{ totalPages }}</span>
+                <button class="btn btn-secondary" (click)="nextPage()" [disabled]="currentPage === totalPages">{{ 'COMMON.NEXT' | translate }}</button>
+              </div>
+            </div>
+            <ng-template #noHistory>
+              <p class="empty-history-message">{{ 'MY_PLAN.NO_HISTORY_FOUND' | translate }}</p>
+            </ng-template>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- New Loading Banner -->
+    <div *ngIf="isLoading" class="loading-banner">
+      <p>{{ 'MY_PLAN.LOADING' | translate }}</p>
+    </div>
+
+  </div> <!-- End of my-plan-container -->
+
+</div> <!-- End of page-container -->
+
+<!-- Confirmation Modal for Leaving Team -->
+<app-confirmation-modal
+  [showModal]="showLeaveConfirmationModal"
+  [title]="'MY_PLAN.LEAVE_TEAM_MODAL_TITLE' | translate"
+  [message]="'MY_PLAN.LEAVE_TEAM_CONFIRMATION' | translate"
+  [errorMessage]="leaveError"
+  (confirm)="handleLeaveTeamConfirm()"
+  (cancel)="handleLeaveTeamCancel()">
+</app-confirmation-modal>
+

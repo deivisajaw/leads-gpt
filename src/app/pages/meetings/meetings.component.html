@@ -1,0 +1,283 @@
+<div class="page-container">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ 'MEETINGS.PAGE_TITLE' | translate }}</h1>
+      <p>{{ 'MEETINGS.PAGE_SUBTITLE' | translate }}</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-toggle-sidebar"
+        (click)="toggleSidebar()"
+        [title]="(sidebarCollapsed ? 'MEETINGS.SIDEBAR.EXPAND' : 'MEETINGS.SIDEBAR.COLLAPSE') | translate">
+        <i class="fas" [class.fa-columns]="!sidebarCollapsed" [class.fa-table-columns]="sidebarCollapsed"></i>
+        <span>{{ (sidebarCollapsed ? 'MEETINGS.SIDEBAR.EXPAND' : 'MEETINGS.SIDEBAR.COLLAPSE') | translate }}</span>
+      </button>
+      <button class="btn-refresh" (click)="load()" [disabled]="isLoading"
+        [title]="'MEETINGS.ACTION.REFRESH' | translate">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+        {{ 'MEETINGS.ACTION.REFRESH' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="meetings-layout" [class.sidebar-hidden]="sidebarCollapsed">
+
+    <!-- ──────────── MAIN ──────────── -->
+    <div class="meetings-main">
+
+      <!-- TOOLBAR -->
+      <div class="meetings-toolbar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            [placeholder]="'MEETINGS.TOOLBAR.SEARCH_PLACEHOLDER' | translate"
+            [value]="searchQuery"
+            (input)="onSearch($event)"
+          />
+        </div>
+        <div class="filter-pills">
+          <button [class.active]="activeFilter==='all'"      (click)="setFilter('all')">
+            {{ 'MEETINGS.FILTER.ALL' | translate }}
+          </button>
+          <button [class.active]="activeFilter==='today'"    (click)="setFilter('today')">
+            {{ 'MEETINGS.FILTER.TODAY' | translate }}
+          </button>
+          <button [class.active]="activeFilter==='tomorrow'" (click)="setFilter('tomorrow')">
+            {{ 'MEETINGS.FILTER.TOMORROW' | translate }}
+          </button>
+          <button [class.active]="activeFilter==='upcoming'" (click)="setFilter('upcoming')">
+            {{ 'MEETINGS.FILTER.UPCOMING' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="empty-state" *ngIf="isLoading">
+        <div class="loader-ring"></div>
+        <p>{{ 'MEETINGS.STATE.LOADING' | translate }}</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="empty-state error-state" *ngIf="!isLoading && error">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>{{ error }}</p>
+        <button class="btn-refresh" (click)="load()">{{ 'MEETINGS.ACTION.RETRY' | translate }}</button>
+      </div>
+
+      <!-- VACÍO -->
+      <div class="empty-state" *ngIf="!isLoading && !error && filteredMeetings.length === 0">
+        <i class="fas fa-calendar-times"></i>
+        <p>{{ 'MEETINGS.STATE.EMPTY' | translate }}</p>
+      </div>
+
+      <!-- GRUPOS -->
+      <ng-container *ngIf="!isLoading && !error && filteredMeetings.length > 0">
+        <div class="meeting-group" *ngFor="let group of meetingGroups">
+
+          <div class="group-label-row">
+            <span class="group-pill" [ngClass]="'pill-'+group.tag">
+              {{ groupLabelKey(group.tag) | translate }}
+            </span>
+            <span class="group-count">
+              {{ group.meetings.length }}
+              {{ (group.meetings.length !== 1 ? 'MEETINGS.GROUP.MEETINGS_PLURAL' : 'MEETINGS.GROUP.MEETINGS_SINGULAR') | translate }}
+            </span>
+          </div>
+
+          <!-- TABLE -->
+          <div class="meetings-table-wrap">
+            <table class="meetings-table">
+              <thead>
+                <tr>
+                  <th>{{ 'MEETINGS.TABLE.TITLE'      | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.DATE'       | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.TIME'       | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.DURATION'   | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.ATTENDEES'  | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.AGENT'      | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.STATUS'     | translate }}</th>
+                  <th>{{ 'MEETINGS.TABLE.LINK'       | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let m of group.meetings"
+                  [class.row-now]="svc.isHappeningNow(m)"
+                  [class.row-soon]="svc.isSoon(m) && !svc.isHappeningNow(m)"
+                  [class.row-cancelled]="m.status === 'cancelled'"
+                  class="row-clickable"
+                  (click)="goToDetail(m)"
+                >
+                  <!-- Título -->
+                  <td class="td-title">
+                    <span class="live-badge" *ngIf="svc.isHappeningNow(m)">
+                      <span class="live-dot"></span>
+                      {{ 'MEETINGS.BADGE.LIVE' | translate }}
+                    </span>
+                    <span class="soon-badge" *ngIf="svc.isSoon(m) && !svc.isHappeningNow(m)">
+                      {{ svc.minutesUntil(m.startTime) }}{{ 'MEETINGS.BADGE.MIN' | translate }}
+                    </span>
+                    {{ m.title }}
+                  </td>
+
+                  <!-- Fecha -->
+                  <td class="td-date">{{ svc.formatShortDate(m.startTime) }}</td>
+
+                  <!-- Hora -->
+                  <td class="td-time">
+                    {{ svc.formatTime(m.startTime) }} — {{ svc.formatTime(m.endTime) }}
+                  </td>
+
+                  <!-- Duración -->
+                  <td class="td-dur">
+                    <i class="fas fa-clock"></i> {{ svc.getDuration(m.startTime, m.endTime) }}
+                  </td>
+
+                  <!-- Asistentes -->
+                  <td class="td-attendees">
+                    <div class="avatar-stack">
+                      <div
+                        class="avatar-chip"
+                        *ngFor="let att of m.attendees.slice(0,3)"
+                        [style.background]="avatarColor(att.name)"
+                        [title]="att.name + ' · ' + att.email"
+                      >{{ getInitials(att.name) }}</div>
+                      <div class="avatar-more" *ngIf="m.attendees.length > 3">
+                        +{{ m.attendees.length - 3 }}
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Agente -->
+                  <td class="td-agent">
+                    <span class="agent-tag" *ngIf="m.agentName">
+                      <i class="fas fa-robot"></i> {{ m.agentName }}
+                    </span>
+                    <span class="no-data" *ngIf="!m.agentName">—</span>
+                  </td>
+
+                  <!-- Estado -->
+                  <td class="td-status">
+                    <span class="status-chip" [ngClass]="'chip-'+m.status.toLowerCase()">
+                      {{ statusKey(m.status) | translate }}
+                    </span>
+                  </td>
+
+                  <!-- Enlace -->
+                  <td class="td-link">
+                    <a *ngIf="m.meetingUrl" [href]="m.meetingUrl" target="_blank" class="btn-join">
+                      <i class="fas fa-video"></i> {{ 'MEETINGS.ACTION.JOIN' | translate }}
+                    </a>
+                    <span class="no-data" *ngIf="!m.meetingUrl">—</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- ──────────── SIDEBAR ──────────── -->
+    <aside class="meetings-sidebar" [class.collapsed]="sidebarCollapsed">
+
+      <!-- TOGGLE STRIP (visible solo cuando está colapsado) -->
+      <div class="sidebar-collapsed-strip" *ngIf="sidebarCollapsed" (click)="toggleSidebar()"
+        [title]="'MEETINGS.SIDEBAR.EXPAND' | translate">
+        <i class="fas fa-chevron-left"></i>
+      </div>
+
+      <!-- CONTENIDO del sidebar (oculto cuando colapsado) -->
+      <ng-container *ngIf="!sidebarCollapsed">
+
+        <!-- PRÓXIMAS 48h -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">
+            <i class="fas fa-bolt"></i>
+            <span>{{ 'MEETINGS.SIDEBAR.UPCOMING_TITLE' | translate }}</span>
+          </div>
+
+          <div class="sidebar-empty" *ngIf="!isLoading && upcomingMeetings.length === 0">
+            <i class="fas fa-mug-hot"></i>
+            <p>{{ 'MEETINGS.SIDEBAR.UPCOMING_EMPTY' | translate }}</p>
+          </div>
+
+          <div class="skeleton-list" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let s of [1,2,3]"></div>
+          </div>
+
+          <div class="timeline" *ngIf="!isLoading && upcomingMeetings.length > 0">
+            <div
+              class="tl-item"
+              *ngFor="let m of upcomingMeetings"
+              [class.tl-now]="svc.isHappeningNow(m)"
+              [class.tl-soon]="svc.isSoon(m) && !svc.isHappeningNow(m)"
+            >
+              <div class="tl-dot"
+                [class.dot-now]="svc.isHappeningNow(m)"
+                [class.dot-soon]="svc.isSoon(m) && !svc.isHappeningNow(m)">
+              </div>
+              <div class="tl-body">
+                <div class="tl-meta">
+                  <span class="tl-time">{{ svc.formatTime(m.startTime) }}</span>
+                  <span class="tl-day">{{ svc.formatShortDate(m.startTime) }}</span>
+                  <span class="tl-live" *ngIf="svc.isHappeningNow(m)">
+                    {{ 'MEETINGS.BADGE.LIVE' | translate }}
+                  </span>
+                  <span class="tl-soon-tag" *ngIf="svc.isSoon(m) && !svc.isHappeningNow(m)">
+                    {{ svc.minutesUntil(m.startTime) }}{{ 'MEETINGS.BADGE.MIN' | translate }}
+                  </span>
+                </div>
+                <p class="tl-title">{{ m.title }}</p>
+                <div class="tl-avatars">
+                  <div
+                    class="tl-avatar"
+                    *ngFor="let att of m.attendees.slice(0,3)"
+                    [style.background]="avatarColor(att.name)"
+                    [title]="att.name"
+                  >{{ getInitials(att.name) }}</div>
+                  <span class="tl-more" *ngIf="m.attendees.length > 3">+{{ m.attendees.length - 3 }}</span>
+                </div>
+                <a *ngIf="m.meetingUrl" [href]="m.meetingUrl" target="_blank" class="tl-join">
+                  <i class="fas fa-video"></i> {{ 'MEETINGS.ACTION.JOIN' | translate }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="sidebar-card stats-card" *ngIf="!isLoading && meetings.length > 0">
+          <div class="sidebar-card-header">
+            <i class="fas fa-chart-pie"></i>
+            <span>{{ 'MEETINGS.SIDEBAR.STATS_TITLE' | translate }}</span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-num">{{ meetings.length }}</span>
+              <span class="stat-lbl">{{ 'MEETINGS.STATS.TOTAL' | translate }}</span>
+            </div>
+            <div class="stat-box stat-today">
+              <span class="stat-num">{{ upcomingMeetings.length }}</span>
+              <span class="stat-lbl">{{ 'MEETINGS.STATS.TODAY_TOMORROW' | translate }}</span>
+            </div>
+            <div class="stat-box stat-accepted">
+              <span class="stat-num">{{ countByStatus('ACCEPTED') }}</span>
+              <span class="stat-lbl">{{ 'MEETINGS.STATS.CONFIRMED' | translate }}</span>
+            </div>
+            <div class="stat-box stat-pending">
+              <span class="stat-num">{{ countByStatus('PENDING') }}</span>
+              <span class="stat-lbl">{{ 'MEETINGS.STATS.PENDING' | translate }}</span>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+    </aside>
+
+  </div>
+</div>

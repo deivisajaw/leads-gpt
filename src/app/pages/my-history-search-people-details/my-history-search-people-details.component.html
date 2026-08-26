@@ -1,0 +1,432 @@
+<div class="page-container screenin">
+  <div class="header-section">
+    <div class="header-left">
+      <h1>{{ "HISTORY_DETAILS.PEOPLE_TITLE" | translate }}</h1>
+      <p></p>
+    </div>
+    <div class="header-right">
+      <div class="header-credits-stat">
+        <span class="credit-label">{{ "CREDITS.CURRENT_CREDITS" | translate }}</span>
+        <span class="credit-value">{{ creditsRemaining | number }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-details-page-new">
+    <!-- Header principal de la página de detalles -->
+    <div class="history-details-main-header">
+      <div class="history-details-header-row-1">
+        <button class="btn-outline" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          {{ "HISTORY_DETAILS.BACK_TO_HISTORY" | translate }}
+        </button>
+      </div>
+      <div class="history-details-header-row-2">
+        <div class="details-header-info">
+          <h2 *ngIf="searchDetails">{{ searchDetails.searchString }}</h2>
+          <span *ngIf="searchDetails" [ngClass]="getStatusClass(searchDetails.statusSelect)">
+            {{ getStatusText(searchDetails.statusSelect) }}
+          </span>
+          <span *ngIf="searchDetails" class="results-count">
+            {{ searchDetails.resultsNumber }} {{ "HISTORY_DETAILS.RESULTS" | translate }}
+          </span>
+        </div>
+        <div class="controls-right">
+          <button
+            class="btn-add-all"
+            (click)="openAddAllModal()"
+            [disabled]="isSavingAll || totalResultsInServer === 0"
+          >
+            <i class="fas fa-layer-group"></i>
+            <span>{{ "HISTORY_DETAILS.ADD_ALL_TO_LIST" | translate }}</span>
+          </button>
+          <div class="dropdown-wrapper">
+            <div class="dropdown-control" (click)="toggleDropdown('sort')">
+              <i class="fas fa-sort"></i>
+              <span>{{ "HISTORY_DETAILS.SORT" | translate }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" [class.show]="showSortDropdown">
+              <div class="dropdown-item" (click)="onSortChange('name_asc')">
+                {{ "HISTORY_DETAILS.NAME_AZ" | translate }}
+              </div>
+              <div class="dropdown-item" (click)="onSortChange('name_desc')">
+                {{ "HISTORY_DETAILS.NAME_ZA" | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="history-details-content-new">
+      <!-- Loading State -->
+      <div
+        *ngIf="isLoading"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+        "
+      >
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5b4fe5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+          "
+        ></div>
+        <p>{{ "HISTORY_DETAILS.LOADING_RESULTS" | translate }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="!isLoading && (!searchDetails || searchDetails.results.length === 0)"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #64748b;
+          text-align: center;
+        "
+      >
+        <div style="font-size: 48px; margin-bottom: 16px; color: #94a3b8">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 style="margin-bottom: 8px; color: #1e293b">
+          {{ "HISTORY_DETAILS.NO_RESULTS_TITLE" | translate }}
+        </h3>
+        <p style="margin-bottom: 24px">
+          {{ "HISTORY_DETAILS.NO_RESULTS_SUBTITLE" | translate }}
+        </p>
+      </div>
+
+      <!-- Results Table (Grid View) -->
+      <div
+        *ngIf="!isLoading && searchDetails && searchDetails.results.length > 0"
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <div style="flex: 1; overflow: auto; background: white">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead
+              style="
+                position: sticky;
+                top: 0;
+                z-index: 10;
+              "
+            >
+              <tr style="border-bottom: 1px solid #e2e8f0">
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    width: 250px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <input
+                      type="checkbox"
+                      class="select-all-checkbox"
+                      [checked]="selectAllChecked"
+                      (change)="toggleSelectAll()"
+                      title="{{ 'HISTORY_DETAILS.SELECT_ALL' | translate }}"
+                    />
+                    {{ "HISTORY_DETAILS.TABLE_HEADERS.NAME" | translate }}
+                  </div>
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.JOB_TITLE" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.COMPANY" | translate }}
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    min-width: 200px;
+                  "
+                >
+                  {{ "HISTORY_DETAILS.TABLE_HEADERS.LOCATION" | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let people of searchDetails.results; let i = index"
+                class="rowin"
+                [class.play]="rowsRevealed"
+                [style.animation-delay.ms]="i * 30"
+                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
+                style="border-bottom: 1px solid #e2e8f0"
+              >
+                <td
+                  style="
+                    padding: 12px;
+                    font-weight: 500;
+                    color: #1e293b;
+                    text-decoration: underline;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <input
+                      type="checkbox"
+                      [checked]="selectedPeople.includes(people.id)"
+                      (change)="togglePeopleSelection(people.id)"
+                    />
+                    <img
+                      [src]="people.avatar"
+                      [alt]="people.name"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                    />
+                    <div>
+                      <div
+                        style="
+                          font-weight: 500;
+                          color: #1e293b;
+                          text-decoration: underline;
+                          cursor: pointer;
+                        "
+                      >
+                        {{ people.name }}
+                      </div>
+                      <div
+                        *ngIf="people.email"
+                        style="font-size: 12px; color: #64748b"
+                      >
+                        {{ people.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding: 12px;">
+                  {{ people.jobTitle }}
+                </td>
+                <td style="padding: 12px;">
+                  {{ people.company }}
+                </td>
+                <td style="padding: 12px;">
+                  {{ people.location }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          style="
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div style="color: #64748b; font-size: 14px">
+            {{ getStartIndex() }} - {{ getEndIndex() }} of
+            {{ getFormattedTotal() }}
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button
+              (click)="goToPage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'"
+              [style.color]="currentPage === 1 ? '#94a3b8' : '#64748b'"
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span
+              style="padding: 8px 12px; color: #64748b; font-size: 14px"
+            >
+              {{ "HISTORY_DETAILS.PAGE" | translate }} {{ currentPage }}
+              {{ "HISTORY_DETAILS.OF" | translate }} {{ totalPages }}
+            </span>
+            <button
+              (click)="goToPage(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              [style.cursor]="
+                currentPage === totalPages ? 'not-allowed' : 'pointer'
+              "
+              [style.color]="
+                currentPage === totalPages ? '#94a3b8' : '#64748b'
+              "
+              style="
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 4px;
+              "
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selection Bar (se mueve a <body> por JS, ver ngAfterViewInit — vive fuera de cualquier
+       *ngIf para existir desde el primer render) -->
+  <div
+    #selectionBarPortal
+    [style.display]="showSelectionBar ? 'flex' : 'none'"
+    style="
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 12px 20px;
+      align-items: center;
+      gap: 16px;
+      z-index: 1000;
+      min-width: 400px;
+    "
+  >
+    <span style="color: #1e293b; font-weight: 500"
+      >{{ "HISTORY_DETAILS.ADD_TO_SHORTLIST" | translate }} ({{
+        selectedPeople.length
+      }})</span
+    >
+    <div style="display: flex; gap: 8px; margin-left: auto">
+      <button
+        (click)="addToMyList()"
+        [disabled]="isSaving"
+        style="
+          background: #5b4fe5;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 120px;
+        "
+      >
+        <span *ngIf="isSaving" class="btn-spinner"></span>
+        <span *ngIf="!isSaving">{{ "HISTORY_DETAILS.ADD_TO_MY_LIST" | translate }}</span>
+      </button>
+      <button
+        (click)="closeSelectionBar()"
+        style="
+          background: none;
+          border: 1px solid #e2e8f0;
+          padding: 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          color: #64748b;
+        "
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal (seleccionados / todos) — vive fuera de *ngIf para existir desde el primer
+     render; se mueve a <body> por JS (ver ngAfterViewInit) -->
+<div #confirmModalPortal class="modal-overlay" [style.display]="showConfirmModal ? 'flex' : 'none'" (click)="closeConfirmModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-icon">
+      <i class="fas fa-layer-group"></i>
+    </div>
+    <h3 class="modal-title">{{ confirmModalTitle }}</h3>
+    <p class="modal-message">
+      {{ confirmModalMessage }}
+    </p>
+    <div class="modal-meta">
+      <span class="modal-meta-item">
+        <i class="fas fa-users"></i>
+        {{ confirmModalCount | number }} {{ "HISTORY_DETAILS.RESULTS" | translate }}
+      </span>
+      <span class="modal-meta-item">
+        <i class="fas fa-coins"></i>
+        {{ confirmModalCount | number }} {{ "CREDITS.CREDITS" | translate }}
+      </span>
+    </div>
+    <div class="modal-lists">
+      <label>Agregar a lista (opcional)</label>
+      <div class="modal-lists-options" *ngIf="availableLists.length > 0">
+        <label class="modal-list-option" *ngFor="let l of availableLists">
+          <input type="checkbox" [checked]="confirmSelectedListIds.has(l.id)" (change)="toggleConfirmList(l.id)" />
+          {{ l.name }}
+        </label>
+      </div>
+      <span class="modal-tags-hint" *ngIf="availableLists.length === 0">Aún no tienes listas creadas.</span>
+      <input
+        type="text"
+        [(ngModel)]="confirmNewListName"
+        placeholder="o crea una lista nueva…"
+        (keydown.enter)="confirmModalAction()"
+      />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" (click)="closeConfirmModal()" [disabled]="isSavingAll || isSaving">
+        {{ "HISTORY_DETAILS.CANCEL" | translate }}
+      </button>
+      <button class="modal-btn-confirm" (click)="confirmModalAction()" [disabled]="isSavingAll || isSaving">
+        <span *ngIf="isSavingAll || isSaving" class="btn-spinner"></span>
+        <span *ngIf="!isSavingAll && !isSaving">{{ "HISTORY_DETAILS.CONFIRM" | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>
