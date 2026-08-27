@@ -331,3 +331,76 @@
     margin-top: 15px;
   }
 }
+/* Barra de celebracion: aparece una vez, se despide sola */
+.congrats-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(120, 113, 251, 0.08), rgba(37, 31, 149, 0.06));
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+  padding: 12px 16px;
+  animation: congrats-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.congrats-bar.leaving {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.congrats-spark {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #7871fb, #251f95);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 31, 149, 0.28);
+}
+
+.congrats-spark svg { width: 18px; height: 18px; }
+
+.congrats-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.congrats-text strong {
+  font-size: 14px;
+  color: var(--text-heading, #0f172a);
+}
+
+.congrats-text span {
+  font-size: 12.5px;
+  color: var(--text-secondary, #64748b);
+}
+
+.congrats-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #94a3b8);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  transition: all 0.15s ease;
+}
+
+.congrats-close:hover {
+  background: rgba(91, 79, 229, 0.08);
+  color: var(--text-primary, #1e293b);
+}
+
+.congrats-close svg { width: 14px; height: 14px; }
+
+@keyframes congrats-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

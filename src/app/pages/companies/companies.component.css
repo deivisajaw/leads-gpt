@@ -1805,7 +1805,6 @@
 .coin-gear {
   width: 14px;
   height: 14px;
-  filter: brightness(0) invert(1);
   display: block;
 }
 

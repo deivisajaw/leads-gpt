@@ -55,20 +55,53 @@ export class OnboardingWidgetComponent implements OnInit, OnDestroy {
     );
   }
 
+  // Presentacional: el mensaje de "todo completado" se muestra UNA sola vez y luego desaparece
+  private static CONGRATS_SEEN_KEY = 'ajawOnboardingCongratsSeen';
+  public congratsVisible = false;
+  public congratsLeaving = false;
+  private congratsSubscription!: Subscription;
+  private congratsTimer: ReturnType<typeof setTimeout> | null = null;
+
   ngOnInit(): void {
     this.stepsSubscription = this.onboardingStatus$
-      .pipe(filter(steps => !!steps && steps.length > 0)) 
+      .pipe(filter(steps => !!steps && steps.length > 0))
       .subscribe(steps => {
         this.steps = steps as OnboardingStepStatus[];
-        this.currentSlideIndex = 0; 
+        this.currentSlideIndex = 0;
         this.startCarousel();
       });
+
+    this.congratsSubscription = this.allStepsCompleted$
+      .pipe(filter(done => done === true))
+      .subscribe(() => {
+        const seen = localStorage.getItem(OnboardingWidgetComponent.CONGRATS_SEEN_KEY) === '1';
+        if (!seen && !this.congratsVisible) {
+          this.congratsVisible = true;
+          this.congratsTimer = setTimeout(() => this.dismissCongrats(), 8000);
+        }
+      });
+  }
+
+  dismissCongrats(): void {
+    if (this.congratsTimer) { clearTimeout(this.congratsTimer); this.congratsTimer = null; }
+    this.congratsLeaving = true;
+    setTimeout(() => {
+      this.congratsVisible = false;
+      this.congratsLeaving = false;
+      localStorage.setItem(OnboardingWidgetComponent.CONGRATS_SEEN_KEY, '1');
+    }, 350);
   }
 
   ngOnDestroy(): void {
     this.stopCarousel();
     if (this.stepsSubscription) {
       this.stepsSubscription.unsubscribe();
+    }
+    if (this.congratsSubscription) {
+      this.congratsSubscription.unsubscribe();
+    }
+    if (this.congratsTimer) {
+      clearTimeout(this.congratsTimer);
     }
   }
 
