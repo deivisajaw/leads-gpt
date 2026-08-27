@@ -222,7 +222,7 @@ export class OnboardingWizardComponent implements OnInit, OnChanges {
           });
         }
       }, 50);
-    }, 1000);
+    }, 300);
   }
 
   public handleWebhookError(): void {

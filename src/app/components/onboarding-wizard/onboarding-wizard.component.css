@@ -27,7 +27,7 @@
 }
 #progress .fill {
   height: 100%;
-  background: var(--indigo);
+  background: var(--grad);
   width: 0;
   transition: width .4s var(--ease-out);
 }
@@ -145,6 +145,10 @@
 
 /* Texto de la categoría estrictamente azul */
 .category-text-blue {
+  background-image: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: var(--indigo) !important;
 }
 
@@ -189,15 +193,15 @@
 }
 
 .opt:hover {
-  border-color: var(--indigo);
-  background: var(--grey-light);
+  border: 1px solid transparent;
+  background: linear-gradient(var(--grey-light), var(--grey-light)) padding-box, var(--grad) border-box;
   transform: translateY(-4px);   
   box-shadow: var(--shadow-lg);
 }
 .opt.sel {
-  border-color: var(--indigo);
-  background: var(--indigo-soft);
-  box-shadow: 0 0 0 1px var(--indigo);
+  border: 1px solid transparent;
+  background: linear-gradient(var(--indigo-soft), var(--indigo-soft)) padding-box, var(--grad) border-box;
+  box-shadow: 0 4px 16px rgba(37, 31, 149, 0.18);
 }
 
 .opt .lbl {
@@ -214,6 +218,10 @@
 .opt .ic {
   margin-right: 16px;
   color: var(--indigo);
+  background-image: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: 18px;
   
   width: 40px;
@@ -221,7 +229,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--grey-light); 
   border: 1px solid var(--grey-border);
   border-radius: 10px; 
   flex-shrink: 0; 
