@@ -128,39 +128,40 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
     return `${label} 👋`;
   }
 
-  // Titulo rotativo estilo asistente: distinto en cada visita, con sabor segun la hora
+  // Titulo rotativo estilo asistente (patron ChatGPT: mayoria de lineas calmadas,
+  // toque motivacional ocasional para que no canse)
   private pickWittyTitle(): string {
     const hour = new Date().getHours();
     const night = hour >= 22 || hour < 5;
-    const peoplePool = night
+    const isCompanies = this.mode === 'companies';
+
+    if (night) {
+      const nightPool = isCompanies
+        ? ['¿Una empresa más antes de cerrar el día?', 'Los mejores mercados se encuentran de noche.', '¿Qué empresa quieres encontrar?']
+        : ['¿Un contacto más antes de cerrar el día?', 'Mientras otros duermen, tú llenas el pipeline.', '¿A quién quieres encontrar?'];
+      return nightPool[Math.floor(Math.random() * nightPool.length)];
+    }
+
+    const calmPool = isCompanies
       ? [
-        'A los que venden no los para nadie.',
-        'Mientras otros duermen, tú llenas el pipeline.',
-        '¿Un contacto más antes de cerrar el día?'
-      ]
-      : [
-        '¿A quién le vas a vender hoy?',
-        '¿A quién quieres encontrar hoy?',
-        '¿Cuántas reuniones vamos a agendar hoy?',
-        'Tu próximo cliente ya existe. Encuéntralo.',
-        '¿Vamos a llenar el calendario hoy?',
-        'Hoy es buen día para cerrar algo grande.'
-      ];
-    const companyPool = night
-      ? [
-        'Los mejores mercados se encuentran de noche.',
-        'Mientras otros duermen, tú encuentras clientes.',
-        '¿Una empresa más antes de cerrar el día?'
-      ]
-      : [
-        '¿A qué empresa le vas a vender hoy?',
         '¿Qué empresa quieres encontrar hoy?',
-        '¿Qué mercado atacamos hoy?',
-        'Tu próximo cliente ya existe. Búscalo.',
-        '¿Vamos a ganar más hoy?',
-        'Hay 75 millones de empresas esperando tu llamada.'
+        '¿Por dónde empezamos hoy?',
+        '¿Qué mercado exploramos hoy?',
+        'Lista cuando tú lo estés.'
+      ]
+      : [
+        '¿A quién quieres encontrar hoy?',
+        '¿Por dónde empezamos hoy?',
+        '¿A quién buscamos hoy?',
+        'Lista cuando tú lo estés.'
       ];
-    const pool = this.mode === 'companies' ? companyPool : peoplePool;
+    const spicyPool = isCompanies
+      ? ['¿A qué empresa le vas a vender hoy?', '¿Vamos a ganar más hoy?', 'Tu próximo cliente ya existe. Búscalo.']
+      : ['¿A quién le vas a vender hoy?', '¿Cuántas reuniones vamos a agendar hoy?', 'Tu próximo cliente ya existe. Encuéntralo.'];
+
+    // ~70% calmado, ~30% con sabor
+    const useSpicy = Math.random() < 0.3;
+    const pool = useSpicy ? spicyPool : calmPool;
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
