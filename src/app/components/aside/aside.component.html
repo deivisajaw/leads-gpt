@@ -233,7 +233,7 @@
         </a>
     </li>
 
-    <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" *ngIf="authService.hasNoSubscription || authService.hasFreeSubscription" [attr.data-tooltip]="'ASIDE.REDEEM_CODE_TOOLTIP' |
+    <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [attr.data-tooltip]="'ASIDE.REDEEM_CODE_TOOLTIP' |
       translate" data-page="redeem-code">
         <a routerLink="/redeem-code" class="nav-link">
           <i class="fas fa-ticket-alt"></i>

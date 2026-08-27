@@ -109,7 +109,15 @@ export class CompaniesService {
 
   constructor(private apiConfig: ApiConfigService) { }
 
-  async runSearchCompanies(query: string, offset = 0, limit = 25, sortBy = 'title_asc', searchId?: number): Promise<CompanySearchResponse> {
+    async runSearchCompanies(
+    query: string,
+    offset = 0,
+    limit = 25,
+    sortBy = 'title_asc',
+    searchId?: number,
+    category?: string,
+    location?: string
+  ): Promise<CompanySearchResponse> {
     try {
       const token = localStorage.getItem("csrfToken")
 
@@ -128,6 +136,8 @@ export class CompaniesService {
           action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:runSearchCompanies",
           data: {
             query: query,
+            category: category || undefined,
+            location: location || undefined,
             offset: offset,
             limit: limit,
             sortBy: sortBy,

@@ -922,7 +922,7 @@
               >
                 <div class="instructions-layout">
                   <div class="instructions-left">
-                    <div class="form-group">
+                    <div class="form-group" *ngIf="selectedAgentType !== 'sms'">
                       <label for="opening-line">{{
                         "AGENTS.STEP3.OPENING_LINE" | translate
                       }}</label>

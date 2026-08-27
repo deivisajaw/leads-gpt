@@ -12,7 +12,7 @@ import { NotificationService } from "../../services/notification.service";
 import { PlansComponent } from '../plans/plans.component';
 import { OnboardingService } from "../../services/onboarding.service";
 import { ApiConfigService } from "../../services/api-config.service";
-import { SearchChatComponent } from "../../components/search-chat/search-chat.component";
+import { SearchChatComponent, SearchReadyResult } from "../../components/search-chat/search-chat.component";
 import { ExportService } from "../../services/export.service";
 
 export interface FacetOption {
@@ -34,6 +34,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   searchQuery = ""
   currentQuery = ""
+  currentCategory = ""
+  currentLocation = ""
   isLoading = false;
   currentView: "grid" | "card" | "default" = "grid"
   currentViewText = "Grid view"
@@ -365,13 +367,15 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ─── Llamado por el chat cuando el agente tiene el query listo ───
-  onSearchReady(query: string): void {
-    this.searchQuery = query;
+  onSearchReady(result: SearchReadyResult): void {
+    this.searchQuery = result.query;
+    this.currentCategory = result.category;
+    this.currentLocation = result.location;
     this.onSearch();
   }
 
-  async onSearch() {
-    if (!this.searchQuery.trim()) {
+    async onSearch() {
+    if (!this.searchQuery.trim() && !this.currentCategory.trim() && !this.currentLocation.trim()) {
       this.resetSearchState();
       return;
     }
@@ -391,7 +395,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.companiesService.runSearchCompanies(
-        this.currentQuery, 0, this.itemsPerPage, this.currentSortOrder
+        this.currentQuery, 0, this.itemsPerPage, this.currentSortOrder,
+        undefined, this.currentCategory, this.currentLocation
       );
 
       this.processApiResponse(response);
@@ -531,6 +536,11 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.searchQuery = previousQuery;
     }
+
+    this.currentCategory = "";
+    this.currentLocation = "";
+    this.currentSearchId = null;
+
     this.filteredResults = [];
     this.displayResults = [];
     this.selectedCompanies = [];
@@ -576,7 +586,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async goToPage(page: number) {
-    if (page < 1 || !this.currentQuery || this.isLoading) return;
+    if (page < 1 || (!this.currentQuery && !this.currentCategory && !this.currentLocation) || this.isLoading) return;
 
     const newOffset = (page - 1) * this.itemsPerPage;
     if (newOffset >= this.totalResultsInServer && this.totalResultsInServer > 0) return;
@@ -587,7 +597,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.companiesService.runSearchCompanies(
-        this.currentQuery, newOffset, this.itemsPerPage, this.currentSortOrder, this.currentSearchId ?? undefined
+        this.currentQuery, newOffset, this.itemsPerPage, this.currentSortOrder,
+        this.currentSearchId ?? undefined, this.currentCategory, this.currentLocation
       );
       this.processApiResponse(response);
     } catch (error) {
@@ -598,7 +609,11 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onKeyPress(event: KeyboardEvent) {
-    if (event.key === "Enter") this.onSearch();
+    if (event.key === "Enter") {
+      this.currentCategory = "";
+      this.currentLocation = "";
+      this.onSearch();
+    }
   }
 
   get showSelectionBar(): boolean {

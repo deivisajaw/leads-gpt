@@ -774,6 +774,9 @@ export class AgentsComponent implements OnInit {
         return false;
       }
       case 3: {
+        if (this.selectedAgentType === 'sms') {
+          return !!this.agentPrompt;
+        }
         const baseConditions = !!(this.agentPrompt && this.agentOpeningLine);
         if (this.selectedAgentType === 'voice') {
           return baseConditions && !!this.agentVoicemailMessage;

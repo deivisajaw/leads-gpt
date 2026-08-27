@@ -17,6 +17,12 @@ export interface QuickPrompt {
   query: string;
 }
 
+export interface SearchReadyResult {
+  query: string;
+  category: string;
+  location: string;
+}
+
 export type SearchChatMode = 'people' | 'companies';
 
 @Component({
@@ -28,7 +34,7 @@ export type SearchChatMode = 'people' | 'companies';
 })
 export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   @Input() mode: SearchChatMode = 'people';
-  @Output() searchReady = new EventEmitter<string>();
+  @Output() searchReady = new EventEmitter<SearchReadyResult>();
   // Se emite una sola vez, justo cuando el usuario envía su primer mensaje — el componente
   // padre lo usa para ocultar el resto del contenido (globo, stats, sugeridos) y dejar la
   // pantalla en blanco con solo el header arriba, como pide el diseño.
@@ -175,9 +181,13 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
       return;
     }
 
-    if (result.searchReady && result.query) {
+    if (result.searchReady) {
       this.pushMsg('assistant', result.reply || 'Perfecto, buscando eso ahora.');
-      setTimeout(() => this.searchReady.emit(result.query as string), 500);
+      setTimeout(() => this.searchReady.emit({
+        query: result.query || '',
+        category: result.category || '',
+        location: result.location || '',
+      }), 500);
       return;
     }
 
@@ -211,17 +221,23 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
     this.shouldScroll = true;
   }
 
-  private async callChatAgent(
+    private async callChatAgent(
     message: string
-  ): Promise<{ error: boolean; reply?: string; searchReady?: boolean; query?: string; options?: string[] }> {
+  ): Promise<{
+    error: boolean;
+    reply?: string;
+    searchReady?: boolean;
+    query?: string;
+    category?: string;
+    location?: string;
+    options?: string[];
+  }> {
     try {
       const token = localStorage.getItem('csrfToken');
       if (!token) {
         return { error: true };
       }
 
-      // El historial que se manda es el que había ANTES de este mensaje (el backend agrega
-      // el mensaje nuevo por su cuenta), para no duplicarlo.
       const historyToSend = this.history.slice(0, -1);
 
       const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
@@ -246,8 +262,6 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
       }
 
       const json = await response.json();
-      // Axelor suele envolver el resultado de la acción en data[0].values — se soportan
-      // ambas formas por si acaso, tomando la que exista.
       const values = json?.data?.[0]?.values ?? json?.data ?? json;
 
       if (values?.error) {
@@ -259,6 +273,8 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
         reply: values?.reply,
         searchReady: !!values?.searchReady,
         query: values?.query,
+        category: values?.category,
+        location: values?.location,
         options: Array.isArray(values?.options) ? values.options : undefined,
       };
     } catch (err) {

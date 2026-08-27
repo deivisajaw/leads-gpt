@@ -78,6 +78,12 @@ export class OnboardingGuideComponent implements OnInit, OnDestroy {
   showPlansModal = false;
   private PLANS_MODAL_STATUS_KEY = 'plansModalStatusByUser';
   private hasCheckedPlansModal = false;
+
+  // --- Onboarding Guide Closed Properties ---
+  // Guarda, por usuario, si ya cerró manualmente el tooltip del guide con el botón "x".
+  // Si es true, el guide no se vuelve a mostrar automáticamente (recargas / cambios de ruta).
+  // El usuario siempre puede volver a ver los pasos desde el home/dashboard.
+  private ONBOARDING_GUIDE_CLOSED_KEY = 'onboardingGuideClosedByUser';
   
   // --- Temporary Disable Properties ---
   private isTemporarilyDisabled = false;
@@ -268,6 +274,14 @@ export class OnboardingGuideComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentStep || this.totalSteps === 0) {
+      this.hideGuide();
+      return;
+    }
+
+    // Si el usuario ya cerró manualmente el tooltip del guide, no lo volvemos a
+    // mostrar (persiste entre recargas y cambios de ruta). Puede seguir viendo
+    // los pasos desde el home/dashboard.
+    if (profile.userId && this.getHasClosedGuideLocally(profile.userId)) {
       this.hideGuide();
       return;
     }
@@ -472,8 +486,31 @@ export class OnboardingGuideComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  // --- Onboarding Guide LocalStorage Methods (mismo patrón que Plans Modal / welcomeVideoStatusByUser) ---
+  private getOnboardingGuideStatusMap(): { [userId: number]: boolean } {
+    const stored = localStorage.getItem(this.ONBOARDING_GUIDE_CLOSED_KEY);
+    return stored ? JSON.parse(stored) : {};
+  }
+
+  private updateUserOnboardingGuideStatusLocally(userId: number, status: boolean): void {
+    const statusMap = this.getOnboardingGuideStatusMap();
+    statusMap[userId] = status;
+    localStorage.setItem(this.ONBOARDING_GUIDE_CLOSED_KEY, JSON.stringify(statusMap));
+  }
+
+  private getHasClosedGuideLocally(userId: number): boolean {
+    const statusMap = this.getOnboardingGuideStatusMap();
+    return statusMap[userId] || false;
+  }
+
   closeOverlayTemporarily(): void {
     this.isTemporarilyDisabled = true;
+
+    const userId = this.authService.currentUserProfile?.userId;
+    if (userId) {
+      this.updateUserOnboardingGuideStatusLocally(userId, true);
+    }
+
     this.hideGuide();
   }
 

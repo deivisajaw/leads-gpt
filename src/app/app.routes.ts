@@ -118,7 +118,7 @@ export const routes: Routes = [
       { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [hasPlanGuard, isAdminGuard] },
       { path: 'payment-history', component: PaymentHistoryComponent, canActivate: [hasPlanGuard, isAdminGuard] },
       { path: 'plans-list', component: PlansListComponent, canActivate: [hasPlanGuard] },
-      { path: 'redeem-code', component: RedeemInvitationCodeComponent, canActivate: [noPlanGuard] },
+      { path: 'redeem-code', component: RedeemInvitationCodeComponent },
       { path: 'legal/terms', component: LegalComponent},
       { path: 'legal/privacy', component: LegalComponent}
     ]  

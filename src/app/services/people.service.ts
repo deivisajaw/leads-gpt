@@ -112,8 +112,15 @@ export class PeopleService {
 
   constructor(private apiConfig: ApiConfigService) { }
 
-  async runSearchPeople(query: string, offset = 0, limit = 25,
-  sortBy = 'name_asc', searchId?: number): Promise<PeopleSearchResponse> {
+    async runSearchPeople(
+    query: string,
+    offset = 0,
+    limit = 25,
+    sortBy = 'name_asc',
+    searchId?: number,
+    category?: string,
+    location?: string
+  ): Promise<PeopleSearchResponse> {
     try {
       const token = localStorage.getItem("csrfToken")
 
@@ -132,6 +139,8 @@ export class PeopleService {
           action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:runSearchPeople",
           data: {
             query: query,
+            category: category || undefined,
+            location: location || undefined,
             offset: offset,
             limit: limit,
             sortBy: sortBy,
