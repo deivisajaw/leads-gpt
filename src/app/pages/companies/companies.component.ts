@@ -254,12 +254,20 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   }
 
+
+  // DEMO version barata del "chip vivo" en tiempo real: refresca el perfil cada 45s
+  // para que el saldo (y el pulso) se actualice aunque el consumo pase en el backend.
+  // La version propia (websocket/push) queda para Deivis — reemplazar este timer.
+  private creditsPollTimer: ReturnType<typeof setInterval> | null = null;
+
   ngOnInit(): void {
     this.userProfileSubscription = this.authService.userProfile$.subscribe(profile => {
       if (profile && profile.companyProfile) {
         this.creditsRemaining = profile.companyProfile.creditsAllocated ?? 0;
       }
     });
+
+    this.creditsPollTimer = setInterval(() => this.authService.refreshUserProfile(), 45000);
 
     this.loadDashboardStats();
     this.loadSuggestedProspects();
@@ -290,6 +298,9 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     if (this.userProfileSubscription) {
       this.userProfileSubscription.unsubscribe();
+    }
+    if (this.creditsPollTimer) {
+      clearInterval(this.creditsPollTimer);
     }
     this.destroyGlobe();
     this.selectionBarPortalRef?.nativeElement.remove();
