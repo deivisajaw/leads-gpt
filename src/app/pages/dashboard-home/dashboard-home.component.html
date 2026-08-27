@@ -286,16 +286,24 @@
             </h3>
           </div>
           <div class="card-body">
-            <canvas
+            <div
+              class="funnel-breakdown"
               *ngIf="
                 dashboardData.conversionFunnel &&
                 dashboardData.conversionFunnel.length > 0
               "
-              baseChart
-              [data]="funnelChartData"
-              [options]="funnelChartOptions"
-              [type]="funnelChartType"
-            ></canvas>
+            >
+              <div class="funnel-step" *ngFor="let step of funnelSteps">
+                <div class="funnel-step-top">
+                  <span class="funnel-step-name">{{ step.name }}</span>
+                  <span class="funnel-step-count">{{ step.count | number }}</span>
+                  <span class="funnel-step-pct">{{ step.pct }}%</span>
+                </div>
+                <div class="funnel-bar-track">
+                  <div class="funnel-bar-fill" [style.width.%]="step.pct"></div>
+                </div>
+              </div>
+            </div>
             <div
               *ngIf="
                 !dashboardData.conversionFunnel ||

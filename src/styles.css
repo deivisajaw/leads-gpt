@@ -15,6 +15,7 @@
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
   --primary-gradient: linear-gradient(135deg, #7871fb, #251f95);
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
 }
 
 * {
@@ -47,6 +48,14 @@ h1, h2, h3, h4 {
   color: var(--text-heading);
   letter-spacing: -0.02em;
   font-weight: 600;
+  font-family: var(--font-display);
+}
+
+.metric-value,
+.deal-kpi-value,
+.wf-stat-value,
+.funnel-step-count {
+  font-family: var(--font-display);
 }
 
 .app-root{
@@ -2775,4 +2784,41 @@ tbody td:first-child {
 
 .sidebar.collapsed .logo-mark-only {
   display: block;
+}
+
+/* ===== Botones primarios: gradiente de marca en toda la app =====
+   (!important necesario: los estilos de componente Angular ganan especificidad) */
+.btn-primary,
+button.btn-primary,
+.btn-action.view,
+.play-btn,
+.btn-retry,
+.btn-retry-sm,
+.btn-view-recordings,
+.purchase-btn,
+.buy-minutes-btn,
+.error-retry-btn,
+.btn-pagination {
+  background: var(--primary-gradient) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+.btn-action.view:hover,
+.play-btn:hover,
+.btn-retry:hover,
+.btn-retry-sm:hover,
+.btn-view-recordings:hover,
+.purchase-btn:hover,
+.buy-minutes-btn:hover,
+.error-retry-btn:hover,
+.btn-pagination:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-primary:disabled,
+.btn-pagination:disabled {
+  filter: grayscale(0.4) opacity(0.6);
 }

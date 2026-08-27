@@ -10,7 +10,8 @@ import {
   DashboardData,
   DealMetrics,
   DealStageMetric,
-  AcademicVideo
+  AcademicVideo,
+  FunnelStep
 } from '../../services/dashboard.service';
 import { OnboardingWidgetComponent } from '../../components/onboarding-widget/onboarding-widget.component';
 import { VideoModalComponent } from '../../components/shared/video-modal/video-modal.component';
@@ -230,6 +231,26 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
     if (!date) return '';
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(date).toLocaleDateString('es-ES', options);
+  }
+
+  // Presentacional: pasos del embudo con % relativo al primer paso (estilo Shopify).
+  // Cacheado por referencia: devolver un array nuevo en cada ciclo de change detection
+  // hace que *ngFor reconstruya el DOM en loop (congela la pagina).
+  private _funnelStepsCache: { src: FunnelStep[]; steps: Array<{ name: string; count: number; pct: number }> } | null = null;
+
+  get funnelSteps(): Array<{ name: string; count: number; pct: number }> {
+    const src = this.dashboardData?.conversionFunnel || [];
+    if (this._funnelStepsCache && this._funnelStepsCache.src === src) {
+      return this._funnelStepsCache.steps;
+    }
+    const base = src.length > 0 ? Math.max(src[0].count, 1) : 1;
+    const steps = src.map(s => ({
+      name: s.name,
+      count: s.count,
+      pct: Math.round((s.count / base) * 1000) / 10
+    }));
+    this._funnelStepsCache = { src, steps };
+    return steps;
   }
 
   goToPeople(): void { this.router.navigate(['/people']); }
