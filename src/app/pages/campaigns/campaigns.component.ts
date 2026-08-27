@@ -17,6 +17,29 @@ import { ApiConfigService } from '../../services/api-config.service';
 export class CampaignsComponent implements OnInit {
 
   campaigns: Campaign[] = [];
+
+  // Metricas presentacionales calculadas sobre las campanas ya cargadas (no toca API)
+  get totalCampaigns(): number { return this.campaigns.length; }
+  get activeCampaigns(): number { return this.campaigns.filter(c => c.status === 'in_progress').length; }
+  get totalRegisteredLeads(): number { return this.campaigns.reduce((s, c) => s + (c.registeredLeadsCount || 0), 0); }
+  get totalConnectedLeads(): number { return this.campaigns.reduce((s, c) => s + (c.connectedLeadsCount || 0), 0); }
+  get totalMeetings(): number { return this.campaigns.reduce((s, c) => s + (c.scheduledMeetingsCount || 0), 0); }
+
+  // Filtros presentacionales (mismo patron que la pagina de Agentes)
+  filterSearchText = '';
+  filterCampaignType = '';
+  filterCampaignStatus = '';
+
+  get filteredCampaigns(): Campaign[] {
+    const q = this.filterSearchText.trim().toLowerCase();
+    return this.campaigns.filter(c => {
+      const matchesText = !q || (c.name || '').toLowerCase().includes(q) || (c.agentName || '').toLowerCase().includes(q);
+      const matchesType = !this.filterCampaignType || (c.campaignType || '').toLowerCase() === this.filterCampaignType;
+      const matchesStatus = !this.filterCampaignStatus || (c.status || '').toLowerCase() === this.filterCampaignStatus;
+      return matchesText && matchesType && matchesStatus;
+    });
+  }
+
   currentStep = 1;
   selectedCampaignType: string | null = null;
   selectedLeads: Lead[] = [];

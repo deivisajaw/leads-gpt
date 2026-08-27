@@ -409,7 +409,7 @@
   background: var(--background-white);
 }
 
-.grid-table thead tr { background: var(--background-gray); }
+.grid-table thead tr { background: var(--background-white); }
 .grid-table thead th {
   padding: 12px 14px;
   font-size: 12px; font-weight: 600;

@@ -3,16 +3,89 @@
   <div class="header-section">
     <div class="header-left">
       <h1>Campa&ntilde;as</h1>
-      <p></p>
+      <p>Llamadas y mensajes que tus agentes IA ejecutan solos</p>
     </div>
-    <div class="header-right">         
-    </div>
+    <div class="header-right"></div>
   </div>
 
   <div>
     <div class="campaign-manager">
+
+      <div class="campaign-metrics" *ngIf="campaigns && campaigns.length > 0">
+        <div class="metric-tile">
+          <div class="metric-ico ico-indigo"><i class="fas fa-bullhorn"></i></div>
+          <div class="metric-data">
+            <span class="metric-value">{{ totalCampaigns }}</span>
+            <span class="metric-label">Campa&ntilde;as</span>
+          </div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-ico ico-green"><i class="fas fa-bolt"></i></div>
+          <div class="metric-data">
+            <span class="metric-value">{{ activeCampaigns }}</span>
+            <span class="metric-label">En ejecuci&oacute;n</span>
+          </div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-ico ico-indigo"><i class="fas fa-users"></i></div>
+          <div class="metric-data">
+            <span class="metric-value">{{ totalRegisteredLeads | number }}</span>
+            <span class="metric-label">Leads registrados</span>
+          </div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-ico ico-amber"><i class="fas fa-phone-volume"></i></div>
+          <div class="metric-data">
+            <span class="metric-value">{{ totalConnectedLeads | number }}</span>
+            <span class="metric-label">Leads conectados</span>
+          </div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-ico ico-pink"><i class="fas fa-calendar-check"></i></div>
+          <div class="metric-data">
+            <span class="metric-value">{{ totalMeetings | number }}</span>
+            <span class="metric-label">Meetings agendados</span>
+          </div>
+        </div>
+      </div>
+
       <div id="main-view" class="main-view">
         <div class="header">
+          <div class="campaign-filters">
+            <div class="campaign-search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="campaign-search-input"
+                name="campaignSearchText"
+                placeholder="Buscar campa&ntilde;as"
+                [(ngModel)]="filterSearchText"
+              />
+            </div>
+            <select
+              id="campaign-type-filter"
+              name="campaignTypeFilter"
+              class="campaign-filter-select"
+              [(ngModel)]="filterCampaignType"
+            >
+              <option value="">Todos los tipos</option>
+              <option value="voice">Voz</option>
+              <option value="text">Texto</option>
+              <option value="sms">SMS</option>
+            </select>
+            <select
+              id="campaign-status-filter"
+              name="campaignStatusFilter"
+              class="campaign-filter-select"
+              [(ngModel)]="filterCampaignStatus"
+            >
+              <option value="">Todos los estados</option>
+              <option value="planned">Planeada</option>
+              <option value="in_progress">En Ejecuci&oacute;n</option>
+              <option value="finished">Finalizada</option>
+              <option value="cancelled">Cancelada</option>
+            </select>
+          </div>
           <button
             id="add-campaign-btn"
             class="btn-primary"
@@ -49,7 +122,7 @@
               </tr>
             </thead>
             <tbody id="campaigns-tbody">
-              <tr *ngFor="let campaign of campaigns">
+              <tr *ngFor="let campaign of filteredCampaigns">
                 <td>
                   <a [routerLink]="['/campaigns', campaign.id]" class="campaign-name-link">
                     {{ campaign.name }}

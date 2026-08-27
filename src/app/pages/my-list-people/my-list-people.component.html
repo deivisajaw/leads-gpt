@@ -76,30 +76,24 @@
 
     <!-- Content -->
     <div class="my-list-content">
-      <!-- Loading State -->
-      <div
-        *ngIf="isLoading"
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 400px;
-          color: #64748b;
-        "
-      >
-        <div
-          style="
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #5b4fe5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 16px;
-          "
-        ></div>
-        <p>{{ "MY_LIST_PEOPLE.LOADING_PEOPLE" | translate }}</p>
+      <!-- Loading State (skeleton) -->
+      <div *ngIf="isLoading" class="skeleton-table" aria-hidden="true">
+        <div class="skeleton-row skeleton-head">
+          <span class="sk sk-bar" style="width: 120px"></span>
+          <span class="sk sk-bar" style="width: 90px"></span>
+          <span class="sk sk-bar" style="width: 80px"></span>
+          <span class="sk sk-bar" style="width: 70px"></span>
+        </div>
+        <div class="skeleton-row" *ngFor="let r of [1,2,3,4,5,6,7,8]">
+          <span class="sk sk-avatar"></span>
+          <span class="sk-col">
+            <span class="sk sk-bar" [style.width.px]="150 + (r % 3) * 40"></span>
+            <span class="sk sk-bar sk-dim" [style.width.px]="100 + (r % 4) * 30"></span>
+          </span>
+          <span class="sk sk-bar" [style.width.px]="120 + (r % 5) * 25"></span>
+          <span class="sk sk-bar sk-dim" style="width: 80px"></span>
+          <span class="sk sk-pill"></span>
+        </div>
       </div>
 
       <!-- Empty State -->

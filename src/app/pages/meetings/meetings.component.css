@@ -36,7 +36,7 @@
    ============================================= */
 
 .header-section h1 {
-  color: var(--primary-blue);
+  color: var(--text-heading);
 }
 
 /* =============================================
@@ -276,7 +276,7 @@
 }
 
 .meetings-table thead tr {
-  background: var(--background-gray) !important;
+  background: var(--background-white) !important;
   border-bottom: none;
 }
 
@@ -288,7 +288,7 @@
   font-size: 12px;
   letter-spacing: 0;
   white-space: nowrap;
-  background: var(--background-gray) !important;
+  background: var(--background-white) !important;
 }
 
 .meetings-table tbody tr {

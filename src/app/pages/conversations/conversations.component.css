@@ -161,7 +161,7 @@
 
 /* Head */
 .conv-table thead tr {
-  background: var(--background-gray) !important;
+  background: var(--background-white) !important;
 }
 
 .conv-table thead th {
