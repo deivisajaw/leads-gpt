@@ -2,7 +2,7 @@
    HEADER
    ============================================= */
 
-.header-section h1 { color: var(--primary-blue); }
+.header-section h1 { color: var(--text-heading); }
 
 .header-right {
   display: flex;
@@ -409,15 +409,15 @@
   background: var(--background-white);
 }
 
-.grid-table thead tr { background: var(--primary-blue); }
+.grid-table thead tr { background: var(--background-gray); }
 .grid-table thead th {
   padding: 12px 14px;
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  color: #fff; text-align: left; white-space: nowrap;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-secondary); text-align: left; white-space: nowrap;
 }
 .grid-table thead th.sortable { cursor: pointer; user-select: none; }
-.grid-table thead th.sortable:hover { background: rgba(255,255,255,0.1); }
+.grid-table thead th.sortable:hover { background: var(--hover-bg); }
 .grid-table thead th i { margin-left: 5px; font-size: 10px; opacity: 0.7; }
 
 .grid-table tbody tr { border-bottom: 1px solid var(--border-color); }
@@ -794,7 +794,7 @@
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
-.preview-table th { font-weight: 700; color: white; }
+.preview-table th { font-weight: 600; color: var(--text-secondary); }
 .preview-table tbody tr:last-child td { border-bottom: none; }
 
 .import-result {

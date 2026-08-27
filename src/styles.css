@@ -4,6 +4,7 @@
   --primary-blue-light: #eef2ff;
   --background-white: #ffffff;
   --background-gray: #f8fafc;
+  --text-heading: #0f172a;
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
@@ -28,10 +29,24 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--background-gray);
   display: flex;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv05', 'cv11';
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+h1, h2, h3, h4 {
+  color: var(--text-heading);
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
 .app-root{
@@ -1571,20 +1586,21 @@ table {
 }
 
 thead {
-  background: var(--primary-blue);
-  color: white;
+  background: var(--background-gray);
+  color: var(--text-secondary);
   position: sticky;
   top: 0;
 }
 
 th {
-  padding: 12px;
+  padding: 10px 12px;
   text-align: left;
   font-weight: 600;
-  background-color: var(--primary-blue);
-  color: white;
+  background-color: var(--background-gray);
+  color: var(--text-secondary);
   font-size: 12px;
-  text-transform: uppercase;
+  text-transform: none;
+  letter-spacing: 0;
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -1592,6 +1608,7 @@ td {
   padding: 12px;
   border-bottom: 1px solid #e2e8f0;
   vertical-align: top;
+  color: var(--text-primary);
 }
 
 tbody tr:hover {
@@ -2481,9 +2498,10 @@ tbody tr:hover {
 }
 
 .header-section h1 {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--text-heading);
+  letter-spacing: -0.02em;
   margin: 0;
   text-shadow: none;
 }

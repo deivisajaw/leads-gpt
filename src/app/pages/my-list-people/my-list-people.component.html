@@ -154,7 +154,6 @@
                     text-align: left;
                     font-weight: 600;
                     font-size: 12px;
-                    text-transform: uppercase;
                     min-width: 200px;
                   "
                 >
@@ -166,7 +165,6 @@
                     text-align: left;
                     font-weight: 600;
                     font-size: 12px;
-                    text-transform: uppercase;
                     min-width: 150px;
                   "
                 >
@@ -178,7 +176,6 @@
                     text-align: left;
                     font-weight: 600;
                     font-size: 12px;
-                    text-transform: uppercase;
                     min-width: 120px;
                   "
                 >
@@ -190,7 +187,6 @@
                     text-align: left;
                     font-weight: 600;
                     font-size: 12px;
-                    text-transform: uppercase;
                     min-width: 120px;
                   "
                 >
@@ -202,7 +198,6 @@
                     text-align: left;
                     font-weight: 600;
                     font-size: 12px;
-                    text-transform: uppercase;
                     min-width: 120px;
                   "
                 >
@@ -216,7 +211,6 @@
                 class="rowin"
                 [class.play]="rowsRevealed"
                 [style.animation-delay.ms]="i * 30"
-                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
                 style="border-bottom: 1px solid #e2e8f0; cursor: pointer"
                 (click)="viewPeopleDetails(person.id)"
               >
@@ -246,7 +240,7 @@
                   </div>
                 </td>
                 <td>
-                  {{ person.title }}
+                  {{ displayTitle(person) }}
                 </td>
                 <td>
                   {{ person.location }}

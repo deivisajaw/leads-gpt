@@ -23,7 +23,8 @@
   <!-- ===== ERROR INIT ===== -->
   <div class="conv-state" *ngIf="!isLoadingInit && initError">
     <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
-    <p>{{ initError }}</p>
+    <p class="error-title">No pudimos cargar tus mensajes</p>
+    <p class="error-hint">Intenta de nuevo en unos segundos. Si el problema continúa, escríbenos a soporte y lo revisamos de inmediato.</p>
     <button class="btn-retry" (click)="ngOnInit()">
       <i class="fas fa-sync-alt"></i> Reintentar
     </button>

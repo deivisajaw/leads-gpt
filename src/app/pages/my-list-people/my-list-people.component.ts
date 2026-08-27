@@ -113,6 +113,18 @@ export class MyListPeopleComponent implements OnInit {
     return date.toLocaleDateString();
   }
 
+  // Display-only: backend titles often arrive as "Full Name - Actual Title";
+  // strip the redundant name prefix so the Cargo column shows only the title.
+  displayTitle(person: { name?: string; title?: string }): string {
+    const title = person?.title || '';
+    const name = person?.name || '';
+    if (name && title.toLowerCase().startsWith(name.toLowerCase())) {
+      const rest = title.slice(name.length).replace(/^[\s\-–—|,]+/, '');
+      return rest || title;
+    }
+    return title;
+  }
+
   toggleDropdown(dropdownName: string) {
     this.showViewDropdown = false;
     this.showExportDropdown = false;

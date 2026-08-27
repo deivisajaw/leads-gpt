@@ -628,3 +628,16 @@
   .cw-body { grid-template-columns: 1fr; }
   .cw-messages-col { display: none; }
 }
+.error-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.error-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 380px;
+  margin: 0;
+}

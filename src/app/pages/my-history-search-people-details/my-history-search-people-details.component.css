@@ -289,8 +289,8 @@ th, td {
 th {
     font-weight: 600;
     font-size: 12px;
-    text-transform: uppercase;
-    background-color: var(--primary-blue);
+    color: var(--text-secondary);
+    background-color: var(--background-gray);
 }
 
 tbody tr:nth-child(even) {

@@ -2,7 +2,7 @@
    HEADER
    ============================================= */
 
-.header-section h1 { color: var(--primary-blue); }
+.header-section h1 { color: var(--text-heading); }
 
 .btn-refresh {
   display: inline-flex;
@@ -161,19 +161,18 @@
 
 /* Head */
 .conv-table thead tr {
-  background: var(--primary-blue) !important;
+  background: var(--background-gray) !important;
 }
 
 .conv-table thead th {
   padding: 13px 16px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #ffffff !important;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-secondary) !important;
   white-space: nowrap;
   text-align: left;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Body rows */

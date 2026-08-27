@@ -276,20 +276,19 @@
 }
 
 .meetings-table thead tr {
-  background: var(--primary-blue) !important;
+  background: var(--background-gray) !important;
   border-bottom: none;
 }
 
 .meetings-table th {
   padding: 10px 14px;
   font-weight: 600;
-  color: #ffffff !important;
+  color: var(--text-secondary) !important;
   text-align: left;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0;
   white-space: nowrap;
-  background: var(--primary-blue) !important;
+  background: var(--background-gray) !important;
 }
 
 .meetings-table tbody tr {
