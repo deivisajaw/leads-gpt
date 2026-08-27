@@ -233,6 +233,18 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
     return new Date(date).toLocaleDateString('es-ES', options);
   }
 
+  // Guia de inicio re-abrible (solo vista; no resetea pasos en backend)
+  showGuide = false;
+
+  toggleGuide(): void {
+    this.showGuide = !this.showGuide;
+    if (this.showGuide) {
+      setTimeout(() => {
+        document.getElementById('onboarding-band')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }
+
   // Presentacional: pasos del embudo con % relativo al primer paso (estilo Shopify).
   // Cacheado por referencia: devolver un array nuevo en cada ciclo de change detection
   // hace que *ngFor reconstruya el DOM en loop (congela la pagina).

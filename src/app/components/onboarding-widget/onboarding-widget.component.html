@@ -1,4 +1,4 @@
-<div class="onboarding-widget-container" *ngIf="!(allStepsCompleted$ | async)">
+<div class="onboarding-widget-container" *ngIf="!(allStepsCompleted$ | async) || forceShow">
   <div class="onboarding-header">
     <h3>{{ 'ONBOARDING.TITLE' | translate }}</h3>
     <p>{{ 'ONBOARDING.SUBTITLE' | translate }}</p>

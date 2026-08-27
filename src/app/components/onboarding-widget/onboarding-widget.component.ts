@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Observable, map, Subscription, filter } from 'rxjs';
@@ -17,6 +17,9 @@ import { OnboardingStepStatus } from '../../models/user-profile.model';
 export class OnboardingWidgetComponent implements OnInit, OnDestroy {
 
   @ViewChild('stepsContainer') stepsContainerRef!: ElementRef;
+
+  // Permite re-abrir la guia de pasos aunque el onboarding este completado (solo vista)
+  @Input() forceShow = false;
 
   public onboardingStatus$: Observable<OnboardingStepStatus[] | undefined>;
   public progress$: Observable<number>;

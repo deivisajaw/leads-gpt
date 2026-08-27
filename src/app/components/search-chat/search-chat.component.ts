@@ -75,9 +75,7 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
   constructor(private apiConfig: ApiConfigService, private renderer: Renderer2) { }
 
   ngOnInit(): void {
-    this.title = this.mode === 'companies'
-      ? '¿Qué empresa quieres encontrar hoy?'
-      : '¿A quién quieres encontrar hoy?';
+    this.title = this.pickWittyTitle();
     this.greeting = this.computeGreeting();
     this.quickPrompts = this.buildQuickPrompts();
     this.startConversation();
@@ -125,8 +123,45 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
 
   private computeGreeting(): string {
     const hour = new Date().getHours();
+    if (hour >= 22 || hour < 5) { return 'Modo nocturno 🌙'; }
     const label = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
     return `${label} 👋`;
+  }
+
+  // Titulo rotativo estilo asistente: distinto en cada visita, con sabor segun la hora
+  private pickWittyTitle(): string {
+    const hour = new Date().getHours();
+    const night = hour >= 22 || hour < 5;
+    const peoplePool = night
+      ? [
+        'A los que venden no los para nadie.',
+        'Mientras otros duermen, tú llenas el pipeline.',
+        '¿Un contacto más antes de cerrar el día?'
+      ]
+      : [
+        '¿A quién le vas a vender hoy?',
+        '¿A quién quieres encontrar hoy?',
+        '¿Cuántas reuniones vamos a agendar hoy?',
+        'Tu próximo cliente ya existe. Encuéntralo.',
+        '¿Vamos a llenar el calendario hoy?',
+        'Hoy es buen día para cerrar algo grande.'
+      ];
+    const companyPool = night
+      ? [
+        'Los mejores mercados se encuentran de noche.',
+        'Mientras otros duermen, tú encuentras clientes.',
+        '¿Una empresa más antes de cerrar el día?'
+      ]
+      : [
+        '¿A qué empresa le vas a vender hoy?',
+        '¿Qué empresa quieres encontrar hoy?',
+        '¿Qué mercado atacamos hoy?',
+        'Tu próximo cliente ya existe. Búscalo.',
+        '¿Vamos a ganar más hoy?',
+        'Hay 75 millones de empresas esperando tu llamada.'
+      ];
+    const pool = this.mode === 'companies' ? companyPool : peoplePool;
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   private buildQuickPrompts(): QuickPrompt[] {

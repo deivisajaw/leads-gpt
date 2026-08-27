@@ -27,7 +27,11 @@
   font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
-  color: #3e34f9;
+  background: linear-gradient(135deg, #7871fb, #251f95);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #251f95;
   margin: 0 0 12px;
 }
 
