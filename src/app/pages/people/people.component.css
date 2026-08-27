@@ -92,19 +92,41 @@
 .topbar-credits {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-2);
   white-space: nowrap;
+  background: #fff;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 999px;
+  padding: 6px 14px 6px 7px;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.topbar-credits:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 14px -4px rgba(91, 79, 229, 0.3);
 }
 
 .topbar-credits .coin {
-  width: 15px;
-  height: 15px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: linear-gradient(150deg, #a78bfa, var(--ind));
+  background: linear-gradient(135deg, #7871fb, #251f95);
+  box-shadow: 0 1px 4px rgba(37, 31, 149, 0.3);
   flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topbar-credits .coin::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
 /* ═══════════ HERO ═══════════ */

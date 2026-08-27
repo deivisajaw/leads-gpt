@@ -1263,8 +1263,18 @@ app-aside .collapse-btn {
   .sidebar .nav-text,
   .sidebar .section-title,
   .sidebar .logo-text,
+  .sidebar .logo-wordmark,
   .sidebar .badge {
     display: none;
+  }
+
+  .sidebar .logo-mark-only {
+    display: block !important;
+  }
+
+  .sidebar .sidebar-header {
+    padding: 14px 12px;
+    min-height: 60px;
   }
 
   .sidebar .submenu {

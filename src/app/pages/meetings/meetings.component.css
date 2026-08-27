@@ -155,8 +155,9 @@
 }
 
 .filter-pills button.active {
-  background: var(--primary-blue);
+  background: var(--primary-gradient);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 31, 149, 0.25);
 }
 
 /* =============================================
