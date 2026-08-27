@@ -59,7 +59,7 @@
 .page-title {
   font-size: 1.875rem; /* 30px */
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--text-heading);
   margin: 0;
 }
 

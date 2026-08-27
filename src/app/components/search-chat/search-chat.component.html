@@ -2,7 +2,7 @@
 
   <!-- HEADER -->
   <p class="search-greet" *ngIf="!hasStarted">{{ greeting }}</p>
-  <h1 class="search-title">
+  <h1 class="search-title" *ngIf="!hasStarted">
     {{ title }}
   </h1>
   <p class="search-subtitle" *ngIf="!hasStarted">{{ subtitle }}</p>
