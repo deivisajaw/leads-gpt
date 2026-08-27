@@ -2743,3 +2743,22 @@ tbody td:first-child {
   height: 13px;
   margin-left: auto;
 }
+
+/* ===== Logo real (wordmark) en el sidebar ===== */
+.logo-wordmark {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.sidebar .logo-mark-only {
+  display: none;
+}
+
+.sidebar.collapsed .logo-wordmark {
+  display: none;
+}
+
+.sidebar.collapsed .logo-mark-only {
+  display: block;
+}

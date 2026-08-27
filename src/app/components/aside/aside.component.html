@@ -3,9 +3,13 @@
     <img
       src="/images/logo_round.png"
       alt="Logo"
-      class="logo"
+      class="logo logo-mark-only"
     />
-    <span class="logo-text">{{ 'ASIDE.LOGO_TEXT' | translate }}</span> 
+    <img
+      src="/images/ajaw-logo.png"
+      alt="{{ 'ASIDE.LOGO_TEXT' | translate }}"
+      class="logo-wordmark"
+    />
   </div>
   <button class="collapse-btn" id="collapseBtn" (click)="toggleSidebar()" [attr.data-tooltip]="'ASIDE.COLLAPSE_BUTTON_TOOLTIP' | translate">
     <svg class="lucide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
