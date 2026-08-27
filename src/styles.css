@@ -76,9 +76,9 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 16px 18px 16px;
+  padding: 20px 16px 16px 14px;
   border-bottom: 1px solid var(--border-color);
-  min-height: 84px;
+  min-height: 72px;
 }
 
 .logo-container {
@@ -2755,10 +2755,14 @@ tbody td:first-child {
 
 /* ===== Logo real (wordmark) en el sidebar ===== */
 .logo-wordmark {
-  width: 176px;
+  width: 138px;
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+.logo-container {
+  justify-content: flex-start;
 }
 
 .sidebar .logo-mark-only {
