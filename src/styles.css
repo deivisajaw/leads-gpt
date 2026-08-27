@@ -76,9 +76,9 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 22px 16px 18px 16px;
   border-bottom: 1px solid var(--border-color);
-  min-height: 64px;
+  min-height: 84px;
 }
 
 .logo-container {
@@ -180,11 +180,11 @@ app-aside .collapse-btn {
 }
 
 .section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #b6bdc9;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   transition: opacity 0.3s ease;
 }
 
@@ -221,7 +221,16 @@ app-aside .collapse-btn {
 .nav-item.active .nav-link {
   background: var(--primary-gradient);
   color: white;
-  box-shadow: 0 8px 18px rgba(37,31,149,.28);
+  box-shadow: 0 2px 10px rgba(37, 31, 149, 0.22);
+}
+
+.nav-link {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.nav-item.active .nav-link .nav-text {
+  font-weight: 600;
 }
 
 .nav-item.active .nav-link i{
@@ -2746,8 +2755,9 @@ tbody td:first-child {
 
 /* ===== Logo real (wordmark) en el sidebar ===== */
 .logo-wordmark {
-  height: 30px;
-  width: auto;
+  width: 176px;
+  max-width: 100%;
+  height: auto;
   display: block;
 }
 

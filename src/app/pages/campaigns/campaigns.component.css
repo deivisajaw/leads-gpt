@@ -1544,10 +1544,12 @@ pre.csv-example-row {
   flex-shrink: 0;
 }
 
-.ico-indigo { background: linear-gradient(135deg, #eef2ff, #e0e7ff); color: var(--primary-blue); }
-.ico-green  { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #059669; }
-.ico-amber  { background: linear-gradient(135deg, #fffbeb, #fef3c7); color: #d97706; }
-.ico-pink   { background: linear-gradient(135deg, #fdf2f8, #fce7f3); color: #db2777; }
+/* Todos los iconos de metricas usan el gradiente de marca (mismo lenguaje que el menu activo) */
+.ico-indigo, .ico-green, .ico-amber, .ico-pink {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 31, 149, 0.25);
+}
 
 .metric-data {
   display: flex;

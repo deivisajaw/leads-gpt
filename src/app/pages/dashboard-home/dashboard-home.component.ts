@@ -141,24 +141,24 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
                 {
                   data: openRates,
                   label: 'Tasa de Apertura',
-                  backgroundColor: 'rgba(56, 189, 248, 0.85)',
-                  borderColor: 'rgba(56, 189, 248, 1)',
+                  backgroundColor: 'rgba(120, 113, 251, 0.9)',
+                  borderColor: 'rgba(120, 113, 251, 1)',
                   borderWidth: 2,
                   borderRadius: 6,
                 },
                 {
                   data: clickRates,
                   label: 'Tasa de Clics',
-                  backgroundColor: 'rgba(236, 72, 153, 0.85)',
-                  borderColor: 'rgba(236, 72, 153, 1)',
+                  backgroundColor: 'rgba(91, 79, 229, 0.9)',
+                  borderColor: 'rgba(91, 79, 229, 1)',
                   borderWidth: 2,
                   borderRadius: 6,
                 },
                 {
                   data: replyRates,
                   label: 'Tasa de Respuestas',
-                  backgroundColor: 'rgba(250, 204, 21, 0.85)',
-                  borderColor: 'rgba(250, 204, 21, 1)',
+                  backgroundColor: 'rgba(37, 31, 149, 0.9)',
+                  borderColor: 'rgba(37, 31, 149, 1)',
                   borderWidth: 2,
                   borderRadius: 6,
                 }
@@ -175,7 +175,7 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
               labels: openStages.map((s: DealStageMetric) => s.stageLabel),
               datasets: [{
                 data: openStages.map((s: DealStageMetric) => s.totalAmount),
-                backgroundColor: openStages.map((s: DealStageMetric) => s.stageColor || '#5b4fe5'),
+                backgroundColor: 'rgba(91, 79, 229, 0.9)',
                 borderRadius: 6,
                 borderSkipped: false,
               }]
@@ -191,18 +191,18 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
                 {
                   data: funnelCounts,
                   backgroundColor: [
-                    'rgba(79, 70, 229, 0.9)',
-                    'rgba(147, 51, 234, 0.9)',
-                    'rgba(14, 165, 233, 0.9)',
-                    'rgba(251, 191, 36, 0.9)',
-                    'rgba(239, 68, 68, 0.9)'
+                    'rgba(37, 31, 149, 0.95)',
+                    'rgba(91, 79, 229, 0.95)',
+                    'rgba(120, 113, 251, 0.95)',
+                    'rgba(165, 160, 252, 0.95)',
+                    'rgba(210, 207, 253, 0.95)'
                   ],
                   borderColor: [
-                    'rgba(79, 70, 229, 1)',
-                    'rgba(147, 51, 234, 1)',
-                    'rgba(14, 165, 233, 1)',
-                    'rgba(251, 191, 36, 1)',
-                    'rgba(239, 68, 68, 1)'
+                    'rgba(37, 31, 149, 1)',
+                    'rgba(91, 79, 229, 1)',
+                    'rgba(120, 113, 251, 1)',
+                    'rgba(165, 160, 252, 1)',
+                    'rgba(210, 207, 253, 1)'
                   ],
                   borderWidth: 2,
                   hoverBorderColor: '#0f172a',

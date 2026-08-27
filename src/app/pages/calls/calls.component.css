@@ -1036,12 +1036,17 @@
   flex-shrink: 0;
 }
 
-.metric-icon--blue   { background: #ede9fe; color: #5b4fe5; }
-.metric-icon--green  { background: #d1fae5; color: #059669; }
-.metric-icon--purple { background: #f3e8ff; color: #9333ea; }
-.metric-icon--teal   { background: #ccfbf1; color: #0d9488; }
-.metric-icon--orange { background: #fef3c7; color: #d97706; }
-.metric-icon--gray   { background: #f1f5f9; color: #64748b; }
+/* Un solo lenguaje: gradiente de marca en todos los iconos de metricas */
+.metric-icon--blue,
+.metric-icon--green,
+.metric-icon--purple,
+.metric-icon--teal,
+.metric-icon--orange,
+.metric-icon--gray {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 31, 149, 0.25);
+}
 
 .metric-body {
   display: flex;

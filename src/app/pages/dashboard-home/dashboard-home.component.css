@@ -49,16 +49,14 @@
   flex-wrap: wrap; 
 }
 .header-metric-item {
-  background-color: var(--background-gray);
+  background: var(--background-white);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 14px; 
-  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   align-items: flex-start; 
   min-width: 100px; 
-  background: linear-gradient(135deg, #5b4fe5, #8e7bff); 
 }  
 
 .header-metric-item:hover {
@@ -67,8 +65,10 @@
 }
 
 .header-metric-item .metric-title {
-  font-size: 11px; 
-  color: white;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
   font-weight: 500;
   white-space: nowrap; 
   overflow: hidden;
@@ -78,7 +78,9 @@
 .header-metric-item .metric-value {
   font-size: 20px; 
   font-weight: 700;
-  color: white
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-heading)
 } 
 .onboarding-band {
   width: 100%;
@@ -523,10 +525,10 @@
   box-shadow: 0 6px 20px rgba(0,0,0,0.09);
 }
 
-.deal-kpi-card--won      { border-left-color: #10b981; }
-.deal-kpi-card--open     { border-left-color: #5b4fe5; }
-.deal-kpi-card--contacts { border-left-color: #f59e0b; }
-.deal-kpi-card--avg      { border-left-color: #06b6d4; }
+.deal-kpi-card--won,
+.deal-kpi-card--open,
+.deal-kpi-card--contacts,
+.deal-kpi-card--avg { border-left-color: transparent; }
 
 .deal-kpi-icon {
   width: 44px;
@@ -539,10 +541,14 @@
   flex-shrink: 0;
 }
 
-.deal-kpi-card--won      .deal-kpi-icon { background: #d1fae5; color: #10b981; }
-.deal-kpi-card--open     .deal-kpi-icon { background: #ede9fe; color: #5b4fe5; }
-.deal-kpi-card--contacts .deal-kpi-icon { background: #fef3c7; color: #d97706; }
-.deal-kpi-card--avg      .deal-kpi-icon { background: #cffafe; color: #0891b2; }
+.deal-kpi-card--won .deal-kpi-icon,
+.deal-kpi-card--open .deal-kpi-icon,
+.deal-kpi-card--contacts .deal-kpi-icon,
+.deal-kpi-card--avg .deal-kpi-icon {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 31, 149, 0.25);
+}
 
 .deal-kpi-body {
   display: flex;
