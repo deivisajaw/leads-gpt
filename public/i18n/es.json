@@ -347,8 +347,8 @@
     "VIEW_PLANS": "Ver planes"
   },
   "PLANS": {
-    "TITLE": "Actualiza tu Plan",
-    "SUBTITLE": "Precios para startups de una persona hasta empresas Fortune 500.",
+    "TITLE": "La plataforma todo-en-uno para hacer crecer tu negocio",
+    "SUBTITLE": "Los equipos con plan de pago agendan un 183% más de reuniones.",
     "PLAN_LIST": "Lista de Planes",
     "ANNUAL_BILLING": "Facturación Anual",
     "MONTHLY_BILLING": "Facturación Mensual",
@@ -429,7 +429,14 @@
     "FOOTER_DUE_TODAY": "A pagar hoy",
     "FOOTER_UPGRADE_BUTTON": "Actualizar",
     "FOOTER_TAXES_NOTE": "*Impuestos de venta calculados al pagar",
-    "GENERATING_PAYMENT_LINK": "Generando enlace de pago..."
+    "GENERATING_PAYMENT_LINK": "Generando enlace de pago...",
+    "STEP1_CHIP": "Paso 1",
+    "STEP1_TITLE": "Elige tu plan y usuarios",
+    "STEP2_CHIP": "Paso 2",
+    "CREDIT_USE_EMAILS": "Correos verificados",
+    "CREDIT_USE_PHONES": "Teléfonos móviles",
+    "CREDIT_USE_DATA": "Datos enriquecidos",
+    "CREDIT_USE_AI": "Llamadas y mensajes con IA"
   },
   "USER_CONFIG": {
     "TITLE": "Configuración",
@@ -455,11 +462,13 @@
     "LANGUAGE_PREFERENCES.ENGLISH": "Inglés"
   },
   "PAYMENT_MODAL": {
-    "TITLE": "Detalles del Enlace de Pago",
-    "MESSAGE_1": "Tu enlace de pago ha sido generado:",
+    "TITLE": "Ir al pago",
+    "MESSAGE_1": "Tu página de pago segura está lista.",
     "MESSAGE_2": "Una copia de este enlace también ha sido enviada a tu dirección de correo electrónico registrada.",
     "MESSAGE_3": "Una vez completado el pago, tu aplicación se actualizará en una nueva pestaña. Por favor, refresca la pestaña original si es necesario.",
-    "CLOSE": "Cerrar"
+    "CLOSE": "Cerrar",
+    "MESSAGE_OPENED": "Abrimos tu página de pago segura en una pestaña nueva.",
+    "GO_TO_PAYMENT": "Ir al pago seguro"
   },
   "PAYMENT_SUCCESS": {
     "TITLE": "¡Pago Exitoso!",
@@ -1415,7 +1424,9 @@
       "TERMS_LINK": "Términos y Condiciones",
       "PRIVACY_LINK": "Política de Privacidad"
     },
-    "DELETE": { "IN_PROGRESS": "Eliminando agente y liberando recursos..." },
+    "DELETE": {
+      "IN_PROGRESS": "Eliminando agente y liberando recursos..."
+    },
     "FILTERS": {
       "SEARCH_PLACEHOLDER": "Buscar agente...",
       "ALL_TYPES": "Todos los tipos",
@@ -1525,7 +1536,9 @@
         "DESCRIPTION": "Descripción",
         "UPDATED": "Actualizado"
       },
-      "ROLE": { "OWNER": "Owner" },
+      "ROLE": {
+        "OWNER": "Owner"
+      },
       "ATTENDEE_STATUS": {
         "ACCEPTED": "Aceptado",
         "PENDING": "Pendiente",
@@ -1548,7 +1561,10 @@
       "PROCESSING": "Procesando",
       "FAILED": "Error"
     },
-    "ACTION": { "REFRESH": "Actualizar", "RETRY": "Reintentar" },
+    "ACTION": {
+      "REFRESH": "Actualizar",
+      "RETRY": "Reintentar"
+    },
     "TOOLBAR": {
       "SEARCH": "Buscar conversaciones...",
       "RECORDINGS": "grabaciones"
@@ -1566,7 +1582,9 @@
       "LOADING": "Cargando historial...",
       "EMPTY": "No hay conversaciones grabadas aún."
     },
-    "ERROR": { "LOAD": "Error al cargar las conversaciones." },
+    "ERROR": {
+      "LOAD": "Error al cargar las conversaciones."
+    },
     "DETAIL": {
       "TITLE": "Detalle de conversación",
       "BACK": "Volver",

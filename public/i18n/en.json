@@ -347,8 +347,8 @@
     "VIEW_PLANS": "View plans"
   },
   "PLANS": {
-    "TITLE": "Upgrade Your Plan",
-    "SUBTITLE": "Pricing for one-person startups to Fortune 500 enterprises.",
+    "TITLE": "The all-in-one platform to grow your business",
+    "SUBTITLE": "Teams with paid plans book 183% more meetings.",
     "PLAN_LIST": "Plan List",
     "ANNUAL_BILLING": "Annual Billing",
     "MONTHLY_BILLING": "Monthly Billing",
@@ -429,7 +429,14 @@
     "FOOTER_DUE_TODAY": "Due Today",
     "FOOTER_UPGRADE_BUTTON": "Upgrade",
     "FOOTER_TAXES_NOTE": "*Sales taxes calculated at checkout",
-    "GENERATING_PAYMENT_LINK": "Generating payment link..."
+    "GENERATING_PAYMENT_LINK": "Generating payment link...",
+    "STEP1_CHIP": "Step 1",
+    "STEP1_TITLE": "Choose your plan and seats",
+    "STEP2_CHIP": "Step 2",
+    "CREDIT_USE_EMAILS": "Verified emails",
+    "CREDIT_USE_PHONES": "Mobile phone numbers",
+    "CREDIT_USE_DATA": "Enriched data",
+    "CREDIT_USE_AI": "AI calls and messages"
   },
   "USER_CONFIG": {
     "TITLE": "Settings",
@@ -455,11 +462,13 @@
     "LANGUAGE_PREFERENCES.ENGLISH": "English"
   },
   "PAYMENT_MODAL": {
-    "TITLE": "Payment Link Details",
-    "MESSAGE_1": "Your payment link has been generated:",
+    "TITLE": "Go to payment",
+    "MESSAGE_1": "Your secure payment page is ready.",
     "MESSAGE_2": "A copy of this link has also been sent to your registered email address.",
     "MESSAGE_3": "Once payment is completed, your application will update in a new tab. Please refresh the original tab if needed.",
-    "CLOSE": "Close"
+    "CLOSE": "Close",
+    "MESSAGE_OPENED": "We opened your secure payment page in a new tab.",
+    "GO_TO_PAYMENT": "Go to secure payment"
   },
   "PAYMENT_SUCCESS": {
     "TITLE": "Payment Successful!",
@@ -1415,7 +1424,9 @@
       "TERMS_LINK": "Terms and Conditions",
       "PRIVACY_LINK": "Privacy Policy"
     },
-    "DELETE": { "IN_PROGRESS": "Deleting agent and freeing up resources..." },
+    "DELETE": {
+      "IN_PROGRESS": "Deleting agent and freeing up resources..."
+    },
     "FILTERS": {
       "SEARCH_PLACEHOLDER": "Search agent...",
       "ALL_TYPES": "All Types",
@@ -1525,7 +1536,9 @@
         "DESCRIPTION": "Description",
         "UPDATED": "Updated"
       },
-      "ROLE": { "OWNER": "Owner" },
+      "ROLE": {
+        "OWNER": "Owner"
+      },
       "ATTENDEE_STATUS": {
         "ACCEPTED": "Accepted",
         "PENDING": "Pending",
@@ -1548,7 +1561,10 @@
       "PROCESSING": "Processing",
       "FAILED": "Error"
     },
-    "ACTION": { "REFRESH": "Refresh", "RETRY": "Retry" },
+    "ACTION": {
+      "REFRESH": "Refresh",
+      "RETRY": "Retry"
+    },
     "TOOLBAR": {
       "SEARCH": "Search conversations...",
       "RECORDINGS": "recordings"
@@ -1566,7 +1582,9 @@
       "LOADING": "Loading history...",
       "EMPTY": "There are no recorded conversations yet."
     },
-    "ERROR": { "LOAD": "Error loading conversations." },
+    "ERROR": {
+      "LOAD": "Error loading conversations."
+    },
     "DETAIL": {
       "TITLE": "Conversation detail",
       "BACK": "Back",

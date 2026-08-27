@@ -5,11 +5,16 @@
       <button class="close-button" (click)="closeModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <p class="message-info"><i class="fas fa-check-circle icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_1' | translate }}</p>
-      <a [href]="paymentUrl" target="_blank" (click)="openPaymentLink()">{{ paymentUrl }}</a>
-
-      <p class="message-info"><i class="fas fa-envelope icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_2' | translate }}</p>
-      <p class="message-warning"><i class="fas fa-exclamation-triangle icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_3' | translate }}</p>
+      <p class="message-info" *ngIf="autoOpened">
+        <i class="fas fa-check-circle icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_OPENED' | translate }}
+      </p>
+      <p class="message-info" *ngIf="!autoOpened">
+        <i class="fas fa-lock icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_1' | translate }}
+      </p>
+      <button class="pay-now-btn" (click)="openPaymentLink()">
+        {{ 'PAYMENT_MODAL.GO_TO_PAYMENT' | translate }} <i class="fas fa-arrow-right"></i>
+      </button>
+      <p class="message-info small"><i class="fas fa-envelope icon-left"></i> {{ 'PAYMENT_MODAL.MESSAGE_2' | translate }}</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="closeModal()">{{ 'PAYMENT_MODAL.CLOSE' | translate }}</button>

@@ -27,7 +27,7 @@
     <div class="plans-content">
       <!-- User Selector -->
       <div class="section-header">
-        <h2>1. Edition & Users</h2>
+        <h2><span class="step-chip">{{ 'PLANS.STEP1_CHIP' | translate }}</span> {{ 'PLANS.STEP1_TITLE' | translate }}</h2>
         <div class="user-selector">
           <label>{{ 'PLANS.HOW_MANY_USERS' | translate }}</label>
           <div class="user-counter">
@@ -76,9 +76,14 @@
       <!-- Credits Explanation -->
       <div class="credits-explainer-card">
         <div class="credits-explainer-content">
-          <h2>{{ 'PLANS.WHAT_ARE_CREDITS' | translate }}</h2>
+          <h2><span class="step-chip">{{ 'PLANS.STEP2_CHIP' | translate }}</span> {{ 'PLANS.WHAT_ARE_CREDITS' | translate }}</h2>
           <p>{{ 'PLANS.CREDITS_EXPLANATION' | translate }}</p>
-          <button class="learn-more-btn">{{ 'PLANS.LEARN_MORE' | translate }}</button>
+          <div class="credit-uses">
+            <span class="credit-use"><i class="fas fa-envelope"></i> {{ 'PLANS.CREDIT_USE_EMAILS' | translate }}</span>
+            <span class="credit-use"><i class="fas fa-mobile-alt"></i> {{ 'PLANS.CREDIT_USE_PHONES' | translate }}</span>
+            <span class="credit-use"><i class="fas fa-database"></i> {{ 'PLANS.CREDIT_USE_DATA' | translate }}</span>
+            <span class="credit-use"><i class="fas fa-robot"></i> {{ 'PLANS.CREDIT_USE_AI' | translate }}</span>
+          </div>
         </div>
       </div>
 

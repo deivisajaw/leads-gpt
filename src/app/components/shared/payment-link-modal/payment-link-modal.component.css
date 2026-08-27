@@ -166,3 +166,26 @@
     font-size: 1em;
   }
 }
+
+.pay-now-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #7871fb, #251f95);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 14px 0;
+  box-shadow: 0 4px 14px rgba(37, 31, 149, 0.3);
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.pay-now-btn:hover { filter: brightness(1.1); }
+.pay-now-btn:active { transform: scale(0.98); }
+.message-info.small { font-size: 12px; opacity: 0.8; }
