@@ -97,6 +97,21 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   public sessionSavedCount = 0;
 
   public creditsRemaining: number = 0;
+
+  // Chip vivo (presentacional): pulso visual cuando cambia el numero de creditos
+  creditsPulse = false;
+  private _prevCreditsShown: number | null = null;
+  private _pulseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  ngDoCheck(): void {
+    if (this._prevCreditsShown !== null && this.creditsRemaining !== this._prevCreditsShown) {
+      if (this._pulseTimer) { clearTimeout(this._pulseTimer); }
+      this.creditsPulse = false;
+      requestAnimationFrame(() => { this.creditsPulse = true; });
+      this._pulseTimer = setTimeout(() => { this.creditsPulse = false; }, 900);
+    }
+    this._prevCreditsShown = this.creditsRemaining;
+  }
   private userProfileSubscription!: Subscription;
 
   public searchError: string | null = null;

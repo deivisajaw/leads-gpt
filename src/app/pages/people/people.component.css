@@ -121,13 +121,7 @@
   justify-content: center;
 }
 
-.topbar-credits .coin::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-}
+
 
 /* ═══════════ HERO ═══════════ */
 .hero-screen {
@@ -1805,4 +1799,31 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Chip vivo: engranaje AJAW blanco + pulso al gastar creditos */
+.coin-gear {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+  display: block;
+}
+
+.topbar-credits.pulse .coin {
+  animation: coin-pulse 0.8s ease-out;
+}
+
+.topbar-credits.pulse b {
+  animation: credits-flash 0.8s ease-out;
+}
+
+@keyframes coin-pulse {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(120, 113, 251, 0.55); }
+  40%  { transform: scale(1.18); box-shadow: 0 0 0 7px rgba(120, 113, 251, 0); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(120, 113, 251, 0); }
+}
+
+@keyframes credits-flash {
+  0%   { color: #5b4fe5; }
+  100% { color: inherit; }
 }
