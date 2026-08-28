@@ -116,7 +116,10 @@ export class PlansComponent implements OnInit, OnDestroy {
           }
         });
 
-        this.selectedPlan = this.plans.find(p => p.id === this.currentPlanId) || this.plans[0];
+        // Preseleccion estilo Apollo: si el usuario no tiene plan, marcar el primer plan PAGO
+        // (no la prueba gratis) para anclar la decision de compra.
+        const firstPaidPlan = this.plans.find(p => parseFloat(p.pricePerMonth) > 0);
+        this.selectedPlan = this.plans.find(p => p.id === this.currentPlanId) || firstPaidPlan || this.plans[0];
         this.updateTotalCost();
       }
     } catch (error) {

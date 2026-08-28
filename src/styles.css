@@ -2531,8 +2531,8 @@ tbody td:first-child {
   align-items: center;
   width: 100%; 
   background-color: white; 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  padding: 0.8rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem 1.75rem;
   margin-bottom: 0; 
   border-radius: 0; 
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -2833,4 +2833,22 @@ button.btn-primary:hover,
 .btn-primary:disabled,
 .btn-pagination:disabled {
   filter: grayscale(0.4) opacity(0.6);
+}
+
+
+/* ===== Empty states: botones compactos siempre ===== */
+.empty-state .btn-primary,
+.empty-state button.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  height: auto;
+  padding: 10px 22px !important;
+  font-size: 14px;
+  border-radius: 9px;
+}
+
+.empty-state .btn-primary i {
+  font-size: 14px;
 }
