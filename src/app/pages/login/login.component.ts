@@ -7,6 +7,7 @@ import { SignupService } from '../../services/signup.service';
 import { SignupPayload } from '../../models/signup.model';
 import { OnboardingWizardComponent } from '../../components/onboarding-wizard/onboarding-wizard.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { DirectorioRedirectService } from '../../services/directorio-redirect.service';
 
 @Component({
   selector: 'app-login',
@@ -67,10 +68,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private directorioRedirect: DirectorioRedirectService
   ) { }
 
   ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+      this.directorioRedirect.capture(params);
+    });
 
     const state = history.state as { signupSuccessMessage?: string };
 
@@ -229,11 +235,18 @@ export class LoginComponent implements OnInit, AfterViewInit {
       }
 
       if (loggedIn) {
-        // handleWebhookSuccess reproduce el video cinemático y luego navega al dashboard
+        // handleWebhookSuccess reproduce el video y luego navega (deep-link del directorio o dashboard).
+        // Ojo: el login de arriba va con navigate=false para no consumir el redirect antes del video.
         if (this.onboardingWizard) {
           this.onboardingWizard.handleWebhookSuccess();
         } else {
-          this.router.navigate(['/dashboard']);
+          // Deep-link del directorio si viene de ahi; si no, al dashboard.
+          const nav = this.directorioRedirect.getRedirectNavigation();
+          if (nav) {
+            this.router.navigate(nav.commands, nav.extras);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         }
       } else {
         // Solo si tras todos los reintentos no se pudo: mensaje y tab de login

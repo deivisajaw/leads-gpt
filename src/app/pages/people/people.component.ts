@@ -1,17 +1,40 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, HostListener, NgZone, Renderer2 } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { FormsModule } from "@angular/forms"
-import { TranslateModule } from '@ngx-translate/core';
-import { Router } from "@angular/router"
-import { PeopleService, People, PeopleSearchResult, PeopleSearchResponse, PeopleDashboardStats, SuggestedProspect } from "../../services/people.service"
-import { MyListPeopleService } from "../../services/my-list-people.service"
-import { SavedListService, SavedListSummary } from "../../services/saved-list.service"
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  HostListener,
+  NgZone,
+  Renderer2,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { TranslateModule } from "@ngx-translate/core";
+import { Router, ActivatedRoute } from "@angular/router";
+import {
+  PeopleService,
+  People,
+  PeopleSearchResult,
+  PeopleSearchResponse,
+  PeopleDashboardStats,
+  SuggestedProspect,
+} from "../../services/people.service";
+import { MyListPeopleService } from "../../services/my-list-people.service";
+import {
+  SavedListService,
+  SavedListSummary,
+} from "../../services/saved-list.service";
 import { AuthService } from "../../services/auth.service";
 import { Subscription } from "rxjs";
 import { NotificationService } from "../../services/notification.service";
-import { PlansComponent } from '../plans/plans.component';
+import { PlansComponent } from "../plans/plans.component";
 import { OnboardingService } from "../../services/onboarding.service";
-import { SearchChatComponent, SearchReadyResult } from "../../components/search-chat/search-chat.component";
+import {
+  SearchChatComponent,
+  SearchReadyResult,
+} from "../../components/search-chat/search-chat.component";
 import { ExportService } from "../../services/export.service";
 
 export interface FacetOption {
@@ -22,46 +45,54 @@ export interface FacetOption {
 @Component({
   selector: "app-people",
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, PlansComponent, SearchChatComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    PlansComponent,
+    SearchChatComponent,
+  ],
   templateUrl: "./people.component.html",
   styleUrl: "./people.component.css",
 })
 export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('globeCanvas') globeCanvasRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('selectionBarPortal') selectionBarPortalRef?: ElementRef<HTMLElement>;
-  @ViewChild('confirmModalPortal') confirmModalPortalRef?: ElementRef<HTMLElement>;
+  @ViewChild("globeCanvas") globeCanvasRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild("selectionBarPortal")
+  selectionBarPortalRef?: ElementRef<HTMLElement>;
+  @ViewChild("confirmModalPortal")
+  confirmModalPortalRef?: ElementRef<HTMLElement>;
 
-  searchQuery = ""
-  currentQuery = ""
-  currentCategory = ""
-  currentLocation = ""
+  searchQuery = "";
+  currentQuery = "";
+  currentCategory = "";
+  currentLocation = "";
 
   isLoading = false;
-  currentView: "grid" | "card" | "default" = "grid"
-  currentViewText = "Grid view"
-  filteredResults: People[] = []
-  currentPage = 1
-  itemsPerPage = 25
-  selectedPeople: number[] = []
-  selectAllChecked = false
-  totalResults = 0
-  currentSearchId: number | null = null
+  currentView: "grid" | "card" | "default" = "grid";
+  currentViewText = "Grid view";
+  filteredResults: People[] = [];
+  currentPage = 1;
+  itemsPerPage = 25;
+  selectedPeople: number[] = [];
+  selectAllChecked = false;
+  totalResults = 0;
+  currentSearchId: number | null = null;
 
   totalResultsInServer = 0;
   searchStatus = "";
   currentOffset = 0;
 
-  showViewDropdown = false
-  showSortDropdown = false
+  showViewDropdown = false;
+  showSortDropdown = false;
 
   // ─── Filtros de la barra lateral izquierda ───
   public showFilters = true;
   public showMoreFilters = false;
   public localFilters = {
-    name: '',
-    jobTitle: '',
-    company: '',
-    location: ''
+    name: "",
+    jobTitle: "",
+    company: "",
+    location: "",
   };
   // Facetas calculadas a partir de los resultados de la página actual (chips "Cargo",
   // "Ubicación" y "Estado de email"). NOTA: como el buscador pagina de a 25, estas facetas
@@ -89,7 +120,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private facetSourcePool = new Map<number, People>();
 
   public displayResults: People[] = [];
-  public currentSortOrder: string = 'name_asc';
+  public currentSortOrder: string = "name_asc";
 
   // Contador de "Guardados" para el bloque de stats del sidebar — es lo agregado en ESTA sesión
   // (no el total histórico de tu lista, que requeriría otra llamada al backend).
@@ -103,11 +134,20 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private _pulseTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngDoCheck(): void {
-    if (this._prevCreditsShown !== null && this.creditsRemaining !== this._prevCreditsShown) {
-      if (this._pulseTimer) { clearTimeout(this._pulseTimer); }
+    if (
+      this._prevCreditsShown !== null &&
+      this.creditsRemaining !== this._prevCreditsShown
+    ) {
+      if (this._pulseTimer) {
+        clearTimeout(this._pulseTimer);
+      }
       this.creditsPulse = false;
-      requestAnimationFrame(() => { this.creditsPulse = true; });
-      this._pulseTimer = setTimeout(() => { this.creditsPulse = false; }, 900);
+      requestAnimationFrame(() => {
+        this.creditsPulse = true;
+      });
+      this._pulseTimer = setTimeout(() => {
+        this.creditsPulse = false;
+      }, 900);
     }
     this._prevCreditsShown = this.creditsRemaining;
   }
@@ -122,33 +162,44 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   // ─── Modal de confirmación genérico (agregar 1 / agregar todos / agregar seleccionados) ───
   // askLists=true muestra el picker de listas: elegir una o varias existentes y/o escribir el
   // nombre de una lista nueva para crearla al confirmar.
-  public confirmState: { message: string; confirmLabel: string; askLists: boolean; onConfirm: (listIds?: number[]) => void } | null = null;
+  public confirmState: {
+    message: string;
+    confirmLabel: string;
+    askLists: boolean;
+    onConfirm: (listIds?: number[]) => void;
+  } | null = null;
   public availableLists: SavedListSummary[] = [];
   public confirmSelectedListIds = new Set<number>();
-  public confirmNewListName = '';
+  public confirmNewListName = "";
 
   private async loadAvailableLists(): Promise<void> {
     const res = await this.savedListService.getMySavedLists();
     this.availableLists = res.error ? [] : res.lists;
   }
 
-  public confirmListFilter = '';
+  public confirmListFilter = "";
 
   public get filteredAvailableLists(): SavedListSummary[] {
     const q = this.confirmListFilter.trim().toLowerCase();
     if (!q) return this.availableLists;
-    return this.availableLists.filter(l => l.name.toLowerCase().includes(q));
+    return this.availableLists.filter((l) => l.name.toLowerCase().includes(q));
   }
 
-  private openConfirm(message: string, confirmLabel: string, onConfirm: (listIds?: number[]) => void, askLists = true): void {
+  private openConfirm(
+    message: string,
+    confirmLabel: string,
+    onConfirm: (listIds?: number[]) => void,
+    askLists = true,
+  ): void {
     this.confirmSelectedListIds.clear();
-    this.confirmNewListName = '';
-    this.confirmListFilter = '';
+    this.confirmNewListName = "";
+    this.confirmListFilter = "";
     this.confirmState = { message, confirmLabel, askLists, onConfirm };
   }
 
   public toggleConfirmList(listId: number): void {
-    if (this.confirmSelectedListIds.has(listId)) this.confirmSelectedListIds.delete(listId);
+    if (this.confirmSelectedListIds.has(listId))
+      this.confirmSelectedListIds.delete(listId);
     else this.confirmSelectedListIds.add(listId);
   }
 
@@ -162,7 +213,9 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!res.error && res.list) {
         listIds.push(res.list.id);
       } else {
-        this.notificationService.showError(res.message || 'No se pudo crear la lista.');
+        this.notificationService.showError(
+          res.message || "No se pudo crear la lista.",
+        );
       }
     }
 
@@ -180,12 +233,17 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Dashboard stats (barra superior de la vista inicial) — mismas stats combinadas que
   // companies (getStatistics ya suma AiSearch + LinkedinSearch en el backend). ───
-  public dashboardStats: PeopleDashboardStats = { leads: 0, searches: 0, phones: 0, emails: 0 };
+  public dashboardStats: PeopleDashboardStats = {
+    leads: 0,
+    searches: 0,
+    phones: 0,
+    emails: 0,
+  };
   public statsLoading = true;
 
   public suggestedProspects: SuggestedProspect[] = [];
   public suggestedRevealed = false;
-  private readonly avatarColors = ['#5b4fe5', '#ec4899', '#3b82f6', '#0ea968'];
+  private readonly avatarColors = ["#5b4fe5", "#ec4899", "#3b82f6", "#0ea968"];
 
   // ─── Globo punteado interactivo de fondo (idéntico al de companies) ───
   private globeCtx: CanvasRenderingContext2D | null = null;
@@ -214,18 +272,32 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── "Manchas" sobre el globo (puramente decorativo, sin datos reales) ───
   private readonly PIN_CITIES: [number, number][] = [
-    [4.6, -74.1], [6.2, -75.6], [3.4, -76.5], [10.4, -75.5],
-    [-12.0, -77.0], [-33.4, -70.6], [-34.6, -58.4], [-23.5, -46.6],
-    [-22.9, -43.2], [19.4, -99.1], [20.7, -103.3], [25.7, -100.3],
-    [-0.2, -78.5], [9.0, -79.5],
+    [4.6, -74.1],
+    [6.2, -75.6],
+    [3.4, -76.5],
+    [10.4, -75.5],
+    [-12.0, -77.0],
+    [-33.4, -70.6],
+    [-34.6, -58.4],
+    [-23.5, -46.6],
+    [-22.9, -43.2],
+    [19.4, -99.1],
+    [20.7, -103.3],
+    [25.7, -100.3],
+    [-0.2, -78.5],
+    [9.0, -79.5],
   ];
   private pins: number[][] = [];
 
   // Ruta al land-mask usado para dibujar el globo punteado (mismo archivo que companies).
-  private readonly landmaskSrc = 'images/earth_landmask_720.png';
-  private readonly reducedMotion = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private readonly landmaskSrc = "images/earth_landmask_720.png";
+  private readonly reducedMotion =
+    typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  private boundOnGlobePointerMove = (e: MouseEvent | TouchEvent) => this.onGlobePointerMove(e);
+  private boundOnGlobePointerMove = (e: MouseEvent | TouchEvent) =>
+    this.onGlobePointerMove(e);
   private boundOnGlobePointerUp = () => this.onGlobePointerUp();
 
   constructor(
@@ -233,31 +305,42 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     private myListPeopleService: MyListPeopleService,
     private savedListService: SavedListService,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private notificationService: NotificationService,
     private onboardingService: OnboardingService,
     private ngZone: NgZone,
     private renderer: Renderer2,
-    private exportService: ExportService
+    private exportService: ExportService,
   ) {
     document.addEventListener("click", (event) => {
-      const target = event.target as HTMLElement
+      const target = event.target as HTMLElement;
       if (!target.closest(".dropdown-wrapper")) {
-        this.closeAllDropdowns()
+        this.closeAllDropdowns();
       }
-    })
+    });
   }
 
   ngOnInit(): void {
-    this.userProfileSubscription = this.authService.userProfile$.subscribe(profile => {
-      if (profile && profile.companyProfile) {
-        this.creditsRemaining = profile.companyProfile.creditsAllocated ?? 0;
-      }
-    });
+    this.userProfileSubscription = this.authService.userProfile$.subscribe(
+      (profile) => {
+        if (profile && profile.companyProfile) {
+          this.creditsRemaining = profile.companyProfile.creditsAllocated ?? 0;
+        }
+      },
+    );
 
     this.loadDashboardStats();
     this.loadSuggestedProspects();
     this.loadAvailableLists();
+
+    const peopleIdParam = this.route.snapshot.queryParamMap.get("peopleId");
+    if (peopleIdParam) {
+      const peopleId = Number(peopleIdParam);
+      if (Number.isFinite(peopleId) && peopleId > 0) {
+        this.loadSinglePersonFromDirectorio(peopleId);
+      }
+    }
   }
 
   ngAfterViewInit(): void {
@@ -271,12 +354,18 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   // ese ancestro pasa a ser su "contenedor", y bottom:20px/top:50% dejan de calcularse contra
   // la pantalla. Los movemos una sola vez a <body>, donde no hay ninguna duda posible.
   private portalFixedElementsToBody(): void {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
     if (this.selectionBarPortalRef) {
-      this.renderer.appendChild(document.body, this.selectionBarPortalRef.nativeElement);
+      this.renderer.appendChild(
+        document.body,
+        this.selectionBarPortalRef.nativeElement,
+      );
     }
     if (this.confirmModalPortalRef) {
-      this.renderer.appendChild(document.body, this.confirmModalPortalRef.nativeElement);
+      this.renderer.appendChild(
+        document.body,
+        this.confirmModalPortalRef.nativeElement,
+      );
     }
   }
 
@@ -311,16 +400,18 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.suggestedProspects = [];
     }
     this.suggestedRevealed = false;
-    setTimeout(() => { this.suggestedRevealed = true; }, 0);
+    setTimeout(() => {
+      this.suggestedRevealed = true;
+    }, 0);
   }
 
   public getInitials(name: string): string {
     return name
-      .split(' ')
+      .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map(w => w[0])
-      .join('')
+      .map((w) => w[0])
+      .join("")
       .toUpperCase();
   }
 
@@ -332,29 +423,29 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   // corresponde a una persona real — abrimos el MISMO drawer que usan los resultados de
   // búsqueda (openDetail), así "Acceder email"/"Celular" funcionan igual en los dos lugares.
   openSuggestedDetail(p: SuggestedProspect): void {
-    const id = typeof p.id === 'string' ? parseInt(p.id, 10) : p.id;
+    const id = typeof p.id === "string" ? parseInt(p.id, 10) : p.id;
     const asPeople: People = {
       id,
       name: p.name,
-      title: '',
-      link: '',
-      snippet: '',
-      image: '',
-      description: '',
+      title: "",
+      link: "",
+      snippet: "",
+      image: "",
+      description: "",
       searchResultStatusSelect: 0,
       fullName: p.name,
-      email: '',
-      phone: '',
-      education: '',
-      experiencies: '',
-      countryCode: '',
+      email: "",
+      phone: "",
+      education: "",
+      experiencies: "",
+      countryCode: "",
       location: p.city,
-      about: '',
+      about: "",
       itemSelected: false,
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=5b4fe5&color=fff&size=40`,
       verified: p.verified,
-      jobTitle: p.role || '',
-      company: p.company || '',
+      jobTitle: p.role || "",
+      company: p.company || "",
       hasEmailOnFile: undefined,
       hasPhoneOnFile: undefined,
     };
@@ -377,7 +468,12 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async onSearch() {
-    if (!this.searchQuery.trim() && !this.currentCategory.trim() && !this.currentLocation.trim()) {
+    this.clearDirectorioParamsFromUrl();
+    if (
+      !this.searchQuery.trim() &&
+      !this.currentCategory.trim() &&
+      !this.currentLocation.trim()
+    ) {
       this.resetSearchState();
       return;
     }
@@ -397,8 +493,13 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.peopleService.runSearchPeople(
-        this.currentQuery, 0, this.itemsPerPage, this.currentSortOrder,
-        undefined, this.currentCategory, this.currentLocation
+        this.currentQuery,
+        0,
+        this.itemsPerPage,
+        this.currentSortOrder,
+        undefined,
+        this.currentCategory,
+        this.currentLocation,
       );
       this.processApiResponse(response);
     } catch (error) {
@@ -417,13 +518,13 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showPlans = false;
 
     switch (response.status) {
-      case 'SUCCESS':
+      case "SUCCESS":
         this.updateStateFromData(response.data);
-        this.onboardingService.completeOnboardingStepByKey('FIND_LEADS');
+        this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
         break;
 
-      case 'SEARCH_NOT_FOUND':
-      case 'SEARCH_IN_PROGRESS':
+      case "SEARCH_NOT_FOUND":
+      case "SEARCH_IN_PROGRESS":
         this.filteredResults = [];
         this.displayResults = [];
         this.totalResultsInServer = 0;
@@ -432,14 +533,15 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.searchStatus = "";
         break;
 
-      case 'INSUFFICIENT_CREDITS':
-        this.searchError = response.message || "No tienes creditos suficientes.";
+      case "INSUFFICIENT_CREDITS":
+        this.searchError =
+          response.message || "No tienes creditos suficientes.";
         this.showPlans = true;
         break;
 
-      case 'UNAUTHORIZED':
-      case 'INVALID_INPUT':
-      case 'ERROR':
+      case "UNAUTHORIZED":
+      case "INVALID_INPUT":
+      case "ERROR":
         this.searchError = response.message || "Ocurrio un error.";
         break;
 
@@ -461,21 +563,26 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     // Además se preserva el parseo original de "title" ("Nombre - Cargo | Empresa") para
     // extraer jobTitle/company, tal como ya lo hacía este componente antes.
     const safeResults = Array.isArray(data.results) ? data.results : [];
-    this.filteredResults = safeResults.map(people => {
-      const mainParts = (people.title || '').split(' | ');
-      const nameAndTitleParts = mainParts[0].split(' - ');
-      const jobTitle = nameAndTitleParts.length > 1 ? nameAndTitleParts.slice(1).join(' - ').trim() : 'N/A';
-      const company = mainParts[1] ? mainParts[1].trim() : 'N/A';
+    this.filteredResults = safeResults.map((people) => {
+      const mainParts = (people.title || "").split(" | ");
+      const nameAndTitleParts = mainParts[0].split(" - ");
+      const jobTitle =
+        nameAndTitleParts.length > 1
+          ? nameAndTitleParts.slice(1).join(" - ").trim()
+          : "N/A";
+      const company = mainParts[1] ? mainParts[1].trim() : "N/A";
 
       return {
         ...people,
         jobTitle,
         company,
-        avatar: people.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(people.name)}&background=5b4fe5&color=fff&size=40`,
+        avatar:
+          people.image ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(people.name)}&background=5b4fe5&color=fff&size=40`,
         hasEmailOnFile: !!people.email,
         hasPhoneOnFile: !!people.phone,
-        email: '',
-        phone: '',
+        email: "",
+        phone: "",
         verified: false,
       };
     });
@@ -483,7 +590,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.totalResultsInServer = data.resultsNumber || 0;
     this.currentSearchId = data.searchId || null;
     this.currentOffset = data.offset;
-    this.currentSortOrder = data.sortBy || 'name_asc';
+    this.currentSortOrder = data.sortBy || "name_asc";
 
     if (data.creditsRemaining !== undefined) {
       this.authService.updateCurrentUserCredits(data.creditsRemaining);
@@ -504,12 +611,16 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private buildFacets(): void {
     const pool = Array.from(this.facetSourcePool.values());
-    this.jobTitleFacetOptions = this.countBy(pool, p => p.jobTitle);
-    this.locationFacetOptions = this.countBy(pool, p => p.location);
+    this.jobTitleFacetOptions = this.countBy(pool, (p) => p.jobTitle);
+    this.locationFacetOptions = this.countBy(pool, (p) => p.location);
     // Si el backend nunca manda hasEmailOnFile, todos quedan "undefined" y countBy los descarta
     // (valor vacío) — la faceta simplemente no aparece hasta que el backend la soporte.
-    this.emailFacetOptions = this.countBy(pool, p =>
-      p.hasEmailOnFile === undefined ? '' : (p.hasEmailOnFile ? 'Con email' : 'Sin email')
+    this.emailFacetOptions = this.countBy(pool, (p) =>
+      p.hasEmailOnFile === undefined
+        ? ""
+        : p.hasEmailOnFile
+          ? "Con email"
+          : "Sin email",
     );
     this.recomputeFacetChips();
   }
@@ -519,25 +630,28 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private recomputeFacetChips(): void {
     this.jobTitleFacetSelected = Array.from(this.selectedJobTitleFacets);
     this.jobTitleFacetGhost = this.jobTitleFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedJobTitleFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedJobTitleFacets.has(v));
 
     this.locationFacetSelected = Array.from(this.selectedLocationFacets);
     this.locationFacetGhost = this.locationFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedLocationFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedLocationFacets.has(v));
 
     this.emailFacetSelected = Array.from(this.selectedEmailFacets);
     this.emailFacetGhost = this.emailFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedEmailFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedEmailFacets.has(v));
   }
 
-  private countBy(items: People[], pick: (p: People) => string | undefined): FacetOption[] {
+  private countBy(
+    items: People[],
+    pick: (p: People) => string | undefined,
+  ): FacetOption[] {
     const counts = new Map<string, number>();
     for (const item of items) {
-      const value = (pick(item) || '').trim();
-      if (!value || value === 'N/A') continue;
+      const value = (pick(item) || "").trim();
+      if (!value || value === "N/A") continue;
       counts.set(value, (counts.get(value) || 0) + 1);
     }
     return Array.from(counts.entries())
@@ -546,6 +660,8 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private resetSearchState(keepQueryText = false) {
+    this.clearDirectorioParamsFromUrl();
+
     const previousQuery = this.currentQuery;
     this.currentQuery = "";
     if (!keepQueryText) {
@@ -557,7 +673,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentCategory = "";
     this.currentLocation = "";
     this.currentSearchId = null;
-    
+
     this.filteredResults = [];
     this.displayResults = [];
     this.selectedPeople = [];
@@ -602,9 +718,15 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async goToPage(page: number) {
-    if (page < 1 || (!this.currentQuery && !this.currentCategory && !this.currentLocation) || this.isLoading) return;
+    if (
+      page < 1 ||
+      (!this.currentQuery && !this.currentCategory && !this.currentLocation) ||
+      this.isLoading
+    )
+      return;
     const newOffset = (page - 1) * this.itemsPerPage;
-    if (newOffset >= this.totalResultsInServer && this.totalResultsInServer > 0) return;
+    if (newOffset >= this.totalResultsInServer && this.totalResultsInServer > 0)
+      return;
 
     this.isLoading = true;
     this.currentPage = page;
@@ -612,8 +734,13 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.peopleService.runSearchPeople(
-        this.currentQuery, newOffset, this.itemsPerPage, this.currentSortOrder,
-        this.currentSearchId ?? undefined, this.currentCategory, this.currentLocation
+        this.currentQuery,
+        newOffset,
+        this.itemsPerPage,
+        this.currentSortOrder,
+        this.currentSearchId ?? undefined,
+        this.currentCategory,
+        this.currentLocation,
       );
       this.processApiResponse(response);
     } catch (error) {
@@ -632,31 +759,41 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get showSelectionBar(): boolean {
-    return this.selectedPeople.length > 0
+    return this.selectedPeople.length > 0;
   }
 
   changeView(view: "grid" | "card" | "default") {
-    this.currentView = view
+    this.currentView = view;
     switch (view) {
-      case "grid": this.currentViewText = "Grid view"; break;
-      case "card": this.currentViewText = "Card view"; break;
-      case "default": this.currentViewText = "Default view"; break;
+      case "grid":
+        this.currentViewText = "Grid view";
+        break;
+      case "card":
+        this.currentViewText = "Card view";
+        break;
+      case "default":
+        this.currentViewText = "Default view";
+        break;
     }
   }
 
   toggleSelectAll() {
-    this.selectAllChecked = !this.selectAllChecked
-    this.selectedPeople = this.selectAllChecked ? this.displayResults.map(p => p.id) : [];
+    this.selectAllChecked = !this.selectAllChecked;
+    this.selectedPeople = this.selectAllChecked
+      ? this.displayResults.map((p) => p.id)
+      : [];
   }
 
   togglePeopleSelection(peopleId: number) {
-    const index = this.selectedPeople.indexOf(peopleId)
+    const index = this.selectedPeople.indexOf(peopleId);
     if (index > -1) {
-      this.selectedPeople.splice(index, 1)
+      this.selectedPeople.splice(index, 1);
     } else {
-      this.selectedPeople.push(peopleId)
+      this.selectedPeople.push(peopleId);
     }
-    this.selectAllChecked = this.displayResults.length > 0 && this.selectedPeople.length === this.displayResults.length;
+    this.selectAllChecked =
+      this.displayResults.length > 0 &&
+      this.selectedPeople.length === this.displayResults.length;
   }
 
   // ─── Guardar (individual / seleccionados / todos) — pide confirmación + tags, SIN disparar
@@ -670,34 +807,45 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     if (this.creditsRemaining < creditsNeeded) {
-      this.notificationService.showError(`No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`);
+      this.notificationService.showError(
+        `No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`,
+      );
       return;
     }
     this.openConfirm(
-      `¿Añadir ${creditsNeeded} ${creditsNeeded === 1 ? 'persona' : 'personas'} a tu lista? Esto usará ${creditsNeeded} crédito${creditsNeeded === 1 ? '' : 's'}.`,
-      'Añadir',
-      (listIds) => this.doAddToMyList(listIds)
+      `¿Añadir ${creditsNeeded} ${creditsNeeded === 1 ? "persona" : "personas"} a tu lista? Esto usará ${creditsNeeded} crédito${creditsNeeded === 1 ? "" : "s"}.`,
+      "Añadir",
+      (listIds) => this.doAddToMyList(listIds),
     );
   }
 
   private async doAddToMyList(listIds?: number[]): Promise<void> {
     this.isSaving = true;
     try {
-      const result = await this.myListPeopleService.savePeopleResults(this.selectedPeople, listIds);
+      const result = await this.myListPeopleService.savePeopleResults(
+        this.selectedPeople,
+        listIds,
+      );
       if (result.error) {
-        this.notificationService.showError(result.message || "Error al guardar las personas");
+        this.notificationService.showError(
+          result.message || "Error al guardar las personas",
+        );
       } else {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${result.saved} personas anadidas a tu lista.`);
+        this.notificationService.showSuccess(
+          `${result.saved} personas anadidas a tu lista.`,
+        );
         this.sessionSavedCount += result.saved || 0;
         this.selectedPeople = [];
         this.selectAllChecked = false;
-        this.onboardingService.completeOnboardingStepByKey('SAVE_LEAD');
+        this.onboardingService.completeOnboardingStepByKey("SAVE_LEAD");
       }
     } catch (error) {
-      this.notificationService.showError("Error de conexion al guardar las personas.");
+      this.notificationService.showError(
+        "Error de conexion al guardar las personas.",
+      );
     } finally {
       this.isSaving = false;
     }
@@ -707,32 +855,44 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   quickAddToList(people: People): void {
     this.openConfirm(
       `¿Añadir "${people.name}" a tu lista? Esto usará 1 crédito.`,
-      'Añadir',
-      (listIds) => this.doQuickAddToList(people, listIds)
+      "Añadir",
+      (listIds) => this.doQuickAddToList(people, listIds),
     );
   }
 
-  private async doQuickAddToList(people: People, listIds?: number[]): Promise<void> {
+  private async doQuickAddToList(
+    people: People,
+    listIds?: number[],
+  ): Promise<void> {
     if (this.savingSingleId !== null) return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.savingSingleId = people.id;
     try {
-      const result = await this.myListPeopleService.savePeopleResults([people.id], listIds);
+      const result = await this.myListPeopleService.savePeopleResults(
+        [people.id],
+        listIds,
+      );
       if (result.error) {
-        this.notificationService.showError(result.message || 'Error al guardar la persona');
+        this.notificationService.showError(
+          result.message || "Error al guardar la persona",
+        );
       } else {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${people.name} añadida a tu lista.`);
+        this.notificationService.showSuccess(
+          `${people.name} añadida a tu lista.`,
+        );
         this.sessionSavedCount++;
-        this.onboardingService.completeOnboardingStepByKey('SAVE_LEAD');
+        this.onboardingService.completeOnboardingStepByKey("SAVE_LEAD");
       }
     } catch (error) {
-      this.notificationService.showError('Error de conexión al guardar la persona.');
+      this.notificationService.showError(
+        "Error de conexión al guardar la persona.",
+      );
     } finally {
       this.savingSingleId = null;
     }
@@ -741,13 +901,15 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   // "Agregar Todos" — pide confirmación (con listas opcionales) antes de ejecutar.
   addAllToMyList(): void {
     if (!this.currentSearchId || this.totalResultsInServer === 0) {
-      this.notificationService.showError("No hay una busqueda activa o la busqueda no arrojo resultados.");
+      this.notificationService.showError(
+        "No hay una busqueda activa o la busqueda no arrojo resultados.",
+      );
       return;
     }
     this.openConfirm(
       `¿Añadir los ${this.totalResultsInServer} resultados de esta búsqueda a tu lista? Esto usará ${this.totalResultsInServer} créditos.`,
-      'Añadir todos',
-      (listIds) => this.doAddAllToMyList(listIds)
+      "Añadir todos",
+      (listIds) => this.doAddAllToMyList(listIds),
     );
   }
 
@@ -755,51 +917,105 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.currentSearchId || this.totalResultsInServer === 0) return;
     const creditsNeeded = this.totalResultsInServer;
     if (this.creditsRemaining < creditsNeeded) {
-      this.notificationService.showError(`No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`);
+      this.notificationService.showError(
+        `No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`,
+      );
       return;
     }
     this.isSavingAll = true;
     try {
-      const result = await this.myListPeopleService.saveAllPeopleResults(this.currentSearchId, listIds);
-      if (result && result.error === false && typeof result.saved === 'number') {
+      const result = await this.myListPeopleService.saveAllPeopleResults(
+        this.currentSearchId,
+        listIds,
+      );
+      if (
+        result &&
+        result.error === false &&
+        typeof result.saved === "number"
+      ) {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${result.saved} nuevas personas anadidas a tu lista.`);
+        this.notificationService.showSuccess(
+          `${result.saved} nuevas personas anadidas a tu lista.`,
+        );
         this.sessionSavedCount += result.saved;
         this.selectedPeople = [];
         this.selectAllChecked = false;
       } else {
-        const errorMessage = result?.message || "Ocurrio un error en el servidor. Por favor, intentalo de nuevo.";
+        const errorMessage =
+          result?.message ||
+          "Ocurrio un error en el servidor. Por favor, intentalo de nuevo.";
         this.notificationService.showError(errorMessage);
       }
     } catch (error) {
-      this.notificationService.showError("Error de conexion al guardar todas las personas.");
+      this.notificationService.showError(
+        "Error de conexion al guardar todas las personas.",
+      );
     } finally {
       this.isSavingAll = false;
     }
   }
 
-  downloadSelected() { this.notificationService.showError(`Downloading ${this.selectedPeople.length} selected people`) }
-  viewSelected() { this.notificationService.showError(`Viewing ${this.selectedPeople.length} selected people`) }
-  closeSelectionBar() { this.selectedPeople = []; this.selectAllChecked = false; }
+  downloadSelected() {
+    this.notificationService.showError(
+      `Downloading ${this.selectedPeople.length} selected people`,
+    );
+  }
+  viewSelected() {
+    this.notificationService.showError(
+      `Viewing ${this.selectedPeople.length} selected people`,
+    );
+  }
+  closeSelectionBar() {
+    this.selectedPeople = [];
+    this.selectAllChecked = false;
+  }
 
   // Exporta los resultados visibles (después de filtros). Igual que my-list-people.component.ts:
   // exporta exactamente los valores que hay en memoria — por eso email/phone salen vacíos
   // salvo que el usuario ya los haya revelado en esta sesión, sin ningún caso especial.
   exportToCsv(): void {
     if (this.displayResults.length === 0) {
-      this.notificationService.showError('No hay resultados para exportar.');
+      this.notificationService.showError("No hay resultados para exportar.");
       return;
     }
     const dataToExport = this.displayResults.map(
-      ({ id, name, fullName, jobTitle, company, location, countryCode, email, phone,
-        link, description, education, about, experiencies, snippet }) => ({
-        id, name, fullName, jobTitle, company, location, countryCode, email, phone,
-        link, description, education, about, experiencies, snippet,
-      })
+      ({
+        id,
+        name,
+        fullName,
+        jobTitle,
+        company,
+        location,
+        countryCode,
+        email,
+        phone,
+        link,
+        description,
+        education,
+        about,
+        experiencies,
+        snippet,
+      }) => ({
+        id,
+        name,
+        fullName,
+        jobTitle,
+        company,
+        location,
+        countryCode,
+        email,
+        phone,
+        link,
+        description,
+        education,
+        about,
+        experiencies,
+        snippet,
+      }),
     );
-    this.exportService.exportToCsv(dataToExport, 'people-search');
+    this.exportService.exportToCsv(dataToExport, "people-search");
   }
 
   // ─── Panel de detalle (drawer lateral derecho) ───
@@ -814,20 +1030,26 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ─── Revelar email/teléfono por fila (1 crédito por acción) ───
-  isRevealingEmail(id: number): boolean { return this.revealingEmailIds.has(id); }
-  isRevealingPhone(id: number): boolean { return this.revealingPhoneIds.has(id); }
+  isRevealingEmail(id: number): boolean {
+    return this.revealingEmailIds.has(id);
+  }
+  isRevealingPhone(id: number): boolean {
+    return this.revealingPhoneIds.has(id);
+  }
 
   async revealEmail(people: People): Promise<void> {
     if (people.email || this.revealingEmailIds.has(people.id)) return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.revealingEmailIds.add(people.id);
     try {
       const res = await this.peopleService.revealPeopleEmail(people.id);
       if (res.error || !res.value) {
-        this.notificationService.showError(res.message || 'No se pudo obtener el email.');
+        this.notificationService.showError(
+          res.message || "No se pudo obtener el email.",
+        );
       } else {
         people.email = res.value;
         if (res.creditsRemaining !== undefined) {
@@ -842,14 +1064,16 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   async revealPhone(people: People): Promise<void> {
     if (people.phone || this.revealingPhoneIds.has(people.id)) return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.revealingPhoneIds.add(people.id);
     try {
       const res = await this.peopleService.revealPeoplePhone(people.id);
       if (res.error || !res.value) {
-        this.notificationService.showError(res.message || 'No se pudo obtener el teléfono.');
+        this.notificationService.showError(
+          res.message || "No se pudo obtener el teléfono.",
+        );
       } else {
         people.phone = res.value;
         if (res.creditsRemaining !== undefined) {
@@ -861,14 +1085,29 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  get totalPages(): number { return Math.ceil(this.totalResultsInServer / this.itemsPerPage) }
-  getStartIndex(): number { return this.displayResults.length > 0 ? (this.currentPage - 1) * this.itemsPerPage + 1 : 0; }
-  getEndIndex(): number { return Math.min(this.currentPage * this.itemsPerPage, this.totalResultsInServer); }
-  getFormattedTotal(): string { return this.totalResultsInServer.toLocaleString() }
+  get totalPages(): number {
+    return Math.ceil(this.totalResultsInServer / this.itemsPerPage);
+  }
+  getStartIndex(): number {
+    return this.displayResults.length > 0
+      ? (this.currentPage - 1) * this.itemsPerPage + 1
+      : 0;
+  }
+  getEndIndex(): number {
+    return Math.min(
+      this.currentPage * this.itemsPerPage,
+      this.totalResultsInServer,
+    );
+  }
+  getFormattedTotal(): string {
+    return this.totalResultsInServer.toLocaleString();
+  }
 
   toggleDropdown(dropdownName: string) {
-    this.showViewDropdown = dropdownName === 'view' ? !this.showViewDropdown : false;
-    this.showSortDropdown = dropdownName === 'sort' ? !this.showSortDropdown : false;
+    this.showViewDropdown =
+      dropdownName === "view" ? !this.showViewDropdown : false;
+    this.showSortDropdown =
+      dropdownName === "sort" ? !this.showSortDropdown : false;
   }
 
   closeAllDropdowns() {
@@ -876,21 +1115,52 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showSortDropdown = false;
   }
 
-  goToUpgradePlan(): void { this.router.navigate(['/upgrade-plan']); }
+  goToUpgradePlan(): void {
+    this.router.navigate(["/upgrade-plan"]);
+  }
 
   public rowsRevealed = false;
 
   public applyLocalFilters(): void {
     let results = [...this.filteredResults];
-    if (this.localFilters.name) results = results.filter(p => p.name?.toLowerCase().includes(this.localFilters.name.toLowerCase()));
-    if (this.localFilters.jobTitle) results = results.filter(p => p.jobTitle?.toLowerCase().includes(this.localFilters.jobTitle.toLowerCase()));
-    if (this.localFilters.company) results = results.filter(p => p.company?.toLowerCase().includes(this.localFilters.company.toLowerCase()));
-    if (this.localFilters.location) results = results.filter(p => p.location?.toLowerCase().includes(this.localFilters.location.toLowerCase()));
-    if (this.selectedJobTitleFacets.size > 0) results = results.filter(p => this.selectedJobTitleFacets.has(p.jobTitle));
-    if (this.selectedLocationFacets.size > 0) results = results.filter(p => this.selectedLocationFacets.has(p.location));
+    if (this.localFilters.name)
+      results = results.filter((p) =>
+        p.name?.toLowerCase().includes(this.localFilters.name.toLowerCase()),
+      );
+    if (this.localFilters.jobTitle)
+      results = results.filter((p) =>
+        p.jobTitle
+          ?.toLowerCase()
+          .includes(this.localFilters.jobTitle.toLowerCase()),
+      );
+    if (this.localFilters.company)
+      results = results.filter((p) =>
+        p.company
+          ?.toLowerCase()
+          .includes(this.localFilters.company.toLowerCase()),
+      );
+    if (this.localFilters.location)
+      results = results.filter((p) =>
+        p.location
+          ?.toLowerCase()
+          .includes(this.localFilters.location.toLowerCase()),
+      );
+    if (this.selectedJobTitleFacets.size > 0)
+      results = results.filter((p) =>
+        this.selectedJobTitleFacets.has(p.jobTitle),
+      );
+    if (this.selectedLocationFacets.size > 0)
+      results = results.filter((p) =>
+        this.selectedLocationFacets.has(p.location),
+      );
     if (this.selectedEmailFacets.size > 0) {
-      results = results.filter(p => {
-        const label = p.hasEmailOnFile === undefined ? '' : (p.hasEmailOnFile ? 'Con email' : 'Sin email');
+      results = results.filter((p) => {
+        const label =
+          p.hasEmailOnFile === undefined
+            ? ""
+            : p.hasEmailOnFile
+              ? "Con email"
+              : "Sin email";
         return this.selectedEmailFacets.has(label);
       });
     }
@@ -900,7 +1170,9 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     // la animación se agrega DESPUÉS de que las filas ya se pintaron una vez. Por eso
     // arrancamos en "invisible" (ver CSS .rowin) y activamos .play en el siguiente tick.
     this.rowsRevealed = false;
-    setTimeout(() => { this.rowsRevealed = true; }, 0);
+    setTimeout(() => {
+      this.rowsRevealed = true;
+    }, 0);
   }
 
   public onFilterChange(): void {
@@ -919,26 +1191,32 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public toggleJobTitleFacet(value: string): void {
-    if (this.selectedJobTitleFacets.has(value)) this.selectedJobTitleFacets.delete(value);
+    if (this.selectedJobTitleFacets.has(value))
+      this.selectedJobTitleFacets.delete(value);
     else this.selectedJobTitleFacets.add(value);
     this.onFilterChange();
   }
 
   public toggleLocationFacet(value: string): void {
-    if (this.selectedLocationFacets.has(value)) this.selectedLocationFacets.delete(value);
+    if (this.selectedLocationFacets.has(value))
+      this.selectedLocationFacets.delete(value);
     else this.selectedLocationFacets.add(value);
     this.onFilterChange();
   }
 
   public toggleEmailFacet(value: string): void {
-    if (this.selectedEmailFacets.has(value)) this.selectedEmailFacets.delete(value);
+    if (this.selectedEmailFacets.has(value))
+      this.selectedEmailFacets.delete(value);
     else this.selectedEmailFacets.add(value);
     this.onFilterChange();
   }
 
   // Total de filtros activos — alimenta el badge numérico junto a "Ocultar/Mostrar filtros".
   public get activeFilterCount(): number {
-    let n = this.selectedJobTitleFacets.size + this.selectedLocationFacets.size + this.selectedEmailFacets.size;
+    let n =
+      this.selectedJobTitleFacets.size +
+      this.selectedLocationFacets.size +
+      this.selectedEmailFacets.size;
     if (this.localFilters.name) n++;
     if (this.localFilters.jobTitle) n++;
     if (this.localFilters.company) n++;
@@ -954,19 +1232,23 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedJobTitleFacets.clear();
     this.selectedLocationFacets.clear();
     this.selectedEmailFacets.clear();
-    this.localFilters = { name: '', jobTitle: '', company: '', location: '' };
+    this.localFilters = { name: "", jobTitle: "", company: "", location: "" };
     this.currentPage = 1;
     this.recomputeFacetChips();
     this.applyLocalFilters();
   }
 
-  public onSortChange(sortBy: string): void { this.currentSortOrder = sortBy; this.goToPage(1); this.closeAllDropdowns(); }
+  public onSortChange(sortBy: string): void {
+    this.currentSortOrder = sortBy;
+    this.goToPage(1);
+    this.closeAllDropdowns();
+  }
 
   // ════════════════════════════════════════════════════════════════
   //  Globo punteado interactivo (fondo decorativo de la vista inicial) — idéntico a companies
   // ════════════════════════════════════════════════════════════════
 
-  @HostListener('window:resize')
+  @HostListener("window:resize")
   onWindowResize(): void {
     this.resizeGlobe();
   }
@@ -976,7 +1258,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!canvas || this.globeInited) return;
     this.globeInited = true;
 
-    this.globeCtx = canvas.getContext('2d');
+    this.globeCtx = canvas.getContext("2d");
     this.pins = this.PIN_CITIES.map(([lat, lon]) => this.llToVec(lat, lon));
     this.resizeGlobe();
     this.loadLandmask();
@@ -986,12 +1268,16 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     // cada frame dispararía un ciclo completo de change detection de toda la app y termina
     // congelando el navegador.
     this.ngZone.runOutsideAngular(() => {
-      canvas.addEventListener('mousedown', (e) => this.onGlobePointerDown(e));
-      canvas.addEventListener('touchstart', (e) => this.onGlobePointerDown(e), { passive: true });
-      window.addEventListener('mousemove', this.boundOnGlobePointerMove);
-      window.addEventListener('touchmove', this.boundOnGlobePointerMove, { passive: false });
-      window.addEventListener('mouseup', this.boundOnGlobePointerUp);
-      window.addEventListener('touchend', this.boundOnGlobePointerUp);
+      canvas.addEventListener("mousedown", (e) => this.onGlobePointerDown(e));
+      canvas.addEventListener("touchstart", (e) => this.onGlobePointerDown(e), {
+        passive: true,
+      });
+      window.addEventListener("mousemove", this.boundOnGlobePointerMove);
+      window.addEventListener("touchmove", this.boundOnGlobePointerMove, {
+        passive: false,
+      });
+      window.addEventListener("mouseup", this.boundOnGlobePointerUp);
+      window.addEventListener("touchend", this.boundOnGlobePointerUp);
     });
   }
 
@@ -1000,21 +1286,21 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       cancelAnimationFrame(this.globeRafId);
       this.globeRafId = null;
     }
-    window.removeEventListener('mousemove', this.boundOnGlobePointerMove);
-    window.removeEventListener('touchmove', this.boundOnGlobePointerMove);
-    window.removeEventListener('mouseup', this.boundOnGlobePointerUp);
-    window.removeEventListener('touchend', this.boundOnGlobePointerUp);
+    window.removeEventListener("mousemove", this.boundOnGlobePointerMove);
+    window.removeEventListener("touchmove", this.boundOnGlobePointerMove);
+    window.removeEventListener("mouseup", this.boundOnGlobePointerUp);
+    window.removeEventListener("touchend", this.boundOnGlobePointerUp);
   }
 
   private loadLandmask(): void {
     const img = new Image();
     img.onload = () => {
       try {
-        const off = document.createElement('canvas');
+        const off = document.createElement("canvas");
         off.width = img.width;
         off.height = img.height;
-        const octx = off.getContext('2d');
-        if (!octx) throw new Error('no ctx');
+        const octx = off.getContext("2d");
+        if (!octx) throw new Error("no ctx");
         octx.drawImage(img, 0, 0);
         this.landData = octx.getImageData(0, 0, img.width, img.height).data;
         this.landW = img.width;
@@ -1027,7 +1313,9 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.startGlobeLoop();
     };
     img.onerror = () => {
-      console.warn(`No se pudo cargar el land-mask del globo en "${this.landmaskSrc}". Verifica que earth_landmask_720.png esté copiado en esa ruta pública.`);
+      console.warn(
+        `No se pudo cargar el land-mask del globo en "${this.landmaskSrc}". Verifica que earth_landmask_720.png esté copiado en esa ruta pública.`,
+      );
       this.maskFailed = true;
       this.buildGlobeDots();
       this.startGlobeLoop();
@@ -1039,31 +1327,45 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.landData) return true;
     const u = (lonD + 180) / 360;
     const v = (90 - latD) / 180;
-    const px = Math.min(this.landW - 1, Math.max(0, Math.floor(u * this.landW)));
-    const py = Math.min(this.landH - 1, Math.max(0, Math.floor(v * this.landH)));
+    const px = Math.min(
+      this.landW - 1,
+      Math.max(0, Math.floor(u * this.landW)),
+    );
+    const py = Math.min(
+      this.landH - 1,
+      Math.max(0, Math.floor(v * this.landH)),
+    );
     const i = (py * this.landW + px) * 4;
-    return (this.landData[i] + this.landData[i + 1] + this.landData[i + 2]) < 250;
+    return this.landData[i] + this.landData[i + 1] + this.landData[i + 2] < 250;
   }
 
   private buildGlobeDots(): void {
     this.globeDots = [];
     if (!this.landData && !this.maskFailed) return;
     for (let latD = -82; latD <= 84; latD += 2.0) {
-      const lat = latD * Math.PI / 180;
+      const lat = (latD * Math.PI) / 180;
       const n = Math.max(12, Math.round(Math.cos(lat) * 210));
       for (let i = 0; i < n; i++) {
         const lonD = -180 + (i / n) * 360;
         if (this.landData && !this.isLand(latD, lonD)) continue;
-        const lon = lonD * Math.PI / 180;
-        this.globeDots.push([Math.cos(lat) * Math.cos(lon), Math.sin(lat), -Math.cos(lat) * Math.sin(lon)]);
+        const lon = (lonD * Math.PI) / 180;
+        this.globeDots.push([
+          Math.cos(lat) * Math.cos(lon),
+          Math.sin(lat),
+          -Math.cos(lat) * Math.sin(lon),
+        ]);
       }
     }
   }
 
   private llToVec(latD: number, lonD: number): number[] {
-    const lat = latD * Math.PI / 180;
-    const lon = lonD * Math.PI / 180;
-    return [Math.cos(lat) * Math.cos(lon), Math.sin(lat), -Math.cos(lat) * Math.sin(lon)];
+    const lat = (latD * Math.PI) / 180;
+    const lon = (lonD * Math.PI) / 180;
+    return [
+      Math.cos(lat) * Math.cos(lon),
+      Math.sin(lat),
+      -Math.cos(lat) * Math.sin(lon),
+    ];
   }
 
   private resizeGlobe(): void {
@@ -1087,12 +1389,16 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private buildGlobeGradient(): void {
     if (!this.globeCtx) return;
     const g = this.globeCtx.createRadialGradient(
-      this.globeCx - this.globeR * 0.35, this.globeCy - this.globeR * 0.4, this.globeR * 0.05,
-      this.globeCx, this.globeCy, this.globeR * 1.02
+      this.globeCx - this.globeR * 0.35,
+      this.globeCy - this.globeR * 0.4,
+      this.globeR * 0.05,
+      this.globeCx,
+      this.globeCy,
+      this.globeR * 1.02,
     );
-    g.addColorStop(0, 'rgba(255,255,255,0)');
-    g.addColorStop(0.82, 'rgba(91,79,229,0.03)');
-    g.addColorStop(1, 'rgba(91,79,229,0.08)');
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.82, "rgba(91,79,229,0.03)");
+    g.addColorStop(1, "rgba(91,79,229,0.08)");
     this.globeGradient = g;
   }
 
@@ -1103,7 +1409,11 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     const y1 = y;
     const y2 = y1 * Math.cos(this.rotX) - z1 * Math.sin(this.rotX);
     const z2 = y1 * Math.sin(this.rotX) + z1 * Math.cos(this.rotX);
-    return { x: this.globeCx + x1 * this.globeR, y: this.globeCy - y2 * this.globeR, depth: z2 };
+    return {
+      x: this.globeCx + x1 * this.globeR,
+      y: this.globeCy - y2 * this.globeR,
+      depth: z2,
+    };
   }
 
   private startGlobeLoop(): void {
@@ -1141,7 +1451,8 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.renderGlobeFrame();
 
-    const stillAnimating = this.dragging || Math.abs(this.velY) > this.velEpsilon;
+    const stillAnimating =
+      this.dragging || Math.abs(this.velY) > this.velEpsilon;
     if (stillAnimating) {
       this.globeRafId = requestAnimationFrame(() => this.globeFrame());
     } else {
@@ -1185,15 +1496,15 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
       const baseR = 2.6;
       const glowR = baseR * 5;
       const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
-      g.addColorStop(0, 'rgba(91,79,229,0.35)');
-      g.addColorStop(0.5, 'rgba(91,79,229,0.10)');
-      g.addColorStop(1, 'rgba(91,79,229,0)');
+      g.addColorStop(0, "rgba(91,79,229,0.35)");
+      g.addColorStop(0.5, "rgba(91,79,229,0.10)");
+      g.addColorStop(1, "rgba(91,79,229,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(91,79,229,0.9)';
+      ctx.fillStyle = "rgba(91,79,229,0.9)";
       ctx.beginPath();
       ctx.arc(p.x, p.y, baseR, 0, Math.PI * 2);
       ctx.fill();
@@ -1203,8 +1514,8 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private onGlobePointerDown(e: MouseEvent | TouchEvent): void {
     this.dragging = true;
     this.velY = 0;
-    this.globeCanvasRef?.nativeElement.classList.add('drag');
-    const t = 'touches' in e ? e.touches[0] : e;
+    this.globeCanvasRef?.nativeElement.classList.add("drag");
+    const t = "touches" in e ? e.touches[0] : e;
     this.lastX = t.clientX;
     this.lastY = t.clientY;
     this.startGlobeLoop();
@@ -1212,7 +1523,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private onGlobePointerMove(e: MouseEvent | TouchEvent): void {
     if (!this.dragging) return;
-    const t = 'touches' in e ? e.touches[0] : e;
+    const t = "touches" in e ? e.touches[0] : e;
     const dx = t.clientX - this.lastX;
     const dy = t.clientY - this.lastY;
     this.lastX = t.clientX;
@@ -1220,7 +1531,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.rotY += dx * 0.006;
     this.rotX = Math.max(-1.2, Math.min(1.2, this.rotX + dy * 0.006));
     this.velY = dx * 0.006;
-    if ('touches' in e && e.cancelable) e.preventDefault();
+    if ("touches" in e && e.cancelable) e.preventDefault();
   }
 
   private onGlobePointerUp(): void {
@@ -1228,6 +1539,53 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.reducedMotion) {
       this.velY = 0;
     }
-    this.globeCanvasRef?.nativeElement.classList.remove('drag');
+    this.globeCanvasRef?.nativeElement.classList.remove("drag");
   }
+
+  private async loadSinglePersonFromDirectorio(
+    peopleId: number,
+  ): Promise<void> {
+    this.isLoading = true;
+    this.searchError = null;
+    this.showPlans = false;
+
+    const result = await this.peopleService.getPeopleResultById(peopleId);
+
+    this.isLoading = false;
+
+    if (result.error || !result.person) {
+      this.searchError =
+        result.message || "No se encontro la persona solicitada.";
+      return;
+    }
+
+    this.currentQuery =
+      result.person.fullName || result.person.name || `Persona #${peopleId}`;
+    this.currentCategory = "";
+    this.currentLocation = "";
+    this.currentSearchId = null;
+
+    this.updateStateFromData({
+      notFound: false,
+      searchString: this.currentQuery,
+      results: [result.person],
+      searchId: undefined,
+      statusSelect: 2,
+      resultsNumber: 1,
+      offset: 0,
+      limit: 1,
+      fetched: 1,
+      sortBy: this.currentSortOrder,
+    });
+
+    this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
+  }
+
+  private clearDirectorioParamsFromUrl(): void {
+    if (this.route.snapshot.queryParamMap.has('peopleId') || this.route.snapshot.queryParamMap.has('directorio')) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+    }
+  }
+
+
 }

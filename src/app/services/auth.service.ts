@@ -6,6 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
 import { LanguageService } from './language.service';
 import { UserProfile } from '../models/user-profile.model';
+import { DirectorioRedirectService } from './directorio-redirect.service';
 
 declare const clarity: any;
 
@@ -34,7 +35,8 @@ export class AuthService {
     private router: Router,
     public apiConfig: ApiConfigService,
     private languageService: LanguageService,
-    private http: HttpClient
+    private http: HttpClient,
+    private directorioRedirect: DirectorioRedirectService
   ) { }
 
   getOnboardingQuestions(): Observable<{ error: boolean, questions?: OnboardingQuestion[], message?: string }> {
@@ -108,7 +110,12 @@ export class AuthService {
       localStorage.setItem('csrfToken', csrfToken);
       await this.fetchUserProfile();
       if (navigate) {
-        this.router.navigate(['/dashboard']);
+        const nav = this.directorioRedirect.getRedirectNavigation();
+        if (nav) {
+          this.router.navigate(nav.commands, nav.extras);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       }
 
     } catch (error) {
