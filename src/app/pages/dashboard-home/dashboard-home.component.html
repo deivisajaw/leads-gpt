@@ -85,7 +85,7 @@
         </div>
 
         <div class="deal-kpi-card deal-kpi-card--open">
-          <div class="deal-kpi-icon"><i class="fas fa-spinner"></i></div>
+          <div class="deal-kpi-icon"><i class="fas fa-coins"></i></div>
           <div class="deal-kpi-body">
             <span class="deal-kpi-value">{{ dm.totalOpenAmount | currency:'USD':'symbol':'1.0-0' }}</span>
             <span class="deal-kpi-label">{{ "DASHBOARD.DEALS_OPEN_AMOUNT" | translate }}</span>
@@ -135,30 +135,21 @@
           </div>
         </div>
 
-        <!-- Stage breakdown list -->
-        <div class="card deal-stage-card">
+        <!-- Founder welcome video card -->
+        <div class="card founder-video-card">
           <div class="card-header">
-            <h3 class="card-title">{{ "DASHBOARD.DEALS_BY_STAGE" | translate }}</h3>
+            <h3 class="card-title">Mensaje de bienvenida</h3>
           </div>
-          <div class="card-body deal-stage-list-body">
-            <ng-container *ngIf="dm.stageBreakdown && dm.stageBreakdown.length > 0; else noStages">
-              <div *ngFor="let stage of dm.stageBreakdown" class="stage-row">
-                <div class="stage-dot" [style.background]="stage.stageColor || '#5b4fe5'"></div>
-                <div class="stage-info">
-                  <span class="stage-name">{{ stage.stageLabel }}</span>
-                  <span class="stage-type-badge stage-type-badge--{{ stage.stageType }}">
-                    {{ "DASHBOARD.STAGE_TYPE_" + (stage.stageType | uppercase) | translate }}
-                  </span>
-                </div>
-                <div class="stage-numbers">
-                  <span class="stage-count">{{ stage.count | number }}</span>
-                  <span class="stage-amount">{{ stage.totalAmount | currency:'USD':'symbol':'1.0-0' }}</span>
-                </div>
-              </div>
-            </ng-container>
-            <ng-template #noStages>
-              <div class="no-activity">{{ "DASHBOARD.NO_DEAL_DATA" | translate }}</div>
-            </ng-template>
+          <div class="card-body founder-video-body">
+            <video
+              class="founder-video"
+              src="videos/welcome.mp4"
+              controls
+              preload="metadata"
+            ></video>
+            <p class="founder-video-caption">
+              Cómo encontrar tus primeros leads y poner tu agente IA a trabajar.
+            </p>
           </div>
         </div>
 
@@ -402,7 +393,7 @@
 
   <ng-template #loadingOrError>
     <div *ngIf="isLoading" class="dashboard-loading">
-      <div class="loading-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
       <p>{{ "DASHBOARD.LOADING" | translate }}</p>
     </div>
 

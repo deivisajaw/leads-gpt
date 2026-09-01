@@ -14,7 +14,7 @@
   <div class="mls-lcontent">
     <!-- Loading State -->
     <div *ngIf="isLoading" class="mls-loading-state">
-      <div class="mls-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
       <p>{{ "MY_LISTS.LOADING" | translate }}</p>
     </div>
 
@@ -91,7 +91,7 @@
         {{ "MY_LISTS.CANCEL" | translate }}
       </button>
       <button class="mls-modal-btn-confirm" (click)="saveListModal()" [disabled]="isSavingList">
-        <span *ngIf="isSavingList" class="mls-btn-spinner"></span>
+        <img *ngIf="isSavingList" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isSavingList">{{ "MY_LISTS.SAVE" | translate }}</span>
       </button>
     </div>
@@ -114,7 +114,7 @@
         {{ "MY_LISTS.CANCEL" | translate }}
       </button>
       <button class="mls-modal-btn-confirm mls-danger" (click)="confirmDelete()" [disabled]="isDeleting">
-        <span *ngIf="isDeleting" class="mls-btn-spinner"></span>
+        <img *ngIf="isDeleting" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isDeleting">{{ "MY_LISTS.DELETE" | translate }}</span>
       </button>
     </div>

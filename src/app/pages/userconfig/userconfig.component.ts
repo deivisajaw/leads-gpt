@@ -1,8 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../services/language.service';
+import { LANGUAGES, AppLanguage, detectLanguage } from '../../services/languages.catalog';
+import { CurrencyService, CURRENCIES, AppCurrency } from '../../services/currency.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 import { OnboardingService } from "../../services/onboarding.service"; // NEW IMPORT
@@ -16,6 +18,43 @@ import { OnboardingService } from "../../services/onboarding.service"; // NEW IM
 })
 export class UserconfigComponent implements OnInit, OnDestroy {
   selectedLanguage: string = 'es';
+  langQuery = '';
+  readonly languages: AppLanguage[] = LANGUAGES;
+  readonly detectedLanguage: string = detectLanguage('es');
+
+  // ── moneda de visualización (el cobro sigue siendo en USD) ──
+  private currencySvc = inject(CurrencyService);
+  currencyQuery = '';
+  readonly currencies: AppCurrency[] = CURRENCIES;
+  readonly detectedCurrency: string = this.currencySvc.detect();
+  selectedCurrency: string = this.currencySvc.current;
+
+  filteredCurrencies(): AppCurrency[] {
+    const q = this.currencyQuery.trim().toLowerCase();
+    if (!q) return this.currencies;
+    return this.currencies.filter(c =>
+      c.code.toLowerCase().includes(q) ||
+      c.name.toLowerCase().includes(q) ||
+      c.symbol.includes(q));
+  }
+
+  selectCurrency(code: string): void {
+    if (this.isLoading) return;
+    this.selectedCurrency = code;
+    this.currencySvc.setCurrency(code);   // se aplica de inmediato
+  }
+
+  /** Filtra por nombre nativo, nombre en inglés o código. Los listos primero. */
+  filteredLanguages(): AppLanguage[] {
+    const q = this.langQuery.trim().toLowerCase();
+    const list = q
+      ? this.languages.filter(l =>
+          l.native.toLowerCase().includes(q) ||
+          l.english.toLowerCase().includes(q) ||
+          l.code.startsWith(q))
+      : this.languages;
+    return [...list].sort((a, b) => Number(b.ready) - Number(a.ready));
+  }
   initialLanguage: string = 'es';
   isLoading: boolean = false;
   message: string | null = null;
@@ -71,7 +110,8 @@ export class UserconfigComponent implements OnInit, OnDestroy {
   }
 
   selectLanguage(lang: string): void {
-    if (!this.isLoading) {
+    const target = this.languages.find(l => l.code === lang);
+    if (!this.isLoading && target?.ready) {
       this.selectedLanguage = lang;
     }
   }

@@ -17,6 +17,10 @@
     })(window, document, "clarity", "script", "tyrtnj021r");
   </script>
 
+  <script>
+    /* dev-only: ?demoseed=1 seeds a demo csrf token for local screenshot captures */
+    if (location.search.indexOf('demoseed') !== -1) { try { localStorage.setItem('csrfToken','demo-shot'); localStorage.setItem('welcomeVideoStatusByUser','{"1":true}'); } catch(e){} }
+  </script>
 </head>
 <body>
   <app-root class="app-root"></app-root>

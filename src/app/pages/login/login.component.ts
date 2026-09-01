@@ -6,11 +6,12 @@ import { AuthService, OnboardingQuestion } from '../../services/auth.service';
 import { SignupService } from '../../services/signup.service';
 import { SignupPayload } from '../../models/signup.model';
 import { OnboardingWizardComponent } from '../../components/onboarding-wizard/onboarding-wizard.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, OnboardingWizardComponent],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, OnboardingWizardComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -207,28 +208,47 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.loading = true;
       this.cdr.detectChanges();
 
-      try {
-        await this.authService.login(userEmail, userPassword, false);
-        // El servicio de autenticación manejará la redirección automática al dashboard/home
+      // El usuario tarda unos segundos en aprovisionarse en el backend después del
+      // webhook de registro, así que el login automático se reintenta con espera
+      // (el overlay "Preparando tu cuenta…" del wizard cubre este tiempo).
+      const retryDelays = [1500, 2500, 3000, 4000, 4000];
+      let loggedIn = false;
+      let lastLoginError: any = null;
+
+      for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+        try {
+          await this.authService.login(userEmail, userPassword, false);
+          loggedIn = true;
+          break;
+        } catch (loginError: any) {
+          lastLoginError = loginError;
+          if (attempt < retryDelays.length) {
+            await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
+          }
+        }
+      }
+
+      if (loggedIn) {
+        // handleWebhookSuccess reproduce el video cinemático y luego navega al dashboard
         if (this.onboardingWizard) {
           this.onboardingWizard.handleWebhookSuccess();
         } else {
-          // Fallback en caso de que no se encuentre la referencia
           this.router.navigate(['/dashboard']);
         }
-      } catch (loginError: any) {
-        // Si el login automático falla, mostramos mensaje y redirigimos al tab de login
+      } else {
+        // Solo si tras todos los reintentos no se pudo: mensaje y tab de login
+        this.showOnboardingWizard = false;
         this.loginMessage = '¡Registro exitoso! Por favor, inicia sesión con tus nuevas credenciales.';
         this.router.navigate(['/login'], {
           state: {
             signupSuccessMessage: '¡Registro exitoso! Por favor, inicia sesión con tus nuevas credenciales.'
           }
         });
-        console.error('Error al iniciar sesión automáticamente:', loginError);
-      } finally {
-        this.loading = false;
-        this.cdr.detectChanges();
+        console.error('Error al iniciar sesión automáticamente tras reintentos:', lastLoginError);
       }
+
+      this.loading = false;
+      this.cdr.detectChanges();
 
     } catch (error: any) {
       this.signupErrorMessage = error.message || 'Ha ocurrido un error en el registro.';

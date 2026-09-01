@@ -1,287 +1,492 @@
-<!-- Fondo difuminado -->
-<div class="background-overlay">
-  <img src="/images/background.png" alt="Background" class="background-image" />
-</div>
+<div class="login-page">
 
-<!-- Modal Container -->
-<div class="modal-container">
-  <div class="modal-card">
-    <div class="modal-content">
-      <!-- Lado Izquierdo - Formularios -->
-      <div class="form-section">
-        <div class="modal-header">
-          <div class="modal-header-logo">
-            <img src="/images/ajaw-logo.png" alt="Logo" class="logo" />
+  <!-- ══════════ LEFT — AJAW world ══════════ -->
+  <aside class="world-panel" aria-hidden="true">
+    <div class="stars stars-far"></div>
+    <div class="stars stars-near"></div>
+    <div class="world-glow"></div>
+
+    <!-- círculos centrales (uno por escena, anillo lento) -->
+    <div class="scene-icons">
+      <span class="si si-1">
+        <svg viewBox="0 0 60 60"><circle class="si-ring" cx="30" cy="30" r="26"/></svg>
+        <i class="fas fa-database"></i>
+      </span>
+      <span class="si si-2">
+        <svg viewBox="0 0 60 60"><circle class="si-ring" cx="30" cy="30" r="26"/></svg>
+        <i class="fab fa-instagram"></i>
+      </span>
+      <span class="si si-3">
+        <svg viewBox="0 0 60 60"><circle class="si-ring" cx="30" cy="30" r="26"/></svg>
+        <i class="fas fa-dollar-sign"></i>
+      </span>
+    </div>
+
+    <!-- ── ESCENA 1 · datos + dinero ── -->
+    <div class="scene scene-1">
+
+      <div class="wpos headline-pos cyc" style="animation-delay: 0s;">
+        <h2 class="scene-title">{{ "LOGIN_V2.W1_TITLE_A" | translate }} <em>{{ "LOGIN_V2.W1_TITLE_B" | translate }}</em> {{ "LOGIN_V2.W1_TITLE_C" | translate }}</h2>
+        <p class="scene-sub">{{ "LOGIN_V2.W1_SUB" | translate }}</p>
+      </div>
+
+      <div class="wpos pos-tr cyc" style="animation-delay: 0.15s;">
+        <div class="widget person-card float-a">
+          <span class="pc-intent">
+            <span class="pc-intent-label"><i class="fas fa-crosshairs"></i> {{ "LOGIN_V2.C_INTENT" | translate }}</span>
+            {{ "LOGIN_V2.C_INTENT_TXT" | translate }} <b>+47%</b>
+          </span>
+          <span class="pc-verified"><i class="fas fa-circle-check"></i> {{ "LOGIN_V2.C_VERIFIED" | translate }}</span>
+          <div class="pc-main">
+            <img class="pc-face" src="/images/avatars/olivia.jpg" alt="" />
+            <div class="pc-info">
+              <span class="pc-name">Olivía Rodríguez</span>
+              <span class="pc-role">{{ "LOGIN_V2.C_ROLE" | translate }}</span>
+              <span class="pc-line"><i class="fas fa-envelope"></i> olivia&#64;boitshift.com</span>
+              <span class="pc-line"><i class="fas fa-phone"></i> 314 798 2468</span>
+            </div>
+          </div>
+          <div class="pc-footer">
+            <span class="pc-cta"><i class="fas fa-magnifying-glass"></i> {{ "LOGIN_V2.C_FINDALL" | translate }}</span>
+            <span class="pc-tag">{{ "LOGIN_V2.C_CLOSED" | translate }} · <b>$707.318</b></span>
           </div>
         </div>
+      </div>
 
-        <div class="form-content">
-          <!-- Tabs -->
-          <div class="tabs-container">
-            <button
-              class="tab-button"
-              [class.active]="activeTab === 'login'"
-              (click)="setActiveTab('login')"
-            >
-              Login
-            </button>
-            <button
-              class="tab-button"
-              [class.active]="activeTab === 'signup'"
-              (click)="setActiveTab('signup')"
-            >
-              Sign Up
-            </button>
+      <div class="wpos pos-bl cyc" style="animation-delay: 0.3s;">
+        <div class="widget money-card float-b">
+          <span class="w-label">{{ "LOGIN_V2.C_CLOSED" | translate }}</span>
+          <span class="w-money">$707.318</span>
+          <div class="w-bars">
+            <span style="height: 34%"></span><span style="height: 58%"></span><span style="height: 42%"></span><span style="height: 76%"></span><span style="height: 52%"></span><span style="height: 90%"></span><span style="height: 66%"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-tl cyc" style="animation-delay: 0.45s;">
+        <div class="widget leads-card float-c">
+          <div class="lc-head">
+            <span>{{ "LOGIN_V2.C_NEWLEADS" | translate }}</span>
+            <span class="lc-badge">NEW</span>
+          </div>
+          <div class="lc-row">
+            <img src="/images/avatars/lead1.jpg" alt="" />
+            <img src="/images/avatars/lead2.jpg" alt="" />
+            <img src="/images/avatars/lead3.jpg" alt="" />
+            <img src="/images/avatars/lead4.jpg" alt="" />
+            <span class="lc-more">+145</span>
+          </div>
+          <span class="lc-foot"><i class="fas fa-arrows-rotate"></i> {{ "LOGIN_V2.C_JOBCHANGE" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wpos pos-ml cyc" style="animation-delay: 0.6s;">
+        <div class="widget search-pill float-b">
+          <span class="sp-ico"><i class="fas fa-magnifying-glass"></i></span>
+          <div class="sp-text">
+            <span class="sp-q">{{ "LOGIN_V2.C_SEARCH" | translate }}</span>
+            <span class="sp-r">{{ "LOGIN_V2.C_SEARCH_R" | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-br cyc" style="animation-delay: 0.75s;">
+        <div class="widget money-card stat-card float-c">
+          <span class="w-label"><i class="fas fa-circle-check w-label-ico"></i> {{ "LOGIN_V2.C_MOBILES" | translate }}</span>
+          <span class="w-money">2.847</span>
+          <span class="w-sub">{{ "LOGIN_V2.C_MOBILES_SUB" | translate }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ESCENA 2 · agentes IA ── -->
+    <div class="scene scene-2">
+
+      <div class="wpos headline-pos cyc" style="animation-delay: 7s;">
+        <h2 class="scene-title">{{ "LOGIN_V2.W2_TITLE_A" | translate }} <em>{{ "LOGIN_V2.W2_TITLE_B" | translate }}</em> {{ "LOGIN_V2.W2_TITLE_C" | translate }}</h2>
+        <p class="scene-sub">{{ "LOGIN_V2.W2_SUB" | translate }}</p>
+      </div>
+
+      <div class="wpos pos-tl cyc" style="animation-delay: 7.15s;">
+        <div class="widget call-card float-a">
+          <span class="cc-ico"><i class="fas fa-phone"></i></span>
+          <div class="cc-info">
+            <span class="cc-title">{{ "LOGIN_V2.C_CALL" | translate }}</span>
+            <span class="cc-sub">2:14 · cita agendada <i class="fas fa-circle-check ok"></i></span>
+          </div>
+          <span class="cc-wave"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+      </div>
+
+      <div class="wpos pos-tr cyc" style="animation-delay: 7.3s;">
+        <div class="widget wa-bubble float-b">
+          <span class="wa-ico"><i class="fab fa-whatsapp"></i></span>
+          <div class="wa-text">
+            <span class="wa-name">{{ "LOGIN_V2.C_WA" | translate }}</span>
+            {{ "LOGIN_V2.C_WA_TXT" | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-ml cyc" style="animation-delay: 7.45s;">
+        <div class="widget wa-bubble ig-bubble float-c">
+          <span class="wa-ico ig-ico"><i class="fab fa-instagram"></i></span>
+          <div class="wa-text">
+            <span class="wa-name ig-name">{{ "LOGIN_V2.C_IG" | translate }}</span>
+            {{ "LOGIN_V2.C_IG_TXT" | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-br cyc" style="animation-delay: 7.6s;">
+        <div class="widget money-card stat-card float-a">
+          <span class="w-label"><i class="fas fa-calendar-check w-label-ico"></i> {{ "LOGIN_V2.C_MEETINGS" | translate }}</span>
+          <span class="w-money">12 <b class="w-up"><i class="fas fa-arrow-trend-up"></i> +40%</b></span>
+          <span class="w-sub">{{ "LOGIN_V2.C_MEETINGS_SUB" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wpos pos-bl cyc" style="animation-delay: 7.75s;">
+        <div class="widget money-card stat-card float-b">
+          <span class="w-label"><i class="fas fa-paper-plane w-label-ico"></i> {{ "LOGIN_V2.C_FOLLOWUPS" | translate }}</span>
+          <span class="w-money">1.240</span>
+          <div class="w-bars">
+            <span style="height: 30%"></span><span style="height: 48%"></span><span style="height: 40%"></span><span style="height: 66%"></span><span style="height: 58%"></span><span style="height: 82%"></span><span style="height: 100%"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ESCENA 3 · revenue ── -->
+    <div class="scene scene-3">
+
+      <div class="wpos headline-pos cyc" style="animation-delay: 14s;">
+        <h2 class="scene-title">{{ "LOGIN_V2.W3_TITLE_A" | translate }} <em>{{ "LOGIN_V2.W3_TITLE_B" | translate }}</em></h2>
+        <p class="scene-sub">{{ "LOGIN_V2.W3_SUB" | translate }}</p>
+      </div>
+
+      <div class="wpos pos-tr cyc" style="animation-delay: 14.15s;">
+        <div class="widget money-card cash-card float-a">
+          <span class="w-label">{{ "LOGIN_V2.C_CASH" | translate }}</span>
+          <span class="w-money">$118.400 <b class="w-up"><i class="fas fa-arrow-trend-up"></i> +32%</b></span>
+          <div class="w-bars w-bars-green">
+            <span style="height: 30%"></span><span style="height: 44%"></span><span style="height: 38%"></span><span style="height: 62%"></span><span style="height: 74%"></span><span style="height: 88%"></span><span style="height: 100%"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-tl cyc" style="animation-delay: 14.3s;">
+        <div class="widget deal-card float-b">
+          <span class="dc-ico">🎉</span>
+          <div class="dc-info">
+            <span class="dc-title">{{ "LOGIN_V2.C_DEALWON" | translate }} <b>$10.000</b></span>
+            <span class="dc-sub">Katherine Ramírez · Bogotá</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wpos pos-bl cyc" style="animation-delay: 14.45s;">
+        <div class="widget money-card stat-card float-c">
+          <span class="w-label"><i class="fas fa-filter w-label-ico"></i> {{ "LOGIN_V2.C_PIPELINE" | translate }}</span>
+          <span class="w-money">$86.500</span>
+          <span class="w-sub">{{ "LOGIN_V2.C_PIPELINE_SUB" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wpos pos-ml cyc" style="animation-delay: 14.6s;">
+        <div class="widget rate-card float-a">
+          <span class="rc-num">+47%</span>
+          <span class="rc-label">{{ "LOGIN_V2.C_RESPONSE" | translate }}</span>
+        </div>
+      </div>
+
+      <div class="wpos pos-br cyc" style="animation-delay: 14.75s;">
+        <div class="widget money-card stat-card float-b">
+          <span class="w-label"><i class="fas fa-rocket w-label-ico"></i> {{ "LOGIN_V2.C_ROI" | translate }}</span>
+          <span class="w-money">8.4x <b class="w-up"><i class="fas fa-sack-dollar"></i> $118K</b></span>
+          <span class="w-sub">{{ "LOGIN_V2.C_ROI_SUB" | translate }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="dots">
+      <span class="dot dot-1"></span>
+      <span class="dot dot-2"></span>
+      <span class="dot dot-3"></span>
+    </div>
+  </aside>
+
+  <!-- ══════════ RIGHT — form ══════════ -->
+  <main class="form-panel">
+    <div class="form-card glass-card">
+
+      <div class="brand-row">
+        <img src="/images/ajaw-logo.png" alt="AJAW" class="brand-logo" />
+      </div>
+
+      <h1 class="form-title">{{ "LOGIN_V2.TITLE" | translate }}</h1>
+      <p class="form-subtitle">{{ "LOGIN_V2.SUBTITLE" | translate }}</p>
+
+      <!-- Tabs -->
+      <div class="tabs-container">
+        <button
+          class="tab-button"
+          [class.active]="activeTab === 'login'"
+          (click)="setActiveTab('login')"
+        >
+          Iniciar sesión
+        </button>
+        <button
+          class="tab-button"
+          [class.active]="activeTab === 'signup'"
+          (click)="setActiveTab('signup')"
+        >
+          Crear cuenta
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <div class="tab-content" [class.active]="activeTab === 'login'">
+        <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+          <div class="form-group">
+            <label for="login-email">{{ "LOGIN_V2.EMAIL" | translate }}</label>
+            <input
+              type="email"
+              id="login-email" autocomplete="username" inputmode="email"
+              placeholder="tu@empresa.com"
+              required
+              [(ngModel)]="username"
+              name="username"
+              [disabled]="loading"
+            />
           </div>
 
-          <!-- Login Form -->
-          <div class="tab-content" [class.active]="activeTab === 'login'">
-            <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
-              <div class="form-group">
-                <label for="login-email">Business Email</label>
-                <input
-                  type="email"
-                  id="login-email"
-                  placeholder=""
-                  required
-                  [(ngModel)]="username"
-                  name="username"
-                  [disabled]="loading"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="login-password">Password</label>
-                <div class="password-input">
-                  <input
-                    [type]="passwordFieldType"
-                    id="login-password"
-                    placeholder=""
-                    required
-                    [(ngModel)]="password"
-                    name="password"
-                    [disabled]="loading"
-                  />
-                  <button
-                    type="button"
-                    class="password-toggle"
-                    (click)="togglePasswordVisibility()"
-                  >
-                    <i
-                      class="fa-solid"
-                      [class.fa-eye]="passwordFieldType === 'password'"
-                      [class.fa-eye-slash]="passwordFieldType !== 'password'"
-                    ></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <a routerLink="/recovery-password" class="forgot-password">Forgot password?</a>
-              </div>
-
+          <div class="form-group">
+            <label for="login-password">{{ "LOGIN_V2.PASSWORD" | translate }}</label>
+            <div class="password-input">
+              <input
+                [type]="passwordFieldType"
+                id="login-password" autocomplete="current-password"
+                placeholder=""
+                required
+                [(ngModel)]="password"
+                name="password"
+                [disabled]="loading"
+              />
               <button
-                type="submit"
-                class="submit-btn"
-                [disabled]="loading || !loginForm.form.valid"
+                type="button"
+                class="password-toggle"
+                [attr.aria-label]="(passwordFieldType === 'password' ? 'LOGIN_V2.SHOW_PASSWORD' : 'LOGIN_V2.HIDE_PASSWORD') | translate"
+                (click)="togglePasswordVisibility()"
               >
-                {{ loading ? "Iniciando..." : "Login" }}
+                <i
+                  class="fa-solid"
+                  [class.fa-eye]="passwordFieldType === 'password'"
+                  [class.fa-eye-slash]="passwordFieldType !== 'password'"
+                ></i>
               </button>
-            </form>
-            <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
-            <div *ngIf="loginMessage" class="success-message-wrapper">
-                {{ loginMessage }}
             </div>
           </div>
 
-          <!-- Signup Form -->
-          <div class="tab-content" [class.active]="activeTab === 'signup'">
-            <div class="welcome-text">
-              <h2>Bienvenido Ajaw AI!</h2>
-              <p>
-                Registrate ahora y obten tu
-                <span class="highlight">100 leads gratis</span>
-              </p>
-            </div>
-
-            <form class="auth-form" (ngSubmit)="onSignup()" #signupForm="ngForm" novalidate>
-              <div class="form-group">
-                <input type="text" placeholder="Nombres" required [(ngModel)]="signupData.firstName" name="signupFirstName" #signupFirstName="ngModel" (ngModelChange)="validateSignupState()" />
-                <div *ngIf="signupFirstName.invalid && (signupFirstName.touched || signupSubmitted)" class="error-message">
-                  <small>El nombre es requerido.</small>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <input type="text" placeholder="Apellidos" required [(ngModel)]="signupData.lastName" name="signupLastName" #signupLastName="ngModel" (ngModelChange)="validateSignupState()" />
-                <div *ngIf="signupLastName.invalid && (signupLastName.touched || signupSubmitted)" class="error-message">
-                  <small>El apellido es requerido.</small>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <input type="text" placeholder="Empresa" required [(ngModel)]="signupData.companyName" name="signupCompanyName" #signupCompanyName="ngModel" (ngModelChange)="validateSignupState()" />
-                <div *ngIf="signupCompanyName.invalid && (signupCompanyName.touched || signupSubmitted)" class="error-message">
-                  <small>El nombre de la empresa es requerido.</small>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <input type="email" placeholder="Email" required email [(ngModel)]="signupData.email" name="signupEmail" #signupEmail="ngModel" (ngModelChange)="validateSignupState()" />
-                <div *ngIf="signupEmail.invalid && (signupEmail.touched || signupSubmitted)" class="error-message">
-                  <small *ngIf="signupEmail.errors?.['required']">El email es requerido.</small>
-                  <small *ngIf="signupEmail.errors?.['email']">Por favor, introduce un email válido.</small>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="phone-group">
-                  <select class="country-code" [(ngModel)]="signupData.prefixCountyPhone" name="signupPrefix" (ngModelChange)="validateSignupState()">
-                    <!-- LATINOAMÉRICA -->
-                    <option value="+57">🇨🇴 +57</option>
-                    <option value="+52">🇲🇽 +52</option>
-                    <option value="+54">🇦🇷 +54</option>
-                    <option value="+55">🇧🇷 +55</option>
-                    <option value="+56">🇨🇱 +56</option>
-                    <option value="+51">🇵🇪 +51</option>
-                    <option value="+58">🇻🇪 +58</option>
-                    <option value="+593">🇪🇨 +593</option>
-                    <option value="+591">🇧🇴 +591</option>
-                    <option value="+595">🇵🇾 +595</option>
-                    <option value="+598">🇺🇾 +598</option>
-                    <option value="+502">🇬🇹 +502</option>
-                    <option value="+503">🇸🇻 +503</option>
-                    <option value="+504">🇭🇳 +504</option>
-                    <option value="+506">🇨🇷 +506</option>
-                    <option value="+507">🇵🇦 +507</option>
-                    <option value="+509">🇭🇹 +509</option>
-                    <option value="+505">🇳🇮 +505</option>
-                    <option value="+508">🇵🇲 +508</option>
-
-                    <!-- CARIBE -->
-                    <option value="+1-809">🇩🇴 +1 809</option>
-                    <option value="+1-829">🇩🇴 +1 829</option>
-                    <option value="+1-849">🇩🇴 +1 849</option>
-                    <option value="+53">🇨🇺 +53</option>
-                    <option value="+1-868">🇹🇹 +1 868</option>
-                    <option value="+1-876">🇯🇲 +1 876</option>
-                    <option value="+1-869">🇰🇳 +1 869</option>
-                    <option value="+1-758">🇱🇨 +1 758</option>
-                    <option value="+1-784">🇻🇨 +1 784</option>
-                    <option value="+1-721">🇦🇼 +1 721</option>
-                    <option value="+1-242">🇧🇸 +1 242</option>
-                    <option value="+1-441">🇧🇲 +1 441</option>
-                    <option value="+1-345">🇰🇾 +1 345</option>
-                    <option value="+1-664">🇲🇸 +1 664</option>
-
-                    <!-- NORTEAMÉRICA -->
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+1">🇨🇦 +1</option>
-
-                    <!-- EUROPA -->
-                    <option value="+34">🇪🇸 +34</option>
-                    <option value="+33">🇫🇷 +33</option>
-                    <option value="+49">🇩🇪 +49</option>
-                    <option value="+39">🇮🇹 +39</option>
-                    <option value="+44">🇬🇧 +44</option>
-                    <option value="+351">🇵🇹 +351</option>
-                    <option value="+31">🇳🇱 +31</option>
-                    <option value="+41">🇨🇭 +41</option>
-                    <option value="+46">🇸🇪 +46</option>
-                    <option value="+47">🇳🇴 +47</option>
-
-                    <!-- ASIA -->
-                    <option value="+81">🇯🇵 +81</option>
-                    <option value="+82">🇰🇷 +82</option>
-                    <option value="+86">🇨🇳 +86</option>
-                    <option value="+91">🇮🇳 +91</option>
-                    <option value="+65">🇸🇬 +65</option>
-
-                    <!-- ÁFRICA -->
-                    <option value="+27">🇿🇦 +27</option>
-                    <option value="+212">🇲🇦 +212</option>
-                    <option value="+233">🇬🇭 +233</option>
-                    <option value="+234">🇳🇬 +234</option>
-
-                    <!-- OCEANÍA -->
-                    <option value="+61">🇦🇺 +61</option>
-                    <option value="+64">🇳🇿 +64</option>
-                  </select>
-                  <input type="tel" placeholder="Phone Number" required [(ngModel)]="signupData.phoneNumber" name="signupPhone" #signupPhone="ngModel" (ngModelChange)="validateSignupState()" />
-                </div>
-                <div *ngIf="signupPhone.invalid && (signupPhone.touched || signupSubmitted)" class="error-message" style="width: 100%;">
-                  <small>El número de teléfono es requerido.</small>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="password-input">
-                  <input [type]="signupPasswordFieldType" placeholder="Password" required [(ngModel)]="signupData.password" name="signupPassword" #signupPassword="ngModel" (ngModelChange)="validateSignupState()" />
-                  <button type="button" class="password-toggle" (click)="toggleSignupPasswordVisibility()">
-                    <i class="fa-solid" [class.fa-eye]="signupPasswordFieldType === 'password'" [class.fa-eye-slash]="signupPasswordFieldType !== 'password'"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="password-input">
-                  <input [type]="signupPasswordFieldType" placeholder="Confirm Password" required [(ngModel)]="signupRepeatPassword" name="signupRepeatPassword" #signupRepeatPasswordModel="ngModel" (ngModelChange)="validateSignupState()" />
-                </div>
-              </div>
-
-              <!-- Password Validation Checklist -->
-              <div class="password-validation-checklist" *ngIf="signupPassword.dirty || signupRepeatPasswordModel.dirty">
-                <div *ngIf="!passwordValidationState.length" class="validation-item">Al menos 8 caracteres</div>
-                <div *ngIf="!passwordValidationState.uppercase" class="validation-item">Una mayúscula</div>
-                <div *ngIf="!passwordValidationState.lowercase" class="validation-item">Una minúscula</div>
-                <div *ngIf="!passwordValidationState.number" class="validation-item">Un número</div>
-                <div *ngIf="!passwordValidationState.symbol" class="validation-item">Un símbolo (&#64;$!%*?&.)</div>
-                <div *ngIf="!passwordValidationState.match" class="validation-item">Las contraseñas coinciden</div>
-              </div>
-              
-              <div *ngIf="signupErrorMessage" class="error-message general-error">
-                {{ signupErrorMessage }}
-              </div>
-              
-              <div *ngIf="signupSuccessMessage" class="success-message">
-                {{ signupSuccessMessage }}
-              </div>
-
-              <button type="submit" class="submit-btn" [disabled]="isSignupButtonDisabled || signupLoading">
-                {{ signupLoading ? "Registrando..." : "Agree and Continue →" }}
-              </button>
-              
-              <div class="terms-text">
-                Al enviar este formulario, usted acepta nuestros
-                Terminos de uso,
-                Politica de privacidad, y da su consentimiento
-                para recibir comunicaciones de marketing de nuestra parte.
-              </div>
-            </form>
+          <div class="form-actions">
+            <a routerLink="/recovery-password" class="forgot-password">{{ "LOGIN_V2.FORGOT" | translate }}</a>
           </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="loading || !loginForm.form.valid"
+          >
+            <img *ngIf="loading" class="gear-loader-sm btn-gear" src="/images/gear_hr_256.png" alt="" />
+            {{ (loading ? "LOGIN_V2.ENTERING" : "LOGIN_V2.ENTER") | translate }}
+          </button>
+        </form>
+        <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <div *ngIf="loginMessage" class="success-message-wrapper">
+            {{ loginMessage }}
         </div>
+      </div>
 
-        <!-- Footer -->
-        <div class="modal-footer">
+      <!-- Signup Form -->
+      <div class="tab-content" [class.active]="activeTab === 'signup'">
+        <div class="welcome-text">
           <p>
-            © Ajaw 2025 • Privacy • Terms of Use
+            {{ "LOGIN_V2.SIGNUP_PROMO" | translate }}
+            <span class="highlight">{{ "LOGIN_V2.SIGNUP_PROMO_HL" | translate }}</span>
           </p>
         </div>
 
+        <form class="auth-form" (ngSubmit)="onSignup()" #signupForm="ngForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" [attr.placeholder]='"LOGIN_V2.F_FIRSTNAME" | translate' required [(ngModel)]="signupData.firstName" name="signupFirstName" autocomplete="given-name" #signupFirstName="ngModel" (ngModelChange)="validateSignupState()" />
+              <div *ngIf="signupFirstName.invalid && (signupFirstName.touched || signupSubmitted)" class="error-message">
+                <small>{{ "LOGIN_V2.E_FIRSTNAME" | translate }}</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="text" [attr.placeholder]='"LOGIN_V2.F_LASTNAME" | translate' required [(ngModel)]="signupData.lastName" name="signupLastName" autocomplete="family-name" #signupLastName="ngModel" (ngModelChange)="validateSignupState()" />
+              <div *ngIf="signupLastName.invalid && (signupLastName.touched || signupSubmitted)" class="error-message">
+                <small>{{ "LOGIN_V2.E_LASTNAME" | translate }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" [attr.placeholder]='"LOGIN_V2.F_COMPANY" | translate' required [(ngModel)]="signupData.companyName" name="signupCompanyName" autocomplete="organization" #signupCompanyName="ngModel" (ngModelChange)="validateSignupState()" />
+            <div *ngIf="signupCompanyName.invalid && (signupCompanyName.touched || signupSubmitted)" class="error-message">
+              <small>{{ "LOGIN_V2.E_COMPANY" | translate }}</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="email" [attr.placeholder]='"LOGIN_V2.F_EMAIL" | translate' required email [(ngModel)]="signupData.email" name="signupEmail" autocomplete="email" inputmode="email" #signupEmail="ngModel" (ngModelChange)="validateSignupState()" />
+            <div *ngIf="signupEmail.invalid && (signupEmail.touched || signupSubmitted)" class="error-message">
+              <small *ngIf="signupEmail.errors?.['required']">{{ "LOGIN_V2.E_EMAIL" | translate }}</small>
+              <small *ngIf="signupEmail.errors?.['email']">{{ "LOGIN_V2.E_EMAIL_BAD" | translate }}</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="phone-group">
+              <select class="country-code" [(ngModel)]="signupData.prefixCountyPhone" name="signupPrefix" autocomplete="tel-country-code" (ngModelChange)="validateSignupState()">
+                <!-- LATINOAMÉRICA -->
+                <option value="+57">🇨🇴 +57</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+54">🇦🇷 +54</option>
+                <option value="+55">🇧🇷 +55</option>
+                <option value="+56">🇨🇱 +56</option>
+                <option value="+51">🇵🇪 +51</option>
+                <option value="+58">🇻🇪 +58</option>
+                <option value="+593">🇪🇨 +593</option>
+                <option value="+591">🇧🇴 +591</option>
+                <option value="+595">🇵🇾 +595</option>
+                <option value="+598">🇺🇾 +598</option>
+                <option value="+502">🇬🇹 +502</option>
+                <option value="+503">🇸🇻 +503</option>
+                <option value="+504">🇭🇳 +504</option>
+                <option value="+506">🇨🇷 +506</option>
+                <option value="+507">🇵🇦 +507</option>
+                <option value="+509">🇭🇹 +509</option>
+                <option value="+505">🇳🇮 +505</option>
+                <option value="+508">🇵🇲 +508</option>
+
+                <!-- CARIBE -->
+                <option value="+1-809">🇩🇴 +1 809</option>
+                <option value="+1-829">🇩🇴 +1 829</option>
+                <option value="+1-849">🇩🇴 +1 849</option>
+                <option value="+53">🇨🇺 +53</option>
+                <option value="+1-868">🇹🇹 +1 868</option>
+                <option value="+1-876">🇯🇲 +1 876</option>
+                <option value="+1-869">🇰🇳 +1 869</option>
+                <option value="+1-758">🇱🇨 +1 758</option>
+                <option value="+1-784">🇻🇨 +1 784</option>
+                <option value="+1-721">🇦🇼 +1 721</option>
+                <option value="+1-242">🇧🇸 +1 242</option>
+                <option value="+1-441">🇧🇲 +1 441</option>
+                <option value="+1-345">🇰🇾 +1 345</option>
+                <option value="+1-664">🇲🇸 +1 664</option>
+
+                <!-- NORTEAMÉRICA -->
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+1">🇨🇦 +1</option>
+
+                <!-- EUROPA -->
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+39">🇮🇹 +39</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+351">🇵🇹 +351</option>
+                <option value="+31">🇳🇱 +31</option>
+                <option value="+41">🇨🇭 +41</option>
+                <option value="+46">🇸🇪 +46</option>
+                <option value="+47">🇳🇴 +47</option>
+
+                <!-- ASIA -->
+                <option value="+81">🇯🇵 +81</option>
+                <option value="+82">🇰🇷 +82</option>
+                <option value="+86">🇨🇳 +86</option>
+                <option value="+91">🇮🇳 +91</option>
+                <option value="+65">🇸🇬 +65</option>
+
+                <!-- ÁFRICA -->
+                <option value="+27">🇿🇦 +27</option>
+                <option value="+212">🇲🇦 +212</option>
+                <option value="+233">🇬🇭 +233</option>
+                <option value="+234">🇳🇬 +234</option>
+
+                <!-- OCEANÍA -->
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+64">🇳🇿 +64</option>
+              </select>
+              <input type="tel" [attr.placeholder]='"LOGIN_V2.F_PHONE" | translate' required [(ngModel)]="signupData.phoneNumber" name="signupPhone" autocomplete="tel" inputmode="tel" #signupPhone="ngModel" (ngModelChange)="validateSignupState()" />
+            </div>
+            <div *ngIf="signupPhone.invalid && (signupPhone.touched || signupSubmitted)" class="error-message" style="width: 100%;">
+              <small>{{ "LOGIN_V2.E_PHONE" | translate }}</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="password-input">
+              <input [type]="signupPasswordFieldType" [attr.placeholder]='"LOGIN_V2.F_PASSWORD" | translate' required [(ngModel)]="signupData.password" name="signupPassword" autocomplete="new-password" #signupPassword="ngModel" (ngModelChange)="validateSignupState()" />
+              <button type="button" class="password-toggle"
+                    [attr.aria-label]="(signupPasswordFieldType === 'password' ? 'LOGIN_V2.SHOW_PASSWORD' : 'LOGIN_V2.HIDE_PASSWORD') | translate"
+                    (click)="toggleSignupPasswordVisibility()">
+                <i class="fa-solid" [class.fa-eye]="signupPasswordFieldType === 'password'" [class.fa-eye-slash]="signupPasswordFieldType !== 'password'"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="password-input">
+              <input [type]="signupPasswordFieldType" [attr.placeholder]='"LOGIN_V2.F_PASSWORD2" | translate' required [(ngModel)]="signupRepeatPassword" name="signupRepeatPassword" autocomplete="new-password" #signupRepeatPasswordModel="ngModel" (ngModelChange)="validateSignupState()" />
+            </div>
+          </div>
+
+          <!-- Password Validation Checklist -->
+          <div class="password-validation-checklist" *ngIf="signupPassword.dirty || signupRepeatPasswordModel.dirty">
+            <div *ngIf="!passwordValidationState.length" class="validation-item">{{ "LOGIN_V2.V_LENGTH" | translate }}</div>
+            <div *ngIf="!passwordValidationState.uppercase" class="validation-item">{{ "LOGIN_V2.V_UPPER" | translate }}</div>
+            <div *ngIf="!passwordValidationState.lowercase" class="validation-item">{{ "LOGIN_V2.V_LOWER" | translate }}</div>
+            <div *ngIf="!passwordValidationState.number" class="validation-item">{{ "LOGIN_V2.V_NUMBER" | translate }}</div>
+            <div *ngIf="!passwordValidationState.symbol" class="validation-item">Un símbolo (&#64;$!%*?&.)</div>
+            <div *ngIf="!passwordValidationState.match" class="validation-item">{{ "LOGIN_V2.V_MATCH" | translate }}</div>
+          </div>
+
+          <div *ngIf="signupErrorMessage" class="error-message general-error">
+            {{ signupErrorMessage }}
+          </div>
+
+          <div *ngIf="signupSuccessMessage" class="success-message">
+            {{ signupSuccessMessage }}
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isSignupButtonDisabled || signupLoading">
+            <img *ngIf="signupLoading" class="gear-loader-sm btn-gear" src="/images/gear_hr_256.png" alt="" />
+            {{ (signupLoading ? "LOGIN_V2.SUBMITTING" : "LOGIN_V2.SUBMIT") | translate }}
+          </button>
+
+          <div class="terms-text">
+            Al enviar este formulario, aceptas nuestros
+            Términos de uso y
+            Política de privacidad, y das tu consentimiento
+            para recibir comunicaciones de marketing de nuestra parte.
+          </div>
+        </form>
       </div>
 
-      <!-- Lado Derecho - Imagen Promocional -->
-      <div class="image-section">
-        <div class="promo-content">
-          <img
-            src="/images/promo-image.png"
-            alt="Login Promo"
-            class="promo-image"
-          />
-        </div>
+      <!-- Footer -->
+      <div class="modal-footer">
+        <p>© Ajaw 2026 · Privacidad · Términos de uso</p>
       </div>
+
     </div>
-  </div>
+  </main>
 </div>
 
 <app-onboarding-wizard

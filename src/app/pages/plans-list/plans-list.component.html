@@ -47,6 +47,7 @@
               <p class="plan-description">{{ plan.description }}</p>
               <div class="price-container">
                 <span class="price-amount">${{ getRoundedPrice(plan) }} USD</span>
+                <span class="price-approx" *ngIf="approxPrice(plan)">{{ approxPrice(plan) }}</span>
                 <span class="price-period">{{
                   "PLANS.PER_USER_PER_MONTH" | translate
                 }}</span>

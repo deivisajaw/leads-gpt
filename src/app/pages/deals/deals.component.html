@@ -84,13 +84,13 @@
 
   <!-- ===== LOADING ===== -->
   <div class="deals-state" *ngIf="isLoading">
-    <div class="deals-loader"></div>
+    <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
     <p>{{ "DEALS.STATE.LOADING" | translate }}</p>
   </div>
 
   <!-- ===== UPDATING OVERLAY ===== -->
   <div class="updating-badge" *ngIf="isUpdatingStage">
-    <div class="spinner-sm"></div>
+    <img class="gear-loader-sm" src="images/gear_hr_256.png" alt="" />
     {{ "DEALS.STATE.UPDATING" | translate }}
   </div>
 
@@ -913,7 +913,7 @@
 
   <div class="importing-overlay" *ngIf="isImporting">
     <div class="importing-card">
-      <div class="importing-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
       <p class="importing-title">Procesando archivo…</p>
       <p class="importing-sub">Esto puede tardar unos segundos. Por favor espera.</p>
     </div>
@@ -944,7 +944,7 @@
         {{ "DEALS.DELETE.CANCEL" | translate }}
       </button>
       <button class="btn-confirm-delete" (click)="confirmDelete()" [disabled]="isDeletingDeal">
-        <span *ngIf="isDeletingDeal" class="btn-spinner-sm"></span>
+        <img *ngIf="isDeletingDeal" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isDeletingDeal">{{ "DEALS.DELETE.CONFIRM" | translate }}</span>
       </button>
     </div>

@@ -38,7 +38,7 @@
   <div class="lld-dcontent">
 
     <div *ngIf="isLoading" class="lld-loading-state">
-      <div class="lld-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
       <p>{{ "LIST_DETAIL.LOADING" | translate }}</p>
     </div>
 
@@ -171,7 +171,7 @@
         {{ "LIST_DETAIL.CANCEL" | translate }}
       </button>
       <button class="lld-modal-btn-confirm" (click)="confirmPicker()" [disabled]="isAddingFromPicker || pickerSelectedIds.size === 0">
-        <span *ngIf="isAddingFromPicker" class="lld-btn-spinner"></span>
+        <img *ngIf="isAddingFromPicker" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isAddingFromPicker">{{ "LIST_DETAIL.ADD_SELECTED" | translate }} ({{ pickerSelectedIds.size }})</span>
       </button>
     </div>

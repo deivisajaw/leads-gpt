@@ -9,7 +9,7 @@
 
   <!-- ═══════════ HEADER DEL REGISTRO ═══════════ -->
   <div class="acd-loading" *ngIf="isLoadingHeader">
-    <div class="acd-spinner"></div>
+    <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
   </div>
 
   <div class="acd-header" *ngIf="!isLoadingHeader && abandonedCheckout">
@@ -69,7 +69,7 @@
   <div class="acd-content">
 
     <div class="acd-loading" *ngIf="isLoadingFollowups">
-      <div class="acd-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
     </div>
 
     <div class="acd-empty" *ngIf="!isLoadingFollowups && followups.length === 0">

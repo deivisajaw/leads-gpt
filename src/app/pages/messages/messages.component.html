@@ -1,229 +1,425 @@
-<div class="page-container">
+<!-- ══════════════════════════════════════════════════════════════════════
+     VISTA REAL — mismo diseño, conectado a Chatwoot
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="page-container demo-page skin-clasico">
 
-  <!-- ===== HEADER ===== -->
   <div class="header-section">
     <div class="header-left">
-      <h1>Mensajes</h1>
-      <p>Gestiona los mensajes de tus canales</p>
-    </div>
-    <div class="header-right" *ngIf="selectedInbox">
-      <button class="btn-refresh" (click)="loadConversations()" [disabled]="isLoadingConvs">
-        <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingConvs"></i>
-        Actualizar
-      </button>
-    </div>
-  </div>
+      <h1>{{ "MESSAGES.TITLE" | translate }}</h1>
+      <p>{{ "MESSAGES.SUBTITLE" | translate }}</p>
+    
 
-  <!-- ===== LOADING INIT ===== -->
-  <div class="conv-state" *ngIf="isLoadingInit">
-    <div class="conv-loader"></div>
-    <p>Conectando con tus mensajes...</p>
-  </div>
-
-  <!-- ===== ERROR INIT ===== -->
-  <div class="conv-state" *ngIf="!isLoadingInit && initError">
-    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
-    <p class="error-title">No pudimos cargar tus mensajes</p>
-    <p class="error-hint">Intenta de nuevo en unos segundos. Si el problema continúa, escríbenos a soporte y lo revisamos de inmediato.</p>
-    <button class="btn-retry" (click)="ngOnInit()">
-      <i class="fas fa-sync-alt"></i> Reintentar
-    </button>
-  </div>
-
-  <!-- ===== NO INBOXES ===== -->
-  <div class="conv-state" *ngIf="!isLoadingInit && !initError && inboxes.length === 0">
-    <i class="fas fa-inbox" style="font-size:40px; color:var(--text-muted)"></i>
-    <p>No se encontraron bandejas de entrada en tus mensajes.</p>
-  </div>
-
-  <!-- ===== MAIN LAYOUT ===== -->
-  <div class="cw-layout" *ngIf="!isLoadingInit && !initError && inboxes.length > 0">
-
-    <!-- ── INBOX BAR ── -->
-    <div class="agent-bar-wrapper">
-      <button class="agent-scroll-btn" (click)="scrollInboxes('left')">
-        <i class="fas fa-chevron-left"></i>
+</div>
+    <div class="header-right" *ngIf="!isLoadingInit && !initError && !noChannels">
+      <button class="hstat-line" *ngIf="pipelineValue !== '$0' || resolvedToday > 0 || conversationsHandled > 0"
+              (click)="showStreakPanel = !showStreakPanel"
+              [class.open]="showStreakPanel"
+              [title]='"MESSAGES.AI_IMPACT_TITLE" | translate'>
+        <span class="hs-item" *ngIf="pipelineValue !== '$0'">
+          <b>{{ pipelineValue }}</b> {{ "MESSAGES.IN_INBOX" | translate }}
+        </span>
+        <span class="hs-dot" *ngIf="pipelineValue !== '$0'"></span>
+        <span class="hs-item impact">
+          <i class="fas fa-robot"></i>
+          <b>{{ peopleHandled }}</b> {{ "MESSAGES.PEOPLE" | translate }} · <b>{{ hoursSaved }}</b> {{ "MESSAGES.HOURS_SAVED" | translate }}
+        </span>
+        <span class="hs-dot" *ngIf="dealsWon > 0"></span>
+        <span class="hs-item won" *ngIf="dealsWon > 0">
+          <i class="fas fa-trophy"></i> <b>{{ dealsWon }}</b> {{ (dealsWon === 1 ? "MESSAGES.CLOSED_ONE" : "MESSAGES.CLOSED_MANY") | translate }}
+        </span>
+        <span class="hs-dot" *ngIf="resolvedToday > 0"></span>
+        <span class="hs-item done" *ngIf="resolvedToday > 0">
+          <i class="fas fa-check"></i> <b>{{ resolvedToday }}</b> {{ "MESSAGES.TODAY_SHORT" | translate }}
+        </span>
+        <span class="hs-more">{{ "MESSAGES.SEE_DETAIL" | translate }} <i class="fas fa-chevron-down"></i></span>
       </button>
 
-      <div class="agent-scroll-track" #inboxScroll>
-        <button
-          *ngFor="let inbox of inboxes"
-          class="agent-card"
-          [class.active]="selectedInbox?.id === inbox.id"
-          (click)="selectInbox(inbox)">
-          <div class="agent-card-avatar" [style.background]="svc.avatarColor(inbox.name)">
-            <i [class]="inboxChannelIcon(inbox)"></i>
+      <!-- panel: lo que hizo tu IA -->
+      <div class="streak-panel" *ngIf="showStreakPanel">
+        <div class="sp-head">
+          <span class="sp-ai"><i class="fas fa-robot"></i></span>
+          <div>
+            <b>{{ "MESSAGES.AI_IMPACT_TITLE" | translate }}</b>
+            <small>{{ "MESSAGES.AI_IMPACT_SUB" | translate }}</small>
           </div>
-          <div class="agent-card-info">
-            <span class="agent-card-name">{{ inbox.name }}</span>
-            <span class="agent-card-system">{{ inbox.phone_number || inbox.channel_type }}</span>
+          <button class="sp-close" (click)="showStreakPanel = false"><i class="fas fa-xmark"></i></button>
+        </div>
+
+        <div class="sp-grid">
+          <div class="sp-metric">
+            <span class="sm-val">{{ peopleHandled }}</span>
+            <span class="sm-lbl">{{ "MESSAGES.METRIC_PEOPLE" | translate }}</span>
           </div>
-          <div class="agent-card-dot" [class.active]="selectedInbox?.id === inbox.id"></div>
+          <div class="sp-metric">
+            <span class="sm-val">{{ conversationsHandled }}</span>
+            <span class="sm-lbl">{{ "MESSAGES.METRIC_CONVERSATIONS" | translate }}</span>
+          </div>
+          <div class="sp-metric won" *ngIf="dealsWon > 0">
+            <span class="sm-val">{{ dealsWonValue }}</span>
+            <span class="sm-lbl">{{ dealsWon }} {{ (dealsWon === 1 ? "MESSAGES.METRIC_DEALS_ONE" : "MESSAGES.METRIC_DEALS_MANY") | translate }}</span>
+          </div>
+          <div class="sp-metric hi">
+            <span class="sm-val">{{ hoursSaved }}</span>
+            <span class="sm-lbl">{{ "MESSAGES.METRIC_SAVED" | translate }}<i class="fas fa-circle-info" [title]='"MESSAGES.METRIC_SAVED_TIP" | translate'></i></span>
+          </div>
+          <div class="sp-metric">
+            <span class="sm-val">{{ handledByAi }} <small>/ {{ handledByHuman }}</small></span>
+            <span class="sm-lbl">{{ "MESSAGES.AI" | translate }} / {{ "MESSAGES.HUMAN" | translate }}</span>
+          </div>
+        </div>
+
+        <div class="sp-week-head">{{ "MESSAGES.WEEK_HEAD" | translate }}</div>
+        <div class="sp-week">
+          <div class="sp-day" *ngFor="let d of week" [class.today]="d.today">
+            <div class="sp-bar-wrap">
+              <div class="sp-bar" [class.zero]="d.count === 0"
+                   [style.height.%]="d.count === 0 ? 6 : (d.count / weekMax) * 100"
+                   [title]='d.count + " " + ("MESSAGES.RESOLVED_TODAY" | translate)'></div>
+            </div>
+            <span class="sp-lbl">{{ d.label }}</span>
+            <span class="sp-num">{{ d.count }}</span>
+          </div>
+        </div>
+
+        <button class="sp-sound" (click)="toggleSound()">
+          <i class="fas" [ngClass]="soundOn ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
+          <span>{{ "MESSAGES.SOUND_TOGGLE" | translate }}</span>
+          <span class="sp-switch" [class.on]="soundOn"><span class="sp-knob"></span></span>
         </button>
-      </div>
 
-      <button class="agent-scroll-btn" (click)="scrollInboxes('right')">
-        <i class="fas fa-chevron-right"></i>
+        <div class="sp-foot">
+          <span><b>{{ weekTotal }}</b> {{ "MESSAGES.WEEK_RESOLVED" | translate }} · <b>{{ weekHoursSaved }}</b> {{ "MESSAGES.WEEK_THIS" | translate }}</span>
+          <span *ngIf="bestDayCount > 0" class="sp-best">
+            <i class="fas fa-trophy"></i> {{ "MESSAGES.BEST_DAY" | translate }} <b>{{ bestDayCount }}</b> · {{ bestDayLabel }}
+          </span>
+        </div>
+      </div>
+      <button class="btn-refresh" (click)="loadConversations()" [disabled]="isLoadingConvs">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingConvs"></i> {{ "MESSAGES.REFRESH" | translate }}
       </button>
     </div>
+  </div>
 
-    <!-- ── DIVIDER ── -->
-    <div class="section-divider">
-      <span *ngIf="selectedInbox">
-        <i [class]="inboxChannelIcon(selectedInbox)"></i>
-        {{ selectedInbox.name }}
-        <span class="divider-sub" *ngIf="selectedInbox.phone_number">{{ selectedInbox.phone_number }}</span>
-      </span>
-      <span *ngIf="!selectedInbox">Selecciona una bandeja de entrada</span>
-    </div>
+  <!-- cargando -->
+  <div class="conv-state" *ngIf="isLoadingInit">
+    <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
+    <p class="state-hint">{{ "MESSAGES.CONNECTING" | translate }}</p>
+  </div>
 
-    <!-- ── 2-COLUMN BODY ── -->
-    <div class="cw-body" *ngIf="selectedInbox">
-
-      <!-- ─── COL 1: Contacts ─── -->
+  <!-- sin canales -->
+  <div class="cw-layout" *ngIf="!isLoadingInit && !initError && noChannels">
+    <div class="cw-body shell-body">
       <div class="cw-contacts-col">
         <div class="cw-col-toolbar">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Buscar contacto..."
-              [value]="searchQuery" (input)="onSearch($event)"/>
-          </div>
-          <div class="status-tabs">
-            <button class="stab" [class.active]="statusFilter==='all'"      (click)="onStatusChange('all')">Todas</button>
-            <button class="stab" [class.active]="statusFilter==='open'"     (click)="onStatusChange('open')">Abiertas</button>
-            <button class="stab" [class.active]="statusFilter==='resolved'" (click)="onStatusChange('resolved')">Resueltas</button>
-            <button class="stab" [class.active]="statusFilter==='pending'"  (click)="onStatusChange('pending')">Pendientes</button>
-          </div>
-          <div class="cw-stats" *ngIf="!isLoadingConvs && contactGroups.length > 0">
-            <span class="stat-badge">{{ contactGroups.length }} contactos</span>
-            <span class="stat-badge">{{ totalConversations() }} mensajes</span>
-            <span class="stat-badge warn" *ngIf="totalUnread() > 0">{{ totalUnread() }} sin leer</span>
-          </div>
+          <div class="search-box"><i class="fas fa-search"></i>
+            <input type="text" [attr.placeholder]='"MESSAGES.SEARCH_PLACEHOLDER" | translate' disabled /></div>
         </div>
-
-        <div class="col-state" *ngIf="isLoadingConvs">
-          <div class="conv-loader-sm"></div>
-          <p>Cargando mensajes...</p>
-        </div>
-
-        <div class="col-state" *ngIf="!isLoadingConvs && convError">
-          <i class="fas fa-exclamation-circle" style="font-size:24px; color:var(--danger-color)"></i>
-          <p>{{ convError }}</p>
-          <button class="btn-retry-sm" (click)="loadConversations()">Reintentar</button>
-        </div>
-
-        <div class="col-state" *ngIf="!isLoadingConvs && !convError && filteredGroups.length === 0">
-          <i class="fas fa-comment-slash" style="font-size:28px; color:var(--text-muted)"></i>
-          <p>Sin mensajes</p>
-        </div>
-
-        <div class="contact-list" *ngIf="!isLoadingConvs && !convError && filteredGroups.length > 0">
-          <div *ngFor="let group of filteredGroups"
-            class="contact-item"
-            [class.active]="selectedGroup !== null && selectedGroup.contact.id === group.contact.id"
-            (click)="selectGroup(group)">
-
-            <div class="contact-avatar" [style.background]="svc.avatarColor(group.contact.name)">
-              {{ svc.getInitials(group.contact.name) }}
-              <span class="unread-dot" *ngIf="hasUnread(group)"></span>
-            </div>
-
-            <div class="contact-info">
-              <div class="contact-name-row">
-                <span class="contact-name">{{ group.contact.name }}</span>
-                <span class="contact-time">{{ svc.formatUnixShort(group.lastActivity) }}</span>
-              </div>
-              <div class="contact-preview">{{ getLastMessagePreview(group) }}</div>
-              <div class="contact-meta">
-                <span class="conv-count-badge">
-                  <i class="fas fa-comments"></i> {{ group.conversations.length }}
-                </span>
-                <span class="status-chip-sm {{ svc.statusClass(getFirstStatus(group)) }}">
-                  {{ svc.statusLabel(getFirstStatus(group)) }}
-                </span>
-                <span class="unread-badge" *ngIf="group.totalUnread > 0">{{ group.totalUnread }}</span>
-              </div>
-            </div>
+        <div class="rail-disconnected">
+          <div class="chan-chain">
+            <span class="chan-icon chan-ig"><i class="fab fa-instagram"></i></span>
+            <span class="chan-link"></span>
+            <span class="chan-icon chan-wa"><i class="fab fa-whatsapp"></i></span>
+            <span class="chan-link"></span>
+            <span class="chan-icon chan-sms"><i class="fas fa-comment-sms"></i></span>
+            <span class="chan-x"><i class="fas fa-xmark"></i></span>
           </div>
+          <p class="rail-disc-title">{{ "MESSAGES.NO_CHANNELS_RAIL_TITLE" | translate }}</p>
+          <p class="rail-disc-sub">{{ "MESSAGES.NO_CHANNELS_RAIL_SUB" | translate }}</p>
+          <a class="btn-rail-connect" routerLink="/agents" [queryParams]="{ nuevo: 1 }">{{ "MESSAGES.CONNECT" | translate }}</a>
         </div>
       </div>
-
-      <!-- ─── COL 2: Messages ─── -->
       <div class="cw-messages-col">
+        <div class="ghost-hero">
+          <div class="ghost-scene">
+            <span class="ghost-ring"></span>
+            <div class="ghost-card ghost-card-a"><span class="gl gl-w60"></span><span class="gl gl-w40"></span></div>
+            <div class="ghost-card ghost-card-b"><span class="gl gl-w70"></span><span class="gl gl-w90"></span><span class="gl gl-w50"></span></div>
+          </div>
+          <h2 class="ghost-title">{{ "MESSAGES.NO_CHANNELS_TITLE" | translate }}</h2>
+          <p class="ghost-sub">{{ "MESSAGES.NO_CHANNELS_SUB" | translate }}</p>
+          <a class="btn-connect" routerLink="/agents" [queryParams]="{ nuevo: 1 }">{{ "MESSAGES.CREATE_AGENT" | translate }}</a>
+          <button class="btn-link" (click)="ngOnInit()">{{ "MESSAGES.SEARCH_AGAIN" | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="col-placeholder" *ngIf="!selectedGroup">
-          <i class="fas fa-comments" style="font-size:42px; color:var(--text-muted); opacity:0.4"></i>
-          <p>Selecciona un contacto para ver los mensajes</p>
+  <!-- error -->
+  <div class="conv-state" *ngIf="!isLoadingInit && initError && !noChannels">
+    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <p class="error-title">{{ "MESSAGES.LOAD_ERROR_TITLE" | translate }}</p>
+    <p class="error-hint">{{ "MESSAGES.LOAD_ERROR_HINT" | translate }}</p>
+    <button class="btn-retry" (click)="ngOnInit()"><i class="fas fa-sync-alt"></i> Reintentar</button>
+  </div>
+
+  <!-- ══ CANALES (inboxes reales) ══ -->
+  <div class="agents-strip" *ngIf="!isLoadingInit && !initError && !noChannels && inboxes.length > 0">
+    <span class="as-label">{{ "MESSAGES.CHANNELS" | translate }}</span>
+    <button class="agent-pill" [class.on]="allMode" (click)="selectAllInboxes()">
+      <span class="ap-ini" style="background: linear-gradient(135deg,#7871fb,#251f95)">
+        <i class="fas fa-layer-group" style="font-size:14px"></i>
+      </span>
+      <span class="ap-txt">
+        <b>{{ "MESSAGES.ALL_CHANNELS" | translate }}</b>
+        <small>{{ contactGroups.length }} conversaciones</small>
+      </span>
+    </button>
+    <button class="agent-pill" *ngFor="let inbox of inboxes"
+            [class.on]="!allMode && selectedInbox?.id === inbox.id" (click)="selectInbox(inbox)">
+      <span class="ap-ini ch-tile" [ngClass]="'ch-' + inboxChannelKey(inbox)">
+        {{ inboxShortLabel(inbox) }}
+        <span class="ap-ch" [ngClass]="'ch-' + inboxChannelKey(inbox)">
+          <i [class]="channelIconByKey(inboxChannelKey(inbox))"></i>
+        </span>
+      </span>
+      <span class="ap-txt">
+        <b>{{ inbox.name }}</b>
+        <small>{{ channelLabel(inboxChannelKey(inbox)) }}<ng-container *ngIf="inbox.phone_number"> · {{ inbox.phone_number }}</ng-container></small>
+      </span>
+      <span class="ap-dot on"></span>
+    </button>
+    <a class="agent-pill add" routerLink="/agents" [queryParams]="{ nuevo: 1 }">
+      <span class="ap-ico add"><i class="fas fa-plus"></i></span>
+      <span class="ap-txt"><b>{{ "MESSAGES.NEW_AGENT" | translate }}</b><small>{{ "MESSAGES.CONNECT_CHANNEL" | translate }}</small></span>
+    </a>
+  </div>
+
+  <!-- ══ BANDEJA ══ -->
+  <div class="demo-body" [class.no-ctx]="!showContext"
+       *ngIf="!isLoadingInit && !initError && !noChannels && (allMode || selectedInbox)">
+
+    <!-- rail -->
+    <div class="demo-rail">
+      <div class="rail-head">
+        <div class="rail-search">
+          <i class="fas fa-magnifying-glass"></i>
+          <input type="text" [attr.placeholder]='"MESSAGES.SEARCH_PLACEHOLDER" | translate'
+                 [value]="searchQuery" (input)="onSearch($event)" />
+        </div>
+        <div class="rail-tabs">
+          <button class="rtab" [class.on]="statusFilter==='all'"      (click)="onStatusChange('all')">{{ "MESSAGES.TAB_ALL" | translate }} <span class="rtab-n">{{ contactGroups.length }}</span></button>
+          <button class="rtab" [class.on]="statusFilter==='open'"     (click)="onStatusChange('open')">{{ "MESSAGES.TAB_OPEN" | translate }} <span class="rtab-n">{{ countByStatus('open') }}</span></button>
+          <button class="rtab" [class.on]="statusFilter==='pending'"  (click)="onStatusChange('pending')">{{ "MESSAGES.TAB_PENDING" | translate }} <span class="rtab-n">{{ countByStatus('pending') }}</span></button>
+          <button class="rtab" [class.on]="statusFilter==='resolved'" (click)="onStatusChange('resolved')">{{ "MESSAGES.TAB_RESOLVED" | translate }} <span class="rtab-n">{{ countByStatus('resolved') }}</span></button>
+        </div>
+      </div>
+
+      <div class="rail-warn" *ngIf="failedInboxes.length > 0 && !isLoadingConvs">
+        <i class="fas fa-triangle-exclamation"></i>
+        <span>{{ failedInboxes.length }} canal(es) no respondieron: <b>{{ failedInboxes.join(', ') }}</b></span>
+        <button (click)="loadConversations()">{{ "MESSAGES.RETRY" | translate }}</button>
+      </div>
+
+      <!-- cargando conversaciones -->
+      <div class="skeleton-list" *ngIf="isLoadingConvs" aria-hidden="true">
+        <div class="skeleton-item" *ngFor="let s of [1,2,3,4,5,6]">
+          <span class="sk sk-avatar"></span>
+          <span class="sk-lines"><span class="sk sk-line sk-line-name"></span><span class="sk sk-line sk-line-preview"></span></span>
+        </div>
+      </div>
+
+      <div class="col-state conv-error" *ngIf="!isLoadingConvs && convError">
+        <span class="ce-icon"><i class="fas fa-plug-circle-exclamation"></i></span>
+        <p class="ce-title">{{ "MESSAGES.CHANNEL_DOWN" | translate }}</p>
+        <p class="ce-sub">
+          No pudimos traer los chats en este momento.
+          Puedes reintentar o elegir otro canal arriba.
+        </p>
+        <button class="btn-retry-sm" (click)="loadConversations()">
+          <i class="fas fa-sync-alt"></i> {{ "MESSAGES.RETRY" | translate }}
+        </button>
+        <details class="ce-detail">
+          <summary>{{ "MESSAGES.TECH_DETAIL" | translate }}</summary>
+          <code>{{ convError }}</code>
+        </details>
+      </div>
+
+      <div class="rail-list" *ngIf="!isLoadingConvs && !convError">
+        <div class="dthread" *ngFor="let group of filteredGroups"
+             [class.sel]="isSelected(group)"
+             [class.is-new]="$any(group).isNew"
+             [class.resolved-out]="$any(group).justResolved"
+             (click)="selectGroup(group)">
+          <div class="dav" [style.background]="svc.avatarColor(group.contact.name)">
+            <img class="dav-img" *ngIf="hasAvatar(group.contact.avatar_url)"
+                 [src]="group.contact.avatar_url" alt=""
+                 (error)="onAvatarError(group.contact.avatar_url)" />
+            <span *ngIf="!hasAvatar(group.contact.avatar_url)">{{ svc.getInitials(group.contact.name) }}</span>
+            <span class="dbadge" [ngClass]="'ch-' + group.channelKey">
+              <i [class]="channelIconByKey(group.channelKey)"></i>
+            </span>
+          </div>
+          <div class="dinfo">
+            <div class="drow1">
+              <span class="dname">{{ group.contact.name }}</span>
+              <span class="dtime">{{ svc.formatUnixShort(group.lastActivity) }}</span>
+            </div>
+            <div class="dprev">{{ getLastMessagePreview(group) }}</div>
+            <div class="dmeta">
+              <span class="dnew" *ngIf="$any(group).isNew">{{ "MESSAGES.NEW" | translate }}</span>
+              <span class="dvalue" *ngIf="dealAmount(group)">{{ dealAmount(group) }}</span>
+              <span class="dagent" *ngIf="allMode"><i class="fas fa-robot"></i> {{ group.inboxName }}</span>
+              <span class="dagent human" *ngIf="!isAiOn(groupKey(group))"><i class="fas fa-user"></i> {{ assignedName(groupKey(group)) }}</span>
+              <span class="dpill" [ngClass]="'st-' + getFirstStatus(group)">
+                {{ svc.statusLabel(getFirstStatus(group)) }}
+              </span>
+              <span class="dunread" *ngIf="group.totalUnread > 0">{{ group.totalUnread }}</span>
+            </div>
+          </div>
         </div>
 
-        <ng-container *ngIf="selectedGroup">
-
-          <!-- Contact header -->
-          <div class="contact-header">
-            <div class="ch-avatar" [style.background]="svc.avatarColor(selectedGroup.contact.name)">
-              {{ svc.getInitials(selectedGroup.contact.name) }}
-            </div>
-            <div class="ch-info">
-              <span class="ch-name">{{ selectedGroup.contact.name }}</span>
-              <div class="ch-meta">
-                <span *ngIf="selectedGroup.contact.phone_number" class="ch-meta-item">
-                  <i class="fas fa-phone"></i> {{ selectedGroup.contact.phone_number }}
-                </span>
-                <span *ngIf="selectedGroup.contact.email" class="ch-meta-item">
-                  <i class="fas fa-envelope"></i> {{ selectedGroup.contact.email }}
-                </span>
-                <span class="ch-meta-item">
-                  <i class="fas fa-comments"></i>
-                  {{ selectedGroup.conversations.length }} mensaje{{ selectedGroup.conversations.length !== 1 ? 'es' : '' }}
-                </span>
-                <span class="ch-meta-item">
-                  <i class="fas fa-info-circle"></i> {{ getConvStatusSummary(selectedGroup) }}
-                </span>
-              </div>
-            </div>
-            <div class="ch-badges">
-              <span class="unread-badge-lg" *ngIf="selectedGroup.totalUnread > 0">
-                {{ selectedGroup.totalUnread }} sin leer
-              </span>
-            </div>
-          </div>
-
-          <!-- Loading messages -->
-          <div class="col-state" *ngIf="isLoadingMsgs">
-            <div class="conv-loader-sm"></div>
-            <p>Cargando mensajes...</p>
-          </div>
-
-          <!-- Messages -->
-          <div class="messages-list" *ngIf="!isLoadingMsgs">
-            <div class="messages-empty" *ngIf="messages.length === 0">
-              <i class="fas fa-comment-slash"></i>
-              <p>Sin mensajes</p>
-            </div>
-
-            <ng-container *ngFor="let msg of messages">
-              <div class="msg-activity" *ngIf="msg.message_type === 2">{{ msg.content }}</div>
-              <div class="msg-bubble-wrap" *ngIf="msg.message_type !== 2"
-                [class.outgoing]="msg.message_type === 1"
-                [class.incoming]="msg.message_type === 0">
-                <div class="msg-sender-name" *ngIf="msg.sender?.name && msg.message_type === 0">
-                  {{ msg.sender!.name }}
-                </div>
-                <div class="msg-bubble">{{ msg.content }}</div>
-                <div class="msg-time">{{ svc.formatUnixShort(msg.created_at) }}</div>
-              </div>
-            </ng-container>
-          </div>
-
-        </ng-container>
+        <div class="rail-zero" *ngIf="filteredGroups.length === 0">
+          <span class="rz-ok"><i class="fas fa-check"></i></span>
+          <b>{{ searchQuery ? 'Sin resultados' : '¡Todo al día!' }}</b>
+          <small>{{ searchQuery ? 'Prueba con otro nombre o teléfono.' : 'Los mensajes nuevos aparecerán aquí.' }}</small>
+        </div>
       </div>
     </div>
 
-    <!-- No inbox selected -->
-    <div class="conv-state" *ngIf="!selectedInbox">
-      <i class="fas fa-hand-pointer" style="font-size:36px; color:var(--text-muted)"></i>
-      <p>Selecciona una bandeja de entrada para ver sus mensajes</p>
+    <!-- conversación -->
+    <div class="demo-convo">
+      <div class="col-placeholder" *ngIf="!selectedGroup">
+        <i class="fas fa-comments" style="font-size:42px; color:var(--text-muted); opacity:.4"></i>
+        <p>{{ "MESSAGES.PICK_CONTACT" | translate }}</p>
+      </div>
+
+      <ng-container *ngIf="selectedGroup as g">
+        <div class="dc-head">
+          <div class="dav" [style.background]="svc.avatarColor(g.contact.name)">
+            <img class="dav-img" *ngIf="hasAvatar(g.contact.avatar_url)"
+                 [src]="g.contact.avatar_url" alt=""
+                 (error)="onAvatarError(g.contact.avatar_url)" />
+            <span *ngIf="!hasAvatar(g.contact.avatar_url)">{{ svc.getInitials(g.contact.name) }}</span>
+            <span class="dbadge" [ngClass]="'ch-' + g.channelKey">
+              <i [class]="channelIconByKey(g.channelKey)"></i>
+            </span>
+          </div>
+          <div class="dc-who">
+            <span class="dc-name">{{ g.contact.name }}</span>
+            <span class="dc-sub">
+              <ng-container *ngIf="g.contact.phone_number">{{ g.contact.phone_number }} · </ng-container>
+              {{ g.inboxName }}
+            </span>
+          </div>
+          <div class="dc-actions">
+          <div class="ai-toggle" [class.human]="!isAiOn(groupKey(g))"
+               (click)="toggleAi(groupKey(g))"
+               [title]="isAiOn(groupKey(g)) ? 'El agente IA está respondiendo — clic para tomar el control' : 'Lo llevas tú — clic para devolver al agente IA'">
+            <span class="ai-opt" [class.on]="isAiOn(groupKey(g))"><i class="fas fa-robot"></i> IA</span>
+            <span class="ai-opt" [class.on]="!isAiOn(groupKey(g))"><i class="fas fa-user"></i> Humano</span>
+          </div>
+            <button class="dc-btn" *ngIf="g.contact.phone_number"><i class="fas fa-phone"></i></button>
+            <button class="dc-btn" *ngIf="!showContext" (click)="showContext = true" title="Ver panel del lead"><i class="fas fa-address-card"></i></button>
+            <button class="dc-btn primary" (click)="toggleResolved(g)" [disabled]="isResolving">
+              <img *ngIf="isResolving" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
+              <i *ngIf="!isResolving" class="fas" [ngClass]="getFirstStatus(g) === 'resolved' ? 'fa-rotate-left' : 'fa-check'"></i>
+              {{ getFirstStatus(g) === 'resolved' ? 'Reabrir' : 'Resolver' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="col-state" *ngIf="isLoadingMsgs">
+          <img class="gear-loader-sm" src="images/gear_hr_256.png" alt="" />
+          <p>{{ "MESSAGES.LOADING_MESSAGES" | translate }}</p>
+        </div>
+
+        <div class="human-bar" *ngIf="!isAiOn(groupKey(g))">
+          <i class="fas fa-hand"></i>
+          Agente IA en pausa — <b>{{ assignedName(groupKey(g)) }}</b> está atendiendo esta conversación
+        </div>
+
+        <div class="dc-msgs" *ngIf="!isLoadingMsgs">
+          <div class="rail-zero" *ngIf="messages.length === 0">
+            <span class="rz-ok"><i class="fas fa-inbox"></i></span>
+            <b>{{ "MESSAGES.NO_MESSAGES" | translate }}</b>
+          </div>
+          <ng-container *ngFor="let m of messages">
+            <div class="dc-note" *ngIf="m.message_type === 2">
+              <i class="fas fa-bolt"></i> {{ m.content }}
+            </div>
+            <div class="dc-wrap" *ngIf="m.message_type !== 2" [class.out]="m.message_type === 1">
+              <div class="dc-bubble" [class.out]="m.message_type === 1">
+                {{ m.content }}
+                <span class="dc-time">{{ svc.formatUnixShort(m.created_at) }}</span>
+              </div>
+              <div class="dc-by" *ngIf="m.message_type === 1 && m.sender?.name">
+                <span class="by-ini" [style.background]="svc.avatarColor(m.sender!.name)">{{ agentInitial(m.sender!.name) }}</span>
+                Respondido por <b>{{ m.sender!.name }}</b>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="dc-composer">
+          <button class="dc-icon" title="Adjuntar"><i class="fas fa-paperclip"></i></button>
+          <input type="text" [attr.placeholder]='"MESSAGES.MESSAGE_PLACEHOLDER" | translate' />
+          <button class="dc-mic" title="Grabar nota de voz"><i class="fas fa-microphone"></i></button>
+          <button class="dc-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </ng-container>
     </div>
 
+    <!-- panel del lead -->
+    <div class="demo-ctx" *ngIf="showContext && selectedGroup as g">
+      <button class="ctx-close" (click)="showContext = false" title="Ocultar panel">
+        <i class="fas fa-angles-right"></i>
+      </button>
+      <div class="ctx-lead">
+        <div class="dav big" [style.background]="svc.avatarColor(g.contact.name)">
+          <img class="dav-img" *ngIf="hasAvatar(g.contact.avatar_url)"
+               [src]="g.contact.avatar_url" alt=""
+               (error)="onAvatarError(g.contact.avatar_url)" />
+          <span *ngIf="!hasAvatar(g.contact.avatar_url)">{{ svc.getInitials(g.contact.name) }}</span>
+        </div>
+        <div>
+          <span class="ctx-name">{{ g.contact.name }}</span>
+          <span class="ctx-role">{{ g.inboxName }}</span>
+        </div>
+      </div>
+
+      <h4>{{ "MESSAGES.CONTACT" | translate }}</h4>
+      <div class="ctx-row" *ngIf="g.contact.phone_number"><span>{{ "MESSAGES.MOBILE" | translate }}</span><b>{{ g.contact.phone_number }}</b></div>
+      <div class="ctx-row" *ngIf="g.contact.email"><span>{{ "MESSAGES.EMAIL" | translate }}</span><b>{{ g.contact.email }}</b></div>
+      <div class="ctx-row"><span>{{ "MESSAGES.CONVERSATIONS" | translate }}</span><b>{{ g.conversations.length }}</b></div>
+      <div class="ctx-row"><span>{{ "MESSAGES.UNREAD" | translate }}</span><b>{{ g.totalUnread }}</b></div>
+      <div class="ctx-row"><span>{{ "MESSAGES.LAST_ACTIVITY" | translate }}</span><b>{{ svc.formatUnixShort(g.lastActivity) }}</b></div>
+
+      <ng-container *ngIf="dealFor(g) as deal">
+        <h4>{{ "MESSAGES.DEAL" | translate }}</h4>
+        <div class="ctx-deal">
+          <span class="cd-amount">{{ dealAmount(g) }}</span>
+          <span class="cd-stage" [style.background]="deal.stageColor || '#5b4fe5'">{{ deal.stageLabel }}</span>
+        </div>
+        <div class="ctx-row"><span>{{ "MESSAGES.DEAL_NAME" | translate }}</span><b>{{ deal.name }}</b></div>
+        <div class="ctx-row" *ngIf="deal.ownerUserFullName"><span>{{ "MESSAGES.DEAL_OWNER" | translate }}</span><b>{{ deal.ownerUserFullName }}</b></div>
+      </ng-container>
+
+      <h4>{{ "MESSAGES.STATUS" | translate }}</h4>
+      <div class="ctx-row"><span>{{ "MESSAGES.SUMMARY" | translate }}</span><b>{{ getConvStatusSummary(g) }}</b></div>
+
+      <button class="ctx-btn"><i class="fas fa-user"></i> {{ "MESSAGES.VIEW_IN_PEOPLE" | translate }}</button>
+    </div>
+
+  </div>
+
+  <!-- celebración al resolver -->
+  <div class="cel-stage" *ngIf="celebrating">
+    <div class="cel-wrap">
+      <span class="confetti" *ngFor="let c of confetti"
+            [class.round]="c.round"
+            [style.--dx.px]="c.dx"
+            [style.--dy.px]="c.dy"
+            [style.--rot.deg]="c.rot"
+            [style.width.px]="c.round ? c.w * 1.5 : c.w"
+            [style.height.px]="c.round ? c.w * 1.5 : c.h"
+            [style.background]="c.color"
+            [style.animation-delay.s]="c.delay"
+            [style.animation-duration.s]="c.dur"></span>
+
+      <div class="celebrate">
+        <span class="cel-check"><i class="fas fa-check"></i></span>
+        {{ celebrationText }}
+      </div>
+    </div>
   </div>
 </div>

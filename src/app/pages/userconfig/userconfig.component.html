@@ -31,42 +31,102 @@
             <div class="config-section-body">
               <div class="language-selector-wrapper">
                 <div class="loading-overlay" *ngIf="isLoading">
-                  <div class="spinner-large"></div>
+                  <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
                   <p>{{ "USER_CONFIG.SAVING" | translate }}</p>
                 </div>
-                <div class="language-selector">
-                  <div
-                    class="language-option"
-                    [class.selected]="selectedLanguage === 'es'"
-                    (click)="selectLanguage('es')"
-                  >
-                    <div class="language-flag">🇪🇸</div>
-                    <div class="language-details">
-                      <div class="language-name">
-                        {{
-                          "USER_CONFIG.LANGUAGE_PREFERENCES.SPANISH" | translate
-                        }}
-                      </div>
-                      <div class="language-native">Spanish</div>
-                    </div>
-                    <i class="fas fa-check-circle selected-icon"></i>
+                <div class="lang-picker">
+                  <div class="lang-search">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text"
+                           [(ngModel)]="langQuery"
+                           [attr.placeholder]="'USER_CONFIG.LANGUAGE_PREFERENCES.SEARCH' | translate" />
+                    <button *ngIf="langQuery" class="lang-clear" (click)="langQuery = ''">
+                      <i class="fas fa-xmark"></i>
+                    </button>
                   </div>
-                  <div
-                    class="language-option"
-                    [class.selected]="selectedLanguage === 'en'"
-                    (click)="selectLanguage('en')"
-                  >
-                    <div class="language-flag">🇬🇧</div>
-                    <div class="language-details">
-                      <div class="language-name">
-                        {{
-                          "USER_CONFIG.LANGUAGE_PREFERENCES.ENGLISH" | translate
-                        }}
-                      </div>
-                      <div class="language-native">English</div>
-                    </div>
-                    <i class="fas fa-check-circle selected-icon"></i>
+
+                  <div class="lang-list">
+                    <button *ngFor="let l of filteredLanguages()"
+                            type="button"
+                            class="lang-row"
+                            [class.selected]="selectedLanguage === l.code"
+                            [class.soon]="!l.ready"
+                            [disabled]="!l.ready || isLoading"
+                            (click)="selectLanguage(l.code)">
+                      <span class="lang-flag">{{ l.flag }}</span>
+                      <span class="lang-names">
+                        <b>{{ l.native }}</b>
+                        <small>{{ l.english }}</small>
+                      </span>
+                      <span class="lang-soon" *ngIf="!l.ready">
+                        {{ "USER_CONFIG.LANGUAGE_PREFERENCES.SOON" | translate }}
+                      </span>
+                      <span class="lang-auto" *ngIf="l.ready && l.code === detectedLanguage && selectedLanguage !== l.code">
+                        {{ "USER_CONFIG.LANGUAGE_PREFERENCES.DETECTED" | translate }}
+                      </span>
+                      <i class="fas fa-check lang-check" *ngIf="selectedLanguage === l.code"></i>
+                    </button>
+
+                    <p class="lang-empty" *ngIf="filteredLanguages().length === 0">
+                      {{ "USER_CONFIG.LANGUAGE_PREFERENCES.NO_RESULTS" | translate }}
+                    </p>
                   </div>
+
+                  <p class="lang-hint">
+                    <i class="fas fa-location-crosshairs"></i>
+                    {{ "USER_CONFIG.LANGUAGE_PREFERENCES.AUTO_HINT" | translate }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-section mt-4">
+            <div class="config-section-header">
+              <h3 class="config-section-title">
+                {{ "USER_CONFIG.CURRENCY_PREFERENCES.TITLE" | translate }}
+              </h3>
+              <p class="config-section-description">
+                {{ "USER_CONFIG.CURRENCY_PREFERENCES.DESCRIPTION" | translate }}
+              </p>
+            </div>
+            <div class="config-section-body">
+              <div class="lang-picker">
+                <div class="lang-search">
+                  <i class="fas fa-magnifying-glass"></i>
+                  <input type="text"
+                         [(ngModel)]="currencyQuery"
+                         [attr.placeholder]="'USER_CONFIG.CURRENCY_PREFERENCES.SEARCH' | translate" />
+                  <button *ngIf="currencyQuery" class="lang-clear" (click)="currencyQuery = ''">
+                    <i class="fas fa-xmark"></i>
+                  </button>
+                </div>
+
+                <div class="lang-list">
+                  <button *ngFor="let c of filteredCurrencies()"
+                          type="button"
+                          class="lang-row"
+                          [class.selected]="selectedCurrency === c.code"
+                          (click)="selectCurrency(c.code)">
+                    <span class="lang-flag">{{ c.flag }}</span>
+                    <span class="lang-names">
+                      <b>{{ c.code }} · {{ c.symbol }}</b>
+                      <small>{{ c.name }}</small>
+                    </span>
+                    <span class="lang-auto" *ngIf="c.code === detectedCurrency && selectedCurrency !== c.code">
+                      {{ "USER_CONFIG.LANGUAGE_PREFERENCES.DETECTED" | translate }}
+                    </span>
+                    <i class="fas fa-check lang-check" *ngIf="selectedCurrency === c.code"></i>
+                  </button>
+
+                  <p class="lang-empty" *ngIf="filteredCurrencies().length === 0">
+                    {{ "USER_CONFIG.CURRENCY_PREFERENCES.NO_RESULTS" | translate }}
+                  </p>
+                </div>
+
+                <div class="cur-note">
+                  <i class="fas fa-circle-info"></i>
+                  <span>{{ "USER_CONFIG.CURRENCY_PREFERENCES.BILLED_USD" | translate }}</span>
                 </div>
               </div>
             </div>
@@ -133,7 +193,7 @@
             <span *ngIf="!isLoading">{{
               "USER_CONFIG.SAVE_CHANGES" | translate
             }}</span>
-            <div *ngIf="isLoading" class="spinner-small"></div>
+            <img *ngIf="isLoading" class="gear-loader-sm" src="images/gear_hr_256.png" alt="" />
           </button>
         </div>
       </div>

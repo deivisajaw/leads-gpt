@@ -229,6 +229,21 @@ export class MessageService {
     }));
   }
 
+  /** Cambia el estado de una conversación en Chatwoot (resolved / open / pending). */
+  async setConversationStatus(conversationId: number, status: 'resolved' | 'open' | 'pending'): Promise<void> {
+    this.ensureCredentials();
+    const url = `${this.apiConfig.chatwootBaseUrl}/api/v1/accounts/${this.chatwootAccountId}/conversations/${conversationId}/toggle_status`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api_access_token': this.chatwootApiKey!
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!resp.ok) throw new Error(`Toggle status HTTP ${resp.status}`);
+  }
+
   private groupByContact(conversations: ChatwootConversation[]): ContactConversationGroup[] {
     const map = new Map<number, ContactConversationGroup>();
     for (const conv of conversations) {

@@ -133,7 +133,7 @@
 
       <div class="right">
         <button class="tb" *ngIf="currentSearchId && totalResultsInServer > 0 && !isLoading" (click)="addAllToMyList()" [disabled]="isSavingAll">
-          <span *ngIf="isSavingAll" class="btn-spinner"></span>
+          <img *ngIf="isSavingAll" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
           <span *ngIf="!isSavingAll"><i class="fas fa-plus-circle"></i> {{ 'COMPANIES.ADD_ALL' | translate }} ({{ totalResultsInServer }})</span>
         </button>
 
@@ -263,7 +263,7 @@
         </div>
 
         <div *ngIf="isLoading" class="loading-state">
-          <div class="spinner"></div>
+          <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
           <p>Buscando resultados…</p>
         </div>
 
@@ -458,7 +458,7 @@
     <span style="color:#1e293b;font-weight:500">{{ "COMPANIES.ADD_TO_SHORTLIST" | translate }} ({{ selectedCompanies.length }})</span>
     <div style="display:flex;gap:8px;margin-left:auto">
       <button (click)="addToMyList()" class="btn-primary">
-        <span *ngIf="isSaving" class="btn-spinner"></span>
+        <img *ngIf="isSaving" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isSaving">{{ "COMPANIES.ADD_TO_MY_LIST" | translate }}</span>
       </button>
       <button (click)="downloadSelected()" style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:6px;cursor:pointer;color:#64748b;"><i class="fas fa-download"></i></button>

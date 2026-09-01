@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { AgentService, Agent, Voice, PhoneNumber } from '../../services/agent.service';
@@ -244,12 +244,16 @@ export class AgentsComponent implements OnInit {
 
   constructor(
     private apiConfig: ApiConfigService,
-    private onboardingService: OnboardingService
+    private onboardingService: OnboardingService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
     this.loadAgents()
     this.testMessages = [{ role: "agent", content: this.translate.instant("AGENTS.TEST_CHAT.DEFAULT_GREETING") }]
+    if (this.route.snapshot.queryParamMap.get('nuevo')) {
+      this.showAgentModal()
+    }
   }
 
   async loadAgents(): Promise<void> {

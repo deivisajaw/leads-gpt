@@ -30,7 +30,15 @@ html, body {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Inter no trae glifos CJK/árabe/devanagari: sin estos respaldos el texto
+     saldría en cajitas. El navegador toma el primero que tenga el glifo. */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Hiragino Sans", "Yu Gothic UI", "Meiryo",                 /* 日本語 */
+               "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC",      /* 中文 */
+               "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",    /* 한국어 */
+               "Geeza Pro", "Noto Naskh Arabic", "Tahoma",                /* العربية */
+               "Nirmala UI", "Noto Sans Devanagari",                      /* हिन्दी */
+               sans-serif;
   background-color: var(--background-gray);
   display: flex;
   min-height: 100vh;
@@ -2852,3 +2860,44 @@ button.btn-primary:hover,
 .empty-state .btn-primary i {
   font-size: 14px;
 }
+
+/* ===== AJAW gear loader — base loader global ===== */
+.gear-loader {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  animation: gear-spin 1.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  filter: drop-shadow(0 6px 16px rgba(91, 79, 229, 0.25));
+}
+
+.gear-loader-sm {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  animation: gear-spin 1.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes gear-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gear-loader, .gear-loader-sm { animation: none; }
+}
+
+/* engranaje dentro de botones */
+.btn-gear { width: 18px; height: 18px; filter: brightness(0) invert(1); vertical-align: middle; }
+
+/* ═══ soporte RTL (árabe) ═══
+   El navegador voltea el layout con dir="rtl"; aquí solo corregimos lo que
+   quedó fijado a izquierda/derecha con posiciones absolutas o márgenes. */
+html.rtl body { direction: rtl; }
+html.rtl .aside, html.rtl aside { left: auto; right: 0; }
+html.rtl .main-content, html.rtl .content { margin-left: 0; margin-right: var(--aside-width, 260px); }
+html.rtl .fa-chevron-right::before { content: "\f053"; }
+html.rtl .fa-chevron-left::before  { content: "\f054"; }
+html.rtl .fa-arrow-right::before   { content: "\f060"; }
+html.rtl .fa-arrow-left::before    { content: "\f061"; }
+/* números, montos y datos tabulares se leen mejor en LTR aunque el texto sea RTL */
+html.rtl .price-amount, html.rtl .price-approx,
+html.rtl .sm-val, html.rtl .hs-item b, html.rtl td.numeric { direction: ltr; unicode-bidi: embed; }

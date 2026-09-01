@@ -16,7 +16,7 @@
 
     <!-- Loading and Error States -->
     <div *ngIf="isLoading" class="loading-container">
-      <div class="loading-spinner"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
       <p>Cargando detalles del agente...</p>
     </div>
 
@@ -199,7 +199,7 @@
             <!-- Polling in progress indicator -->
             <div class="info-item" *ngIf="isCalendarPolling">
               <div class="calendar-polling-inline">
-                <div class="polling-dot-spinner"></div>
+                <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
                 <span>{{ 'AGENTS.CALENDAR.POLLING_MESSAGE' | translate }}</span>
                 <button class="polling-cancel-btn" (click)="stopCalendarPolling()" [title]="'AGENTS.CALENDAR.CANCEL_POLLING' | translate">
                   <i class="fas fa-times"></i>
@@ -276,7 +276,7 @@
         <div class="modal-actions">
           <button class="btn-secondary" (click)="closeTestCallModal()">Cancelar</button>
           <button class="btn-primary" [disabled]="!isTestCallFormValid() || isTestCallLoading" (click)="triggerTestCall()">
-            <span *ngIf="isTestCallLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <img *ngIf="isTestCallLoading" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
             {{ isTestCallLoading ? 'Llamando...' : 'Llamame' }}
           </button>
         </div>

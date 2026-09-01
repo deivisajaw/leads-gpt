@@ -382,7 +382,7 @@
           min-width: 120px;
         "
       >
-        <span *ngIf="isSaving" class="btn-spinner"></span>
+        <img *ngIf="isSaving" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isSaving">{{ "HISTORY_DETAILS.ADD_TO_MY_LIST" | translate }}</span>
       </button>
       <button
@@ -452,7 +452,7 @@
         {{ "HISTORY_DETAILS.CANCEL" | translate }}
       </button>
       <button class="modal-btn-confirm" (click)="confirmModalAction()" [disabled]="isSavingAll || isSaving">
-        <span *ngIf="isSavingAll || isSaving" class="btn-spinner"></span>
+        <img *ngIf="isSavingAll || isSaving" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
         <span *ngIf="!isSavingAll && !isSaving">{{ "HISTORY_DETAILS.CONFIRM" | translate }}</span>
       </button>
     </div>

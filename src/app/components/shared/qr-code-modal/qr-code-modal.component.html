@@ -5,7 +5,7 @@
     <p>{{ message }}</p>
     <div class="qr-code-container">
       <img [src]="imageUrl" alt="{{ 'QR_CODE_MODAL.QR_CODE_ALT_TEXT' | translate }}" *ngIf="imageUrl" />
-      <div class="spinner" *ngIf="!imageUrl"></div>
+      <img class="gear-loader" src="images/gear_hr_256.png" alt="" *ngIf="!imageUrl" />
     </div>
   </div>
 </div>

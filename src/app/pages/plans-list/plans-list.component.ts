@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { PlanService } from '../../services/plan.service';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { Plan } from '../plans/plans.component';
+import { CurrencyService } from '../../services/currency.service';
 
 
 @Component({
@@ -14,7 +15,9 @@ import { Plan } from '../plans/plans.component';
   styleUrls: ['./plans-list.component.css'],
   providers: [PlanService]
 })
-export class PlansListComponent implements OnInit { 
+export class PlansListComponent implements OnInit {
+  public currency = inject(CurrencyService);
+ 
   
 
   constructor(
@@ -148,4 +151,9 @@ export class PlansListComponent implements OnInit {
     return 'select';
   }
 
+
+  /** "≈ $1.268.096 COP" — vacío si el cliente ya está en USD. */
+  approxPrice(plan: any): string {
+    return this.currency.approx(this.getRoundedPrice(plan));
+  }
 }
