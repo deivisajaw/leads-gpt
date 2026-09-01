@@ -1,48 +1,48 @@
-import { Injectable } from "@angular/core"
-import { ApiConfigService } from "./api-config.service"
+import { Injectable } from "@angular/core";
+import { ApiConfigService } from "./api-config.service";
 
 export interface People {
-  id: number
-  name: string
-  title: string
-  link: string
-  snippet: string
-  image: string
-  description: string
-  searchResultStatusSelect: number
-  fullName: string
-  email?: string
-  phone?: string
-  education: string
-  experiencies: string
-  countryCode: string
-  location: string
-  about: string
-  itemSelected: boolean
+  id: number;
+  name: string;
+  title: string;
+  link: string;
+  snippet: string;
+  image: string;
+  description: string;
+  searchResultStatusSelect: number;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  education: string;
+  experiencies: string;
+  countryCode: string;
+  location: string;
+  about: string;
+  itemSelected: boolean;
   // Campos adicionales para la vista
-  avatar: string
-  verified: boolean,
-  jobTitle: string,
-  company: string
- 
-  hasEmailOnFile?: boolean
-  hasPhoneOnFile?: boolean
+  avatar: string;
+  verified: boolean;
+  jobTitle: string;
+  company: string;
+
+  hasEmailOnFile?: boolean;
+  hasPhoneOnFile?: boolean;
 }
 
 export interface PeopleSearchResult {
-  notFound: boolean
-  searchString: string
-  results: People[]
-  searchId?: number
-  statusSelect?: number
-  resultsNumber?: number
-  offset: number
-  limit: number
-  fetched: number
-  sortBy?: string
-  message?: string
-  error?: boolean,
-  creditsRemaining?: number
+  notFound: boolean;
+  searchString: string;
+  results: People[];
+  searchId?: number;
+  statusSelect?: number;
+  resultsNumber?: number;
+  offset: number;
+  limit: number;
+  fetched: number;
+  sortBy?: string;
+  message?: string;
+  error?: boolean;
+  creditsRemaining?: number;
 }
 
 export interface PeopleSearchHistoryItem {
@@ -65,7 +65,14 @@ export interface PeopleSearchHistoryResponse {
 }
 
 export interface PeopleSearchResponse {
-  status: 'SEARCH_NOT_FOUND' | 'SEARCH_IN_PROGRESS' | 'SUCCESS' | 'INSUFFICIENT_CREDITS' | 'UNAUTHORIZED' | 'INVALID_INPUT' | 'ERROR';
+  status:
+    | "SEARCH_NOT_FOUND"
+    | "SEARCH_IN_PROGRESS"
+    | "SUCCESS"
+    | "INSUFFICIENT_CREDITS"
+    | "UNAUTHORIZED"
+    | "INVALID_INPUT"
+    | "ERROR";
   message?: string;
   data?: PeopleSearchResult;
 }
@@ -109,23 +116,22 @@ export interface PeopleDashboardStatsResponse {
   providedIn: "root",
 })
 export class PeopleService {
+  constructor(private apiConfig: ApiConfigService) {}
 
-  constructor(private apiConfig: ApiConfigService) { }
-
-    async runSearchPeople(
+  async runSearchPeople(
     query: string,
     offset = 0,
     limit = 25,
-    sortBy = 'name_asc',
+    sortBy = "name_asc",
     searchId?: number,
     category?: string,
-    location?: string
+    location?: string,
   ): Promise<PeopleSearchResponse> {
     try {
-      const token = localStorage.getItem("csrfToken")
+      const token = localStorage.getItem("csrfToken");
 
       if (!token) {
-        throw new Error("No authentication token found")
+        throw new Error("No authentication token found");
       }
 
       const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
@@ -136,7 +142,8 @@ export class PeopleService {
           "X-CSRF-Token": token,
         },
         body: JSON.stringify({
-          action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:runSearchPeople",
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:runSearchPeople",
           data: {
             query: query,
             category: category || undefined,
@@ -147,70 +154,29 @@ export class PeopleService {
             searchId: searchId || undefined,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
-      return result.data as PeopleSearchResponse
+      return result.data as PeopleSearchResponse;
     } catch (error) {
-      console.error("Error in runSearchPeople:", error)
+      console.error("Error in runSearchPeople:", error);
       return {
-        status: 'ERROR',
+        status: "ERROR",
         message: "Error calling API",
-      } as PeopleSearchResponse
+      } as PeopleSearchResponse;
     }
   }
 
-  async getMySearchHistoryPeoples(offset = 0, limit = 25, sortBy = 'createdOn_desc'): Promise<PeopleSearchHistoryResponse> {
-    try {
-        const token = localStorage.getItem("csrfToken");
-        if (!token) {
-            throw new Error("No authentication token found");
-        }
-
-        const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": token,
-            },
-            body: JSON.stringify({
-                action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getMySearchHistoryPeoples",
-                data: {
-                    offset: offset,
-                    limit: limit,
-                    sortBy: sortBy,
-                },
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        return result.data as PeopleSearchHistoryResponse;
-    } catch (error) {
-        console.error("Error in getMySearchHistoryPeoples:", error);
-        return {
-            error: true,
-            message: "Error calling API",
-            history: [],
-            total: 0,
-            offset: offset,
-            limit: limit,
-            fetched: 0,
-            sortBy: sortBy,
-        } as PeopleSearchHistoryResponse;
-    }
-  }
-
-  async getMySearchHistoryPeopleDetails(searchId: number, offset = 0, limit = 25, sortBy = 'name_asc'): Promise<PeopleSearchResult> {
+  async getMySearchHistoryPeoples(
+    offset = 0,
+    limit = 25,
+    sortBy = "createdOn_desc",
+  ): Promise<PeopleSearchHistoryResponse> {
     try {
       const token = localStorage.getItem("csrfToken");
       if (!token) {
@@ -225,7 +191,59 @@ export class PeopleService {
           "X-CSRF-Token": token,
         },
         body: JSON.stringify({
-          action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getMySearchHistoryPeopleDetails",
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getMySearchHistoryPeoples",
+          data: {
+            offset: offset,
+            limit: limit,
+            sortBy: sortBy,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.data as PeopleSearchHistoryResponse;
+    } catch (error) {
+      console.error("Error in getMySearchHistoryPeoples:", error);
+      return {
+        error: true,
+        message: "Error calling API",
+        history: [],
+        total: 0,
+        offset: offset,
+        limit: limit,
+        fetched: 0,
+        sortBy: sortBy,
+      } as PeopleSearchHistoryResponse;
+    }
+  }
+
+  async getMySearchHistoryPeopleDetails(
+    searchId: number,
+    offset = 0,
+    limit = 25,
+    sortBy = "name_asc",
+  ): Promise<PeopleSearchResult> {
+    try {
+      const token = localStorage.getItem("csrfToken");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getMySearchHistoryPeopleDetails",
           data: {
             searchId: searchId,
             offset: offset,
@@ -273,7 +291,8 @@ export class PeopleService {
           "X-CSRF-Token": token,
         },
         body: JSON.stringify({
-          action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getSuggestedPeopleProspects",
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getSuggestedPeopleProspects",
           data: { limit },
         }),
       });
@@ -298,15 +317,22 @@ export class PeopleService {
   // OJO: nombres de acción ASUMIDOS siguiendo la misma convención que
   // getCompanyEmail/getCompanyPhone en companies. Si tu backend usa otro nombre para estos
   // dos métodos de people, ajústalo aquí (y en el AiSearchController).
-  async revealPeopleEmail(peopleId: number): Promise<RevealPeopleContactResponse> {
-    return this.revealPeopleContact('getPeopleEmail', peopleId);
+  async revealPeopleEmail(
+    peopleId: number,
+  ): Promise<RevealPeopleContactResponse> {
+    return this.revealPeopleContact("getPeopleEmail", peopleId);
   }
 
-  async revealPeoplePhone(peopleId: number): Promise<RevealPeopleContactResponse> {
-    return this.revealPeopleContact('getPeoplePhone', peopleId);
+  async revealPeoplePhone(
+    peopleId: number,
+  ): Promise<RevealPeopleContactResponse> {
+    return this.revealPeopleContact("getPeoplePhone", peopleId);
   }
 
-  private async revealPeopleContact(actionName: string, peopleId: number): Promise<RevealPeopleContactResponse> {
+  private async revealPeopleContact(
+    actionName: string,
+    peopleId: number,
+  ): Promise<RevealPeopleContactResponse> {
     try {
       const token = localStorage.getItem("csrfToken");
       if (!token) {
@@ -357,7 +383,8 @@ export class PeopleService {
           "X-CSRF-Token": token,
         },
         body: JSON.stringify({
-          action: "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getStatistics",
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getStatistics",
           data: {},
         }),
       });
@@ -373,7 +400,9 @@ export class PeopleService {
       if (payload?.error) {
         return {
           error: true,
-          message: payload.message || "An unknown error occurred while fetching stats.",
+          message:
+            payload.message ||
+            "An unknown error occurred while fetching stats.",
         };
       }
 
@@ -390,11 +419,53 @@ export class PeopleService {
       };
     } catch (error) {
       console.error("Error in getDashboardStats:", error);
-      const errorMessage = error instanceof Error ? error.message : "A network error occurred.";
+      const errorMessage =
+        error instanceof Error ? error.message : "A network error occurred.";
       return {
         error: true,
         message: errorMessage,
       };
+    }
+  }
+
+  async getPeopleResultById(
+    id: number,
+  ): Promise<{ error: boolean; message?: string; person?: People }> {
+    try {
+      const token = localStorage.getItem("csrfToken");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({
+          action:
+            "com.ajawmrp3.apps.prospectingai.web.AiSearchController:getPeopleResultById",
+          data: { _id: id },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const data = result.data;
+
+      if (data?.error) {
+        return { error: true, message: data.message };
+      }
+
+      return { error: false, person: data as People };
+    } catch (error) {
+      console.error("Error in getPeopleResultById:", error);
+      return { error: true, message: "Error calling API" };
     }
   }
 }

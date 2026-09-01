@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, Hos
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { TranslateModule } from '@ngx-translate/core';
-import { Router } from "@angular/router"
+import { Router, ActivatedRoute } from "@angular/router"
 import { CompaniesService, Company, CompanySearchResult, CompanySearchResponse, CompanyDashboardStats, SuggestedProspect } from "../../services/companies.service"
 import { MyListCompanyService } from "../../services/my-list-company.service"
 import { SavedListService, SavedListSummary } from "../../services/saved-list.service"
@@ -238,6 +238,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     private myListCompanyService: MyListCompanyService,
     private savedListService: SavedListService,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private notificationService: NotificationService,
     private onboardingService: OnboardingService,
@@ -264,6 +265,14 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadDashboardStats();
     this.loadSuggestedProspects();
     this.loadAvailableLists();
+
+    const companyIdParam = this.route.snapshot.queryParamMap.get('companyId');
+    if (companyIdParam) {
+      const companyId = Number(companyIdParam);
+      if (Number.isFinite(companyId) && companyId > 0) {
+        this.loadSingleCompanyFromDirectorio(companyId);
+      }
+    }
   }
 
   ngAfterViewInit(): void {
@@ -389,7 +398,10 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.onSearch();
   }
 
-    async onSearch() {
+  async onSearch() {
+
+    this.clearDirectorioParamsFromUrl();
+
     if (!this.searchQuery.trim() && !this.currentCategory.trim() && !this.currentLocation.trim()) {
       this.resetSearchState();
       return;
@@ -544,6 +556,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private resetSearchState(keepQueryText = false) {
+    this.clearDirectorioParamsFromUrl();
+
     const previousQuery = this.currentQuery;
     this.currentQuery = "";
     if (!keepQueryText) {
@@ -1264,5 +1278,50 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.velY = 0;
     }
     this.globeCanvasRef?.nativeElement.classList.remove('drag');
+  }
+
+  private async loadSingleCompanyFromDirectorio(companyId: number): Promise<void> {
+    this.isLoading = true;
+    this.searchError = null;
+    this.showPlans = false;
+
+    const result = await this.companiesService.getCompanyResultById(companyId);
+
+    this.isLoading = false;
+
+    if (result.error || !result.company) {
+      this.searchError = result.message || 'No se encontro la empresa solicitada.';
+      return;
+    }
+
+    // Reusa exactamente el mismo camino que un resultado de busqueda normal: llenar
+    // filteredResults/facetas/etc via updateStateFromData. Como currentQuery queda con
+    // el titulo de la empresa, el hero y <app-search-chat> se ocultan solos (misma
+    // condicion *ngIf="!currentQuery" que ya existe en el html) sin tocar el template.
+    this.currentQuery = result.company.title || `Empresa #${companyId}`;
+    this.currentCategory = '';
+    this.currentLocation = '';
+    this.currentSearchId = null;
+
+    this.updateStateFromData({
+      notFound: false,
+      searchString: this.currentQuery,
+      results: [result.company],
+      searchId: undefined,
+      statusSelect: 2,
+      resultsNumber: 1,
+      offset: 0,
+      limit: 1,
+      fetched: 1,
+      sortBy: this.currentSortOrder,
+    });
+
+    this.onboardingService.completeOnboardingStepByKey('FIND_LEADS');
+  }
+
+  private clearDirectorioParamsFromUrl(): void {
+    if (this.route.snapshot.queryParamMap.has('companyId') || this.route.snapshot.queryParamMap.has('directorio')) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+    }
   }
 }

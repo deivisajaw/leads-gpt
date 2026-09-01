@@ -6,6 +6,7 @@ import { AuthService, OnboardingQuestion } from '../../services/auth.service';
 import { SignupService } from '../../services/signup.service';
 import { SignupPayload } from '../../models/signup.model';
 import { OnboardingWizardComponent } from '../../components/onboarding-wizard/onboarding-wizard.component';
+import { DirectorioRedirectService } from '../../services/directorio-redirect.service';
 
 @Component({
   selector: 'app-login',
@@ -66,10 +67,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private directorioRedirect: DirectorioRedirectService
   ) { }
 
   ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+      this.directorioRedirect.capture(params);
+    });
 
     const state = history.state as { signupSuccessMessage?: string };
 
@@ -214,7 +220,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
           this.onboardingWizard.handleWebhookSuccess();
         } else {
           // Fallback en caso de que no se encuentre la referencia
-          this.router.navigate(['/dashboard']);
+          const nav = this.directorioRedirect.getRedirectNavigation();
+          if (nav) {
+            this.router.navigate(nav.commands, nav.extras);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         }
       } catch (loginError: any) {
         // Si el login automático falla, mostramos mensaje y redirigimos al tab de login

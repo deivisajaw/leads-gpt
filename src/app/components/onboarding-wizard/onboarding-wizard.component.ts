@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { OnboardingQuestion } from '../../services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { DirectorioRedirectService } from '../../services/directorio-redirect.service';
 
 interface Answer {
   answerText: string | null;
@@ -33,7 +34,10 @@ export class OnboardingWizardComponent implements OnInit, OnChanges {
 
   @ViewChild('cineVideo') cineVideo!: ElementRef<HTMLVideoElement>;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, 
+              private directorioRedirect: DirectorioRedirectService) { 
+              
+  }
 
   ngOnInit(): void {
     this.initializeAnswers();
@@ -214,11 +218,11 @@ export class OnboardingWizardComponent implements OnInit, OnChanges {
           video.play().then(() => {
             video.addEventListener('ended', () => {
               this.showCinematic = false;
-              this.router.navigate(['/dashboard']);
+              this.navigateAfterOnboarding();
             });
           }).catch(err => {
             console.error('Error al reproducir el video automáticamente:', err);
-            this.router.navigate(['/dashboard']);
+            this.navigateAfterOnboarding();
           });
         }
       }, 50);
@@ -230,5 +234,14 @@ export class OnboardingWizardComponent implements OnInit, OnChanges {
     
     // Opcional: Si quieres reiniciar el paso actual al primero o dejarlo en el último
     // this.currentStep = 0; 
+  }
+
+  private navigateAfterOnboarding(): void {
+    const nav = this.directorioRedirect.getRedirectNavigation();
+    if (nav) {
+      this.router.navigate(nav.commands, nav.extras);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }
