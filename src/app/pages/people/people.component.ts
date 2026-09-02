@@ -1554,8 +1554,9 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isLoading = false;
 
     if (result.error || !result.person) {
-      this.searchError =
-        result.message || "No se encontro la persona solicitada.";
+      this.currentQuery = `Persona #${peopleId}`;
+      this.filteredResults = [];
+      this.searchError = result.message || 'No se encontro la persona solicitada.';
       return;
     }
 

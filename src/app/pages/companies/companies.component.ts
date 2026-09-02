@@ -1,18 +1,41 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, HostListener, NgZone, Renderer2 } from "@angular/core"
-import { CommonModule } from "@angular/common"
-import { FormsModule } from "@angular/forms"
-import { TranslateModule } from '@ngx-translate/core';
-import { Router, ActivatedRoute } from "@angular/router"
-import { CompaniesService, Company, CompanySearchResult, CompanySearchResponse, CompanyDashboardStats, SuggestedProspect } from "../../services/companies.service"
-import { MyListCompanyService } from "../../services/my-list-company.service"
-import { SavedListService, SavedListSummary } from "../../services/saved-list.service"
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  HostListener,
+  NgZone,
+  Renderer2,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { TranslateModule } from "@ngx-translate/core";
+import { Router, ActivatedRoute } from "@angular/router";
+import {
+  CompaniesService,
+  Company,
+  CompanySearchResult,
+  CompanySearchResponse,
+  CompanyDashboardStats,
+  SuggestedProspect,
+} from "../../services/companies.service";
+import { MyListCompanyService } from "../../services/my-list-company.service";
+import {
+  SavedListService,
+  SavedListSummary,
+} from "../../services/saved-list.service";
 import { AuthService } from "../../services/auth.service";
 import { Subscription } from "rxjs";
 import { NotificationService } from "../../services/notification.service";
-import { PlansComponent } from '../plans/plans.component';
+import { PlansComponent } from "../plans/plans.component";
 import { OnboardingService } from "../../services/onboarding.service";
 import { ApiConfigService } from "../../services/api-config.service";
-import { SearchChatComponent, SearchReadyResult } from "../../components/search-chat/search-chat.component";
+import {
+  SearchChatComponent,
+  SearchReadyResult,
+} from "../../components/search-chat/search-chat.component";
 import { ExportService } from "../../services/export.service";
 
 export interface FacetOption {
@@ -23,46 +46,54 @@ export interface FacetOption {
 @Component({
   selector: "app-companies",
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, PlansComponent, SearchChatComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    PlansComponent,
+    SearchChatComponent,
+  ],
   templateUrl: "./companies.component.html",
   styleUrl: "./companies.component.css",
 })
 export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('globeCanvas') globeCanvasRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('selectionBarPortal') selectionBarPortalRef?: ElementRef<HTMLElement>;
-  @ViewChild('confirmModalPortal') confirmModalPortalRef?: ElementRef<HTMLElement>;
+  @ViewChild("globeCanvas") globeCanvasRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild("selectionBarPortal")
+  selectionBarPortalRef?: ElementRef<HTMLElement>;
+  @ViewChild("confirmModalPortal")
+  confirmModalPortalRef?: ElementRef<HTMLElement>;
 
-  searchQuery = ""
-  currentQuery = ""
-  currentCategory = ""
-  currentLocation = ""
+  searchQuery = "";
+  currentQuery = "";
+  currentCategory = "";
+  currentLocation = "";
   isLoading = false;
-  currentView: "grid" | "card" | "default" = "grid"
-  currentViewText = "Grid view"
-  filteredResults: Company[] = []
-  currentPage = 1
-  itemsPerPage = 25
-  selectedCompanies: number[] = []
-  selectAllChecked = false
-  totalResults = 0
-  currentSearchId: number | null = null
+  currentView: "grid" | "card" | "default" = "grid";
+  currentViewText = "Grid view";
+  filteredResults: Company[] = [];
+  currentPage = 1;
+  itemsPerPage = 25;
+  selectedCompanies: number[] = [];
+  selectAllChecked = false;
+  totalResults = 0;
+  currentSearchId: number | null = null;
 
   totalResultsInServer = 0;
   searchStatus = "";
   currentOffset = 0;
 
-  showViewDropdown = false
-  showSortDropdown = false
+  showViewDropdown = false;
+  showSortDropdown = false;
 
   // ─── Filtros de la barra lateral izquierda ───
   public showFilters = true;
   public showMoreFilters = false;
   public localFilters = {
-    title: '',
-    categoryName: '',
-    city: '',
-    state: '',
-    countryCode: ''
+    title: "",
+    categoryName: "",
+    city: "",
+    state: "",
+    countryCode: "",
   };
   // Facetas calculadas a partir de los resultados de la página actual (chips "Ubicación",
   // "Industria" y "Estado de email"). NOTA: como el buscador pagina de a 25, estas facetas solo
@@ -90,7 +121,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private facetSourcePool = new Map<number, Company>();
 
   public displayResults: Company[] = [];
-  public currentSortOrder: string = 'title_asc';
+  public currentSortOrder: string = "title_asc";
 
   // Contador de "Guardados" para el bloque de stats del sidebar — es lo agregado en ESTA sesión
   // (no el total histórico de tu lista, que requeriría otra llamada al backend).
@@ -104,11 +135,20 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private _pulseTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngDoCheck(): void {
-    if (this._prevCreditsShown !== null && this.creditsRemaining !== this._prevCreditsShown) {
-      if (this._pulseTimer) { clearTimeout(this._pulseTimer); }
+    if (
+      this._prevCreditsShown !== null &&
+      this.creditsRemaining !== this._prevCreditsShown
+    ) {
+      if (this._pulseTimer) {
+        clearTimeout(this._pulseTimer);
+      }
       this.creditsPulse = false;
-      requestAnimationFrame(() => { this.creditsPulse = true; });
-      this._pulseTimer = setTimeout(() => { this.creditsPulse = false; }, 900);
+      requestAnimationFrame(() => {
+        this.creditsPulse = true;
+      });
+      this._pulseTimer = setTimeout(() => {
+        this.creditsPulse = false;
+      }, 900);
     }
     this._prevCreditsShown = this.creditsRemaining;
   }
@@ -123,33 +163,44 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // ─── Modal de confirmación genérico (agregar 1 / agregar todos / agregar seleccionados) ───
   // askLists=true muestra el picker de listas: elegir una o varias existentes y/o escribir el
   // nombre de una lista nueva para crearla al confirmar.
-  public confirmState: { message: string; confirmLabel: string; askLists: boolean; onConfirm: (listIds?: number[]) => void } | null = null;
+  public confirmState: {
+    message: string;
+    confirmLabel: string;
+    askLists: boolean;
+    onConfirm: (listIds?: number[]) => void;
+  } | null = null;
   public availableLists: SavedListSummary[] = [];
   public confirmSelectedListIds = new Set<number>();
-  public confirmNewListName = '';
+  public confirmNewListName = "";
 
   private async loadAvailableLists(): Promise<void> {
     const res = await this.savedListService.getMySavedLists();
     this.availableLists = res.error ? [] : res.lists;
   }
 
-  public confirmListFilter = '';
+  public confirmListFilter = "";
 
   public get filteredAvailableLists(): SavedListSummary[] {
     const q = this.confirmListFilter.trim().toLowerCase();
     if (!q) return this.availableLists;
-    return this.availableLists.filter(l => l.name.toLowerCase().includes(q));
+    return this.availableLists.filter((l) => l.name.toLowerCase().includes(q));
   }
 
-  private openConfirm(message: string, confirmLabel: string, onConfirm: (listIds?: number[]) => void, askLists = true): void {
+  private openConfirm(
+    message: string,
+    confirmLabel: string,
+    onConfirm: (listIds?: number[]) => void,
+    askLists = true,
+  ): void {
     this.confirmSelectedListIds.clear();
-    this.confirmNewListName = '';
-    this.confirmListFilter = '';
+    this.confirmNewListName = "";
+    this.confirmListFilter = "";
     this.confirmState = { message, confirmLabel, askLists, onConfirm };
   }
 
   public toggleConfirmList(listId: number): void {
-    if (this.confirmSelectedListIds.has(listId)) this.confirmSelectedListIds.delete(listId);
+    if (this.confirmSelectedListIds.has(listId))
+      this.confirmSelectedListIds.delete(listId);
     else this.confirmSelectedListIds.add(listId);
   }
 
@@ -164,7 +215,9 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!res.error && res.list) {
         listIds.push(res.list.id);
       } else {
-        this.notificationService.showError(res.message || 'No se pudo crear la lista.');
+        this.notificationService.showError(
+          res.message || "No se pudo crear la lista.",
+        );
       }
     }
 
@@ -181,11 +234,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   public revealingPhoneIds = new Set<number>();
 
   // ─── Dashboard stats (barra superior de la vista inicial) ───
-  public dashboardStats: CompanyDashboardStats = { leads: 0, searches: 0, phones: 0, emails: 0 };
+  public dashboardStats: CompanyDashboardStats = {
+    leads: 0,
+    searches: 0,
+    phones: 0,
+    emails: 0,
+  };
   public statsLoading = true;
 
   public suggestedProspects: SuggestedProspect[] = [];
-  private readonly avatarColors = ['#5b4fe5', '#ec4899', '#3b82f6', '#0ea968'];
+  private readonly avatarColors = ["#5b4fe5", "#ec4899", "#3b82f6", "#0ea968"];
 
   // ─── Globo punteado interactivo de fondo ───
   private globeCtx: CanvasRenderingContext2D | null = null;
@@ -216,10 +274,20 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // Ciclan un resplandor entre las ciudades principales de Latinoamérica, sin representar
   // datos reales de leads (eso requeriría un endpoint dedicado que aún no existe).
   private readonly PIN_CITIES: [number, number][] = [
-    [4.6, -74.1], [6.2, -75.6], [3.4, -76.5], [10.4, -75.5],
-    [-12.0, -77.0], [-33.4, -70.6], [-34.6, -58.4], [-23.5, -46.6],
-    [-22.9, -43.2], [19.4, -99.1], [20.7, -103.3], [25.7, -100.3],
-    [-0.2, -78.5], [9.0, -79.5],
+    [4.6, -74.1],
+    [6.2, -75.6],
+    [3.4, -76.5],
+    [10.4, -75.5],
+    [-12.0, -77.0],
+    [-33.4, -70.6],
+    [-34.6, -58.4],
+    [-23.5, -46.6],
+    [-22.9, -43.2],
+    [19.4, -99.1],
+    [20.7, -103.3],
+    [25.7, -100.3],
+    [-0.2, -78.5],
+    [9.0, -79.5],
   ];
   private pins: number[][] = [];
 
@@ -227,10 +295,14 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // Copia earth_landmask_720.png dentro de public/images/ (Angular sirve el contenido de
   // "public" directamente en la raíz, por eso NO se antepone "assets/" aquí).
   // Si prefieres usar src/assets/, cambia esto a 'assets/images/earth_landmask_720.png'.
-  private readonly landmaskSrc = 'images/earth_landmask_720.png';
-  private readonly reducedMotion = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private readonly landmaskSrc = "images/earth_landmask_720.png";
+  private readonly reducedMotion =
+    typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  private boundOnGlobePointerMove = (e: MouseEvent | TouchEvent) => this.onGlobePointerMove(e);
+  private boundOnGlobePointerMove = (e: MouseEvent | TouchEvent) =>
+    this.onGlobePointerMove(e);
   private boundOnGlobePointerUp = () => this.onGlobePointerUp();
 
   constructor(
@@ -245,28 +317,30 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     private apiConfig: ApiConfigService,
     private ngZone: NgZone,
     private renderer: Renderer2,
-    private exportService: ExportService
+    private exportService: ExportService,
   ) {
     document.addEventListener("click", (event) => {
-      const target = event.target as HTMLElement
+      const target = event.target as HTMLElement;
       if (!target.closest(".dropdown-wrapper")) {
-        this.closeAllDropdowns()
+        this.closeAllDropdowns();
       }
-    })
+    });
   }
 
   ngOnInit(): void {
-    this.userProfileSubscription = this.authService.userProfile$.subscribe(profile => {
-      if (profile && profile.companyProfile) {
-        this.creditsRemaining = profile.companyProfile.creditsAllocated ?? 0;
-      }
-    });
+    this.userProfileSubscription = this.authService.userProfile$.subscribe(
+      (profile) => {
+        if (profile && profile.companyProfile) {
+          this.creditsRemaining = profile.companyProfile.creditsAllocated ?? 0;
+        }
+      },
+    );
 
     this.loadDashboardStats();
     this.loadSuggestedProspects();
     this.loadAvailableLists();
 
-    const companyIdParam = this.route.snapshot.queryParamMap.get('companyId');
+    const companyIdParam = this.route.snapshot.queryParamMap.get("companyId");
     if (companyIdParam) {
       const companyId = Number(companyIdParam);
       if (Number.isFinite(companyId) && companyId > 0) {
@@ -287,12 +361,18 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // la pantalla. En vez de perseguir cuál ancestro es el culpable (puede estar fuera de
   // nuestros archivos), los movemos una sola vez a <body>, donde no hay ninguna duda posible.
   private portalFixedElementsToBody(): void {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
     if (this.selectionBarPortalRef) {
-      this.renderer.appendChild(document.body, this.selectionBarPortalRef.nativeElement);
+      this.renderer.appendChild(
+        document.body,
+        this.selectionBarPortalRef.nativeElement,
+      );
     }
     if (this.confirmModalPortalRef) {
-      this.renderer.appendChild(document.body, this.confirmModalPortalRef.nativeElement);
+      this.renderer.appendChild(
+        document.body,
+        this.confirmModalPortalRef.nativeElement,
+      );
     }
   }
 
@@ -330,16 +410,18 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.suggestedProspects = [];
     }
     this.suggestedRevealed = false;
-    setTimeout(() => { this.suggestedRevealed = true; }, 0);
+    setTimeout(() => {
+      this.suggestedRevealed = true;
+    }, 0);
   }
 
   public getInitials(name: string): string {
     return name
-      .split(' ')
+      .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map(w => w[0])
-      .join('')
+      .map((w) => w[0])
+      .join("")
       .toUpperCase();
   }
 
@@ -352,27 +434,27 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // Por eso abrimos el MISMO drawer que usan los resultados de búsqueda (openDetail), en vez
   // de un panel aparte: así "Acceder email"/"Celular" funcionan igual en los dos lugares.
   openSuggestedDetail(p: SuggestedProspect): void {
-    const id = typeof p.id === 'string' ? parseInt(p.id, 10) : p.id;
+    const id = typeof p.id === "string" ? parseInt(p.id, 10) : p.id;
     const asCompany: Company = {
       id,
       title: p.name,
-      categoryName: p.role || '',
-      address: '',
-      neighborhood: '',
-      street: '',
+      categoryName: p.role || "",
+      address: "",
+      neighborhood: "",
+      street: "",
       city: p.city,
-      postalCode: '',
-      state: '',
-      countryCode: '',
-      phoneUnformatted: '',
+      postalCode: "",
+      state: "",
+      countryCode: "",
+      phoneUnformatted: "",
       permanentlyClosed: false,
-      openingHours: '',
-      website: '',
-      additionalInfo: '',
-      error: '',
-      errorDescription: '',
-      description: '',
-      descriptionMd: '',
+      openingHours: "",
+      website: "",
+      additionalInfo: "",
+      error: "",
+      errorDescription: "",
+      description: "",
+      descriptionMd: "",
       email: undefined,
       // No sabemos si tiene email/teléfono en archivo (el endpoint de sugeridos no lo manda) —
       // dejamos undefined para que muestre el botón normal de "Acceder email"/"Celular" en vez
@@ -399,10 +481,13 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async onSearch() {
-
     this.clearDirectorioParamsFromUrl();
 
-    if (!this.searchQuery.trim() && !this.currentCategory.trim() && !this.currentLocation.trim()) {
+    if (
+      !this.searchQuery.trim() &&
+      !this.currentCategory.trim() &&
+      !this.currentLocation.trim()
+    ) {
       this.resetSearchState();
       return;
     }
@@ -422,8 +507,13 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.companiesService.runSearchCompanies(
-        this.currentQuery, 0, this.itemsPerPage, this.currentSortOrder,
-        undefined, this.currentCategory, this.currentLocation
+        this.currentQuery,
+        0,
+        this.itemsPerPage,
+        this.currentSortOrder,
+        undefined,
+        this.currentCategory,
+        this.currentLocation,
       );
 
       this.processApiResponse(response);
@@ -441,13 +531,13 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showPlans = false;
 
     switch (response.status) {
-      case 'SUCCESS':
+      case "SUCCESS":
         this.updateStateFromData(response.data);
-        this.onboardingService.completeOnboardingStepByKey('FIND_LEADS');
+        this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
         break;
 
-      case 'SEARCH_NOT_FOUND':
-      case 'SEARCH_IN_PROGRESS':
+      case "SEARCH_NOT_FOUND":
+      case "SEARCH_IN_PROGRESS":
         this.filteredResults = [];
         this.displayResults = [];
         this.totalResultsInServer = 0;
@@ -456,14 +546,15 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.searchStatus = "";
         break;
 
-      case 'INSUFFICIENT_CREDITS':
-        this.searchError = response.message || "No tienes creditos suficientes.";
+      case "INSUFFICIENT_CREDITS":
+        this.searchError =
+          response.message || "No tienes creditos suficientes.";
         this.showPlans = true;
         break;
 
-      case 'UNAUTHORIZED':
-      case 'INVALID_INPUT':
-      case 'ERROR':
+      case "UNAUTHORIZED":
+      case "INVALID_INPUT":
+      case "ERROR":
         this.searchError = response.message || "Ocurrio un error.";
         break;
 
@@ -481,17 +572,17 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     // explícitamente con "Acceder email"/"Celular" (revealEmail/revealPhone) en esta sesión.
     // Guardamos si el registro TIENE el dato (no el valor) para poder construir la faceta
     // "Estado de email" sin filtrar el dato real.
-    this.filteredResults = (data.results ?? []).map(c => ({
+    this.filteredResults = (data.results ?? []).map((c) => ({
       ...c,
       hasEmailOnFile: !!c.email,
       hasPhoneOnFile: !!c.phoneUnformatted,
       email: undefined,
-      phoneUnformatted: '',
+      phoneUnformatted: "",
     }));
     this.totalResultsInServer = data.resultsNumber || 0;
     this.currentSearchId = data.searchId || null;
     this.currentOffset = data.offset;
-    this.currentSortOrder = data.sortBy || 'title_asc';
+    this.currentSortOrder = data.sortBy || "title_asc";
 
     if (data.creditsRemaining !== undefined) {
       this.authService.updateCurrentUserCredits(data.creditsRemaining);
@@ -514,12 +605,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private buildFacets(): void {
     const pool = Array.from(this.facetSourcePool.values());
-    this.cityFacetOptions = this.countBy(pool, c => c.city);
-    this.categoryFacetOptions = this.countBy(pool, c => c.categoryName);
+    this.cityFacetOptions = this.countBy(pool, (c) => c.city);
+    this.categoryFacetOptions = this.countBy(pool, (c) => c.categoryName);
     // Si el backend nunca manda hasEmailOnFile, todos quedan "undefined" y countBy los descarta
     // (valor vacío) — la faceta simplemente no aparece hasta que el backend la soporte.
-    this.emailFacetOptions = this.countBy(pool, c =>
-      c.hasEmailOnFile === undefined ? '' : (c.hasEmailOnFile ? 'Con email' : 'Sin email')
+    this.emailFacetOptions = this.countBy(pool, (c) =>
+      c.hasEmailOnFile === undefined
+        ? ""
+        : c.hasEmailOnFile
+          ? "Con email"
+          : "Sin email",
     );
     this.recomputeFacetChips();
   }
@@ -529,24 +624,27 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private recomputeFacetChips(): void {
     this.cityFacetSelected = Array.from(this.selectedCityFacets);
     this.cityFacetGhost = this.cityFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedCityFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedCityFacets.has(v));
 
     this.categoryFacetSelected = Array.from(this.selectedCategoryFacets);
     this.categoryFacetGhost = this.categoryFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedCategoryFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedCategoryFacets.has(v));
 
     this.emailFacetSelected = Array.from(this.selectedEmailFacets);
     this.emailFacetGhost = this.emailFacetOptions
-      .map(o => o.value)
-      .filter(v => !this.selectedEmailFacets.has(v));
+      .map((o) => o.value)
+      .filter((v) => !this.selectedEmailFacets.has(v));
   }
 
-  private countBy(items: Company[], pick: (c: Company) => string | undefined): FacetOption[] {
+  private countBy(
+    items: Company[],
+    pick: (c: Company) => string | undefined,
+  ): FacetOption[] {
     const counts = new Map<string, number>();
     for (const item of items) {
-      const value = (pick(item) || '').trim();
+      const value = (pick(item) || "").trim();
       if (!value) continue;
       counts.set(value, (counts.get(value) || 0) + 1);
     }
@@ -615,10 +713,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async goToPage(page: number) {
-    if (page < 1 || (!this.currentQuery && !this.currentCategory && !this.currentLocation) || this.isLoading) return;
+    if (
+      page < 1 ||
+      (!this.currentQuery && !this.currentCategory && !this.currentLocation) ||
+      this.isLoading
+    )
+      return;
 
     const newOffset = (page - 1) * this.itemsPerPage;
-    if (newOffset >= this.totalResultsInServer && this.totalResultsInServer > 0) return;
+    if (newOffset >= this.totalResultsInServer && this.totalResultsInServer > 0)
+      return;
 
     this.isLoading = true;
     this.currentPage = page;
@@ -626,8 +730,13 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       const response = await this.companiesService.runSearchCompanies(
-        this.currentQuery, newOffset, this.itemsPerPage, this.currentSortOrder,
-        this.currentSearchId ?? undefined, this.currentCategory, this.currentLocation
+        this.currentQuery,
+        newOffset,
+        this.itemsPerPage,
+        this.currentSortOrder,
+        this.currentSearchId ?? undefined,
+        this.currentCategory,
+        this.currentLocation,
       );
       this.processApiResponse(response);
     } catch (error) {
@@ -646,31 +755,41 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get showSelectionBar(): boolean {
-    return this.selectedCompanies.length > 0
+    return this.selectedCompanies.length > 0;
   }
 
   changeView(view: "grid" | "card" | "default") {
-    this.currentView = view
+    this.currentView = view;
     switch (view) {
-      case "grid": this.currentViewText = "Grid view"; break;
-      case "card": this.currentViewText = "Card view"; break;
-      case "default": this.currentViewText = "Default view"; break;
+      case "grid":
+        this.currentViewText = "Grid view";
+        break;
+      case "card":
+        this.currentViewText = "Card view";
+        break;
+      case "default":
+        this.currentViewText = "Default view";
+        break;
     }
   }
 
   toggleSelectAll() {
-    this.selectAllChecked = !this.selectAllChecked
-    this.selectedCompanies = this.selectAllChecked ? this.displayResults.map(c => c.id) : [];
+    this.selectAllChecked = !this.selectAllChecked;
+    this.selectedCompanies = this.selectAllChecked
+      ? this.displayResults.map((c) => c.id)
+      : [];
   }
 
   toggleCompanySelection(companyId: number) {
-    const index = this.selectedCompanies.indexOf(companyId)
+    const index = this.selectedCompanies.indexOf(companyId);
     if (index > -1) {
-      this.selectedCompanies.splice(index, 1)
+      this.selectedCompanies.splice(index, 1);
     } else {
-      this.selectedCompanies.push(companyId)
+      this.selectedCompanies.push(companyId);
     }
-    this.selectAllChecked = this.displayResults.length > 0 && this.selectedCompanies.length === this.displayResults.length;
+    this.selectAllChecked =
+      this.displayResults.length > 0 &&
+      this.selectedCompanies.length === this.displayResults.length;
   }
 
   addToMyList(): void {
@@ -680,34 +799,45 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     if (this.creditsRemaining < creditsNeeded) {
-      this.notificationService.showError(`No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`);
+      this.notificationService.showError(
+        `No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`,
+      );
       return;
     }
     this.openConfirm(
-      `¿Añadir ${creditsNeeded} ${creditsNeeded === 1 ? 'empresa' : 'empresas'} a tu lista? Esto usará ${creditsNeeded} crédito${creditsNeeded === 1 ? '' : 's'}.`,
-      'Añadir',
-      (listIds) => this.doAddToMyList(listIds)
+      `¿Añadir ${creditsNeeded} ${creditsNeeded === 1 ? "empresa" : "empresas"} a tu lista? Esto usará ${creditsNeeded} crédito${creditsNeeded === 1 ? "" : "s"}.`,
+      "Añadir",
+      (listIds) => this.doAddToMyList(listIds),
     );
   }
 
   private async doAddToMyList(listIds?: number[]): Promise<void> {
     this.isSaving = true;
     try {
-      const result = await this.myListCompanyService.saveCompanyResults(this.selectedCompanies, listIds);
+      const result = await this.myListCompanyService.saveCompanyResults(
+        this.selectedCompanies,
+        listIds,
+      );
       if (result.error) {
-        this.notificationService.showError(result.message || "Error al guardar las empresas");
+        this.notificationService.showError(
+          result.message || "Error al guardar las empresas",
+        );
       } else {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${result.saved} empresas anadidas a tu lista.`);
+        this.notificationService.showSuccess(
+          `${result.saved} empresas anadidas a tu lista.`,
+        );
         this.sessionSavedCount += result.saved || 0;
         this.selectedCompanies = [];
         this.selectAllChecked = false;
-        this.onboardingService.completeOnboardingStepByKey('SAVE_LEAD');
+        this.onboardingService.completeOnboardingStepByKey("SAVE_LEAD");
       }
     } catch (error) {
-      this.notificationService.showError("Error de conexion al guardar las empresas.");
+      this.notificationService.showError(
+        "Error de conexion al guardar las empresas.",
+      );
     } finally {
       this.isSaving = false;
     }
@@ -717,32 +847,44 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   quickAddToList(company: Company): void {
     this.openConfirm(
       `¿Añadir "${company.title}" a tu lista? Esto usará 1 crédito.`,
-      'Añadir',
-      (listIds) => this.doQuickAddToList(company, listIds)
+      "Añadir",
+      (listIds) => this.doQuickAddToList(company, listIds),
     );
   }
 
-  private async doQuickAddToList(company: Company, listIds?: number[]): Promise<void> {
+  private async doQuickAddToList(
+    company: Company,
+    listIds?: number[],
+  ): Promise<void> {
     if (this.savingSingleId !== null) return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.savingSingleId = company.id;
     try {
-      const result = await this.myListCompanyService.saveCompanyResults([company.id], listIds);
+      const result = await this.myListCompanyService.saveCompanyResults(
+        [company.id],
+        listIds,
+      );
       if (result.error) {
-        this.notificationService.showError(result.message || 'Error al guardar la empresa');
+        this.notificationService.showError(
+          result.message || "Error al guardar la empresa",
+        );
       } else {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${company.title} añadida a tu lista.`);
+        this.notificationService.showSuccess(
+          `${company.title} añadida a tu lista.`,
+        );
         this.sessionSavedCount++;
-        this.onboardingService.completeOnboardingStepByKey('SAVE_LEAD');
+        this.onboardingService.completeOnboardingStepByKey("SAVE_LEAD");
       }
     } catch (error) {
-      this.notificationService.showError('Error de conexión al guardar la empresa.');
+      this.notificationService.showError(
+        "Error de conexión al guardar la empresa.",
+      );
     } finally {
       this.savingSingleId = null;
     }
@@ -751,13 +893,15 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // "Agregar Todos" — pide confirmación (con listas opcionales) antes de ejecutar.
   addAllToMyList(): void {
     if (!this.currentSearchId || this.totalResultsInServer === 0) {
-      this.notificationService.showError("No hay una busqueda activa o la busqueda no arrojo resultados.");
+      this.notificationService.showError(
+        "No hay una busqueda activa o la busqueda no arrojo resultados.",
+      );
       return;
     }
     this.openConfirm(
       `¿Añadir los ${this.totalResultsInServer} resultados de esta búsqueda a tu lista? Esto usará ${this.totalResultsInServer} créditos.`,
-      'Añadir todos',
-      (listIds) => this.doAddAllToMyList(listIds)
+      "Añadir todos",
+      (listIds) => this.doAddAllToMyList(listIds),
     );
   }
 
@@ -765,53 +909,115 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.currentSearchId || this.totalResultsInServer === 0) return;
     const creditsNeeded = this.totalResultsInServer;
     if (this.creditsRemaining < creditsNeeded) {
-      this.notificationService.showError(`No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`);
+      this.notificationService.showError(
+        `No tienes creditos suficientes. Necesitas ${creditsNeeded} y tienes ${this.creditsRemaining}.`,
+      );
       return;
     }
     this.isSavingAll = true;
     try {
-      const result = await this.myListCompanyService.saveAllCompanyResults(this.currentSearchId, listIds);
-      if (result && result.error === false && typeof result.saved === 'number') {
+      const result = await this.myListCompanyService.saveAllCompanyResults(
+        this.currentSearchId,
+        listIds,
+      );
+      if (
+        result &&
+        result.error === false &&
+        typeof result.saved === "number"
+      ) {
         if (result.creditsRemaining !== undefined) {
           this.authService.updateCurrentUserCredits(result.creditsRemaining);
         }
-        this.notificationService.showSuccess(`${result.saved} nuevas empresas anadidas a tu lista.`);
+        this.notificationService.showSuccess(
+          `${result.saved} nuevas empresas anadidas a tu lista.`,
+        );
         this.sessionSavedCount += result.saved;
         this.selectedCompanies = [];
         this.selectAllChecked = false;
       } else {
-        const errorMessage = result?.message || "Ocurrio un error en el servidor. Por favor, intentalo de nuevo.";
+        const errorMessage =
+          result?.message ||
+          "Ocurrio un error en el servidor. Por favor, intentalo de nuevo.";
         this.notificationService.showError(errorMessage);
       }
     } catch (error) {
-      this.notificationService.showError("Error de conexion al guardar todas las empresas.");
+      this.notificationService.showError(
+        "Error de conexion al guardar todas las empresas.",
+      );
     } finally {
       this.isSavingAll = false;
     }
   }
 
-  downloadSelected() { this.notificationService.showError(`Downloading ${this.selectedCompanies.length} selected companies`) }
-  viewSelected() { this.notificationService.showError(`Viewing ${this.selectedCompanies.length} selected companies`) }
-  closeSelectionBar() { this.selectedCompanies = []; this.selectAllChecked = false; }
+  downloadSelected() {
+    this.notificationService.showError(
+      `Downloading ${this.selectedCompanies.length} selected companies`,
+    );
+  }
+  viewSelected() {
+    this.notificationService.showError(
+      `Viewing ${this.selectedCompanies.length} selected companies`,
+    );
+  }
+  closeSelectionBar() {
+    this.selectedCompanies = [];
+    this.selectAllChecked = false;
+  }
 
   // Exporta los resultados visibles (después de filtros). Igual que my-list-company.component.ts:
   // exporta exactamente los valores que hay en memoria — por eso email/phoneUnformatted salen
   // vacíos salvo que el usuario ya los haya revelado en esta sesión, sin ningún caso especial.
   exportToCsv(): void {
     if (this.displayResults.length === 0) {
-      this.notificationService.showError('No hay resultados para exportar.');
+      this.notificationService.showError("No hay resultados para exportar.");
       return;
     }
     const dataToExport = this.displayResults.map(
-      ({ id, title, categoryName, countryCode, city, state, street, address, postalCode,
-        phoneUnformatted, email, openingHours, permanentlyClosed, website, description,
-        descriptionMd, error, errorDescription, neighborhood, additionalInfo }) => ({
-        id, title, categoryName, countryCode, city, state, street, address, postalCode,
-        phoneUnformatted, email, openingHours, permanentlyClosed, website, description,
-        descriptionMd, error, errorDescription, neighborhood, additionalInfo,
-      })
+      ({
+        id,
+        title,
+        categoryName,
+        countryCode,
+        city,
+        state,
+        street,
+        address,
+        postalCode,
+        phoneUnformatted,
+        email,
+        openingHours,
+        permanentlyClosed,
+        website,
+        description,
+        descriptionMd,
+        error,
+        errorDescription,
+        neighborhood,
+        additionalInfo,
+      }) => ({
+        id,
+        title,
+        categoryName,
+        countryCode,
+        city,
+        state,
+        street,
+        address,
+        postalCode,
+        phoneUnformatted,
+        email,
+        openingHours,
+        permanentlyClosed,
+        website,
+        description,
+        descriptionMd,
+        error,
+        errorDescription,
+        neighborhood,
+        additionalInfo,
+      }),
     );
-    this.exportService.exportToCsv(dataToExport, 'companies-search');
+    this.exportService.exportToCsv(dataToExport, "companies-search");
   }
 
   // ─── Panel de detalle (drawer lateral derecho) ───
@@ -819,14 +1025,21 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   public detailHours: { day: string; hours: string }[] = [];
 
   private readonly DAY_LABELS: Record<string, string> = {
-    Monday: 'Lunes', Tuesday: 'Martes', Wednesday: 'Miércoles', Thursday: 'Jueves',
-    Friday: 'Viernes', Saturday: 'Sábado', Sunday: 'Domingo',
+    Monday: "Lunes",
+    Tuesday: "Martes",
+    Wednesday: "Miércoles",
+    Thursday: "Jueves",
+    Friday: "Viernes",
+    Saturday: "Sábado",
+    Sunday: "Domingo",
   };
 
   // El campo openingHours llega como JSON crudo, ej:
   // [{"day":"Monday","hours":"9:00 AM - 5:00 PM"}, ...] — lo parseamos una sola vez al abrir
   // el panel (no en el template) para no recalcularlo en cada ciclo de change detection.
-  private parseOpeningHours(raw: string | undefined | null): { day: string; hours: string }[] {
+  private parseOpeningHours(
+    raw: string | undefined | null,
+  ): { day: string; hours: string }[] {
     if (!raw) return [];
     try {
       const parsed = JSON.parse(raw);
@@ -835,7 +1048,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
         .filter((item: any) => item && item.day)
         .map((item: any) => ({
           day: this.DAY_LABELS[item.day] || item.day,
-          hours: item.hours === 'Closed' ? 'Cerrado' : (item.hours || '—'),
+          hours: item.hours === "Closed" ? "Cerrado" : item.hours || "—",
         }));
     } catch {
       return [];
@@ -853,20 +1066,26 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ─── Revelar email/teléfono por fila (1 crédito por acción) ───
-  isRevealingEmail(id: number): boolean { return this.revealingEmailIds.has(id); }
-  isRevealingPhone(id: number): boolean { return this.revealingPhoneIds.has(id); }
+  isRevealingEmail(id: number): boolean {
+    return this.revealingEmailIds.has(id);
+  }
+  isRevealingPhone(id: number): boolean {
+    return this.revealingPhoneIds.has(id);
+  }
 
   async revealEmail(company: Company): Promise<void> {
     if (company.email || this.revealingEmailIds.has(company.id)) return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.revealingEmailIds.add(company.id);
     try {
       const res = await this.companiesService.revealCompanyEmail(company.id);
       if (res.error || !res.value) {
-        this.notificationService.showError(res.message || 'No se pudo obtener el email.');
+        this.notificationService.showError(
+          res.message || "No se pudo obtener el email.",
+        );
       } else {
         company.email = res.value;
         if (res.creditsRemaining !== undefined) {
@@ -879,16 +1098,19 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async revealPhone(company: Company): Promise<void> {
-    if (company.phoneUnformatted || this.revealingPhoneIds.has(company.id)) return;
+    if (company.phoneUnformatted || this.revealingPhoneIds.has(company.id))
+      return;
     if (this.creditsRemaining < 1) {
-      this.notificationService.showError('No tienes créditos suficientes.');
+      this.notificationService.showError("No tienes créditos suficientes.");
       return;
     }
     this.revealingPhoneIds.add(company.id);
     try {
       const res = await this.companiesService.revealCompanyPhone(company.id);
       if (res.error || !res.value) {
-        this.notificationService.showError(res.message || 'No se pudo obtener el teléfono.');
+        this.notificationService.showError(
+          res.message || "No se pudo obtener el teléfono.",
+        );
       } else {
         company.phoneUnformatted = res.value;
         if (res.creditsRemaining !== undefined) {
@@ -900,14 +1122,29 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  get totalPages(): number { return Math.ceil(this.totalResultsInServer / this.itemsPerPage) }
-  getStartIndex(): number { return this.displayResults.length > 0 ? (this.currentPage - 1) * this.itemsPerPage + 1 : 0; }
-  getEndIndex(): number { return Math.min(this.currentPage * this.itemsPerPage, this.totalResultsInServer); }
-  getFormattedTotal(): string { return this.totalResultsInServer.toLocaleString() }
+  get totalPages(): number {
+    return Math.ceil(this.totalResultsInServer / this.itemsPerPage);
+  }
+  getStartIndex(): number {
+    return this.displayResults.length > 0
+      ? (this.currentPage - 1) * this.itemsPerPage + 1
+      : 0;
+  }
+  getEndIndex(): number {
+    return Math.min(
+      this.currentPage * this.itemsPerPage,
+      this.totalResultsInServer,
+    );
+  }
+  getFormattedTotal(): string {
+    return this.totalResultsInServer.toLocaleString();
+  }
 
   toggleDropdown(dropdownName: string) {
-    this.showViewDropdown = dropdownName === 'view' ? !this.showViewDropdown : false;
-    this.showSortDropdown = dropdownName === 'sort' ? !this.showSortDropdown : false;
+    this.showViewDropdown =
+      dropdownName === "view" ? !this.showViewDropdown : false;
+    this.showSortDropdown =
+      dropdownName === "sort" ? !this.showSortDropdown : false;
   }
 
   closeAllDropdowns() {
@@ -915,22 +1152,52 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showSortDropdown = false;
   }
 
-  goToUpgradePlan(): void { this.router.navigate(['/upgrade-plan']); }
+  goToUpgradePlan(): void {
+    this.router.navigate(["/upgrade-plan"]);
+  }
 
   public rowsRevealed = false;
 
   public applyLocalFilters(): void {
     let results = [...this.filteredResults];
-    if (this.localFilters.title) results = results.filter(c => c.title?.toLowerCase().includes(this.localFilters.title.toLowerCase()));
-    if (this.localFilters.categoryName) results = results.filter(c => c.categoryName?.toLowerCase().includes(this.localFilters.categoryName.toLowerCase()));
-    if (this.localFilters.city) results = results.filter(c => c.city?.toLowerCase().includes(this.localFilters.city.toLowerCase()));
-    if (this.localFilters.state) results = results.filter(c => c.state?.toLowerCase().includes(this.localFilters.state.toLowerCase()));
-    if (this.localFilters.countryCode) results = results.filter(c => c.countryCode?.toLowerCase().includes(this.localFilters.countryCode.toLowerCase()));
-    if (this.selectedCityFacets.size > 0) results = results.filter(c => this.selectedCityFacets.has(c.city));
-    if (this.selectedCategoryFacets.size > 0) results = results.filter(c => this.selectedCategoryFacets.has(c.categoryName));
+    if (this.localFilters.title)
+      results = results.filter((c) =>
+        c.title?.toLowerCase().includes(this.localFilters.title.toLowerCase()),
+      );
+    if (this.localFilters.categoryName)
+      results = results.filter((c) =>
+        c.categoryName
+          ?.toLowerCase()
+          .includes(this.localFilters.categoryName.toLowerCase()),
+      );
+    if (this.localFilters.city)
+      results = results.filter((c) =>
+        c.city?.toLowerCase().includes(this.localFilters.city.toLowerCase()),
+      );
+    if (this.localFilters.state)
+      results = results.filter((c) =>
+        c.state?.toLowerCase().includes(this.localFilters.state.toLowerCase()),
+      );
+    if (this.localFilters.countryCode)
+      results = results.filter((c) =>
+        c.countryCode
+          ?.toLowerCase()
+          .includes(this.localFilters.countryCode.toLowerCase()),
+      );
+    if (this.selectedCityFacets.size > 0)
+      results = results.filter((c) => this.selectedCityFacets.has(c.city));
+    if (this.selectedCategoryFacets.size > 0)
+      results = results.filter((c) =>
+        this.selectedCategoryFacets.has(c.categoryName),
+      );
     if (this.selectedEmailFacets.size > 0) {
-      results = results.filter(c => {
-        const label = c.hasEmailOnFile === undefined ? '' : (c.hasEmailOnFile ? 'Con email' : 'Sin email');
+      results = results.filter((c) => {
+        const label =
+          c.hasEmailOnFile === undefined
+            ? ""
+            : c.hasEmailOnFile
+              ? "Con email"
+              : "Sin email";
         return this.selectedEmailFacets.has(label);
       });
     }
@@ -941,7 +1208,9 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     // viene puesta desde el primer render, Angular a veces no la hace reproducir. Por eso
     // arrancamos en "invisible" (ver CSS .rowin) y activamos .play en el siguiente tick.
     this.rowsRevealed = false;
-    setTimeout(() => { this.rowsRevealed = true; }, 0);
+    setTimeout(() => {
+      this.rowsRevealed = true;
+    }, 0);
   }
 
   public onFilterChange(): void {
@@ -960,26 +1229,32 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public toggleCityFacet(value: string): void {
-    if (this.selectedCityFacets.has(value)) this.selectedCityFacets.delete(value);
+    if (this.selectedCityFacets.has(value))
+      this.selectedCityFacets.delete(value);
     else this.selectedCityFacets.add(value);
     this.onFilterChange();
   }
 
   public toggleCategoryFacet(value: string): void {
-    if (this.selectedCategoryFacets.has(value)) this.selectedCategoryFacets.delete(value);
+    if (this.selectedCategoryFacets.has(value))
+      this.selectedCategoryFacets.delete(value);
     else this.selectedCategoryFacets.add(value);
     this.onFilterChange();
   }
 
   public toggleEmailFacet(value: string): void {
-    if (this.selectedEmailFacets.has(value)) this.selectedEmailFacets.delete(value);
+    if (this.selectedEmailFacets.has(value))
+      this.selectedEmailFacets.delete(value);
     else this.selectedEmailFacets.add(value);
     this.onFilterChange();
   }
 
   // Total de filtros activos — alimenta el badge numérico junto a "Ocultar/Mostrar filtros".
   public get activeFilterCount(): number {
-    let n = this.selectedCityFacets.size + this.selectedCategoryFacets.size + this.selectedEmailFacets.size;
+    let n =
+      this.selectedCityFacets.size +
+      this.selectedCategoryFacets.size +
+      this.selectedEmailFacets.size;
     if (this.localFilters.title) n++;
     if (this.localFilters.categoryName) n++;
     if (this.localFilters.city) n++;
@@ -996,19 +1271,29 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedCityFacets.clear();
     this.selectedCategoryFacets.clear();
     this.selectedEmailFacets.clear();
-    this.localFilters = { title: '', categoryName: '', city: '', state: '', countryCode: '' };
+    this.localFilters = {
+      title: "",
+      categoryName: "",
+      city: "",
+      state: "",
+      countryCode: "",
+    };
     this.currentPage = 1;
     this.recomputeFacetChips();
     this.applyLocalFilters();
   }
 
-  public onSortChange(sortBy: string): void { this.currentSortOrder = sortBy; this.goToPage(1); this.closeAllDropdowns(); }
+  public onSortChange(sortBy: string): void {
+    this.currentSortOrder = sortBy;
+    this.goToPage(1);
+    this.closeAllDropdowns();
+  }
 
   // ════════════════════════════════════════════════════════════════
   //  Globo punteado interactivo (fondo decorativo de la vista inicial)
   // ════════════════════════════════════════════════════════════════
 
-  @HostListener('window:resize')
+  @HostListener("window:resize")
   onWindowResize(): void {
     this.resizeGlobe();
   }
@@ -1018,7 +1303,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!canvas || this.globeInited) return;
     this.globeInited = true;
 
-    this.globeCtx = canvas.getContext('2d');
+    this.globeCtx = canvas.getContext("2d");
     this.pins = this.PIN_CITIES.map(([lat, lon]) => this.llToVec(lat, lon));
     this.resizeGlobe();
     this.loadLandmask();
@@ -1028,12 +1313,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     // cada frame dispararía un ciclo completo de change detection de toda la app y termina
     // congelando el navegador.
     this.ngZone.runOutsideAngular(() => {
-      canvas.addEventListener('mousedown', (e) => this.onGlobePointerDown(e));
-      canvas.addEventListener('touchstart', (e) => this.onGlobePointerDown(e), { passive: true });
-      window.addEventListener('mousemove', this.boundOnGlobePointerMove);
-      window.addEventListener('touchmove', this.boundOnGlobePointerMove, { passive: false });
-      window.addEventListener('mouseup', this.boundOnGlobePointerUp);
-      window.addEventListener('touchend', this.boundOnGlobePointerUp);
+      canvas.addEventListener("mousedown", (e) => this.onGlobePointerDown(e));
+      canvas.addEventListener("touchstart", (e) => this.onGlobePointerDown(e), {
+        passive: true,
+      });
+      window.addEventListener("mousemove", this.boundOnGlobePointerMove);
+      window.addEventListener("touchmove", this.boundOnGlobePointerMove, {
+        passive: false,
+      });
+      window.addEventListener("mouseup", this.boundOnGlobePointerUp);
+      window.addEventListener("touchend", this.boundOnGlobePointerUp);
     });
   }
 
@@ -1042,21 +1331,21 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       cancelAnimationFrame(this.globeRafId);
       this.globeRafId = null;
     }
-    window.removeEventListener('mousemove', this.boundOnGlobePointerMove);
-    window.removeEventListener('touchmove', this.boundOnGlobePointerMove);
-    window.removeEventListener('mouseup', this.boundOnGlobePointerUp);
-    window.removeEventListener('touchend', this.boundOnGlobePointerUp);
+    window.removeEventListener("mousemove", this.boundOnGlobePointerMove);
+    window.removeEventListener("touchmove", this.boundOnGlobePointerMove);
+    window.removeEventListener("mouseup", this.boundOnGlobePointerUp);
+    window.removeEventListener("touchend", this.boundOnGlobePointerUp);
   }
 
   private loadLandmask(): void {
     const img = new Image();
     img.onload = () => {
       try {
-        const off = document.createElement('canvas');
+        const off = document.createElement("canvas");
         off.width = img.width;
         off.height = img.height;
-        const octx = off.getContext('2d');
-        if (!octx) throw new Error('no ctx');
+        const octx = off.getContext("2d");
+        if (!octx) throw new Error("no ctx");
         octx.drawImage(img, 0, 0);
         this.landData = octx.getImageData(0, 0, img.width, img.height).data;
         this.landW = img.width;
@@ -1069,7 +1358,9 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.startGlobeLoop();
     };
     img.onerror = () => {
-      console.warn(`No se pudo cargar el land-mask del globo en "${this.landmaskSrc}". Verifica que earth_landmask_720.png esté copiado en esa ruta pública.`);
+      console.warn(
+        `No se pudo cargar el land-mask del globo en "${this.landmaskSrc}". Verifica que earth_landmask_720.png esté copiado en esa ruta pública.`,
+      );
       this.maskFailed = true;
       this.buildGlobeDots();
       this.startGlobeLoop();
@@ -1081,31 +1372,45 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.landData) return true;
     const u = (lonD + 180) / 360;
     const v = (90 - latD) / 180;
-    const px = Math.min(this.landW - 1, Math.max(0, Math.floor(u * this.landW)));
-    const py = Math.min(this.landH - 1, Math.max(0, Math.floor(v * this.landH)));
+    const px = Math.min(
+      this.landW - 1,
+      Math.max(0, Math.floor(u * this.landW)),
+    );
+    const py = Math.min(
+      this.landH - 1,
+      Math.max(0, Math.floor(v * this.landH)),
+    );
     const i = (py * this.landW + px) * 4;
-    return (this.landData[i] + this.landData[i + 1] + this.landData[i + 2]) < 250;
+    return this.landData[i] + this.landData[i + 1] + this.landData[i + 2] < 250;
   }
 
   private buildGlobeDots(): void {
     this.globeDots = [];
     if (!this.landData && !this.maskFailed) return;
     for (let latD = -82; latD <= 84; latD += 2.0) {
-      const lat = latD * Math.PI / 180;
+      const lat = (latD * Math.PI) / 180;
       const n = Math.max(12, Math.round(Math.cos(lat) * 210));
       for (let i = 0; i < n; i++) {
         const lonD = -180 + (i / n) * 360;
         if (this.landData && !this.isLand(latD, lonD)) continue;
-        const lon = lonD * Math.PI / 180;
-        this.globeDots.push([Math.cos(lat) * Math.cos(lon), Math.sin(lat), -Math.cos(lat) * Math.sin(lon)]);
+        const lon = (lonD * Math.PI) / 180;
+        this.globeDots.push([
+          Math.cos(lat) * Math.cos(lon),
+          Math.sin(lat),
+          -Math.cos(lat) * Math.sin(lon),
+        ]);
       }
     }
   }
 
   private llToVec(latD: number, lonD: number): number[] {
-    const lat = latD * Math.PI / 180;
-    const lon = lonD * Math.PI / 180;
-    return [Math.cos(lat) * Math.cos(lon), Math.sin(lat), -Math.cos(lat) * Math.sin(lon)];
+    const lat = (latD * Math.PI) / 180;
+    const lon = (lonD * Math.PI) / 180;
+    return [
+      Math.cos(lat) * Math.cos(lon),
+      Math.sin(lat),
+      -Math.cos(lat) * Math.sin(lon),
+    ];
   }
 
   private resizeGlobe(): void {
@@ -1129,12 +1434,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private buildGlobeGradient(): void {
     if (!this.globeCtx) return;
     const g = this.globeCtx.createRadialGradient(
-      this.globeCx - this.globeR * 0.35, this.globeCy - this.globeR * 0.4, this.globeR * 0.05,
-      this.globeCx, this.globeCy, this.globeR * 1.02
+      this.globeCx - this.globeR * 0.35,
+      this.globeCy - this.globeR * 0.4,
+      this.globeR * 0.05,
+      this.globeCx,
+      this.globeCy,
+      this.globeR * 1.02,
     );
-    g.addColorStop(0, 'rgba(255,255,255,0)');
-    g.addColorStop(0.82, 'rgba(91,79,229,0.03)');
-    g.addColorStop(1, 'rgba(91,79,229,0.08)');
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.82, "rgba(91,79,229,0.03)");
+    g.addColorStop(1, "rgba(91,79,229,0.08)");
     this.globeGradient = g;
   }
 
@@ -1145,7 +1454,11 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     const y1 = y;
     const y2 = y1 * Math.cos(this.rotX) - z1 * Math.sin(this.rotX);
     const z2 = y1 * Math.sin(this.rotX) + z1 * Math.cos(this.rotX);
-    return { x: this.globeCx + x1 * this.globeR, y: this.globeCy - y2 * this.globeR, depth: z2 };
+    return {
+      x: this.globeCx + x1 * this.globeR,
+      y: this.globeCy - y2 * this.globeR,
+      depth: z2,
+    };
   }
 
   private startGlobeLoop(): void {
@@ -1186,7 +1499,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.renderGlobeFrame();
 
-    const stillAnimating = this.dragging || Math.abs(this.velY) > this.velEpsilon;
+    const stillAnimating =
+      this.dragging || Math.abs(this.velY) > this.velEpsilon;
     if (stillAnimating) {
       this.globeRafId = requestAnimationFrame(() => this.globeFrame());
     } else {
@@ -1234,15 +1548,15 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       const baseR = 2.6;
       const glowR = baseR * 5;
       const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
-      g.addColorStop(0, 'rgba(91,79,229,0.35)');
-      g.addColorStop(0.5, 'rgba(91,79,229,0.10)');
-      g.addColorStop(1, 'rgba(91,79,229,0)');
+      g.addColorStop(0, "rgba(91,79,229,0.35)");
+      g.addColorStop(0.5, "rgba(91,79,229,0.10)");
+      g.addColorStop(1, "rgba(91,79,229,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(91,79,229,0.9)';
+      ctx.fillStyle = "rgba(91,79,229,0.9)";
       ctx.beginPath();
       ctx.arc(p.x, p.y, baseR, 0, Math.PI * 2);
       ctx.fill();
@@ -1252,8 +1566,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private onGlobePointerDown(e: MouseEvent | TouchEvent): void {
     this.dragging = true;
     this.velY = 0;
-    this.globeCanvasRef?.nativeElement.classList.add('drag');
-    const t = 'touches' in e ? e.touches[0] : e;
+    this.globeCanvasRef?.nativeElement.classList.add("drag");
+    const t = "touches" in e ? e.touches[0] : e;
     this.lastX = t.clientX;
     this.lastY = t.clientY;
     this.startGlobeLoop();
@@ -1261,7 +1575,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private onGlobePointerMove(e: MouseEvent | TouchEvent): void {
     if (!this.dragging) return;
-    const t = 'touches' in e ? e.touches[0] : e;
+    const t = "touches" in e ? e.touches[0] : e;
     const dx = t.clientX - this.lastX;
     const dy = t.clientY - this.lastY;
     this.lastX = t.clientX;
@@ -1269,7 +1583,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.rotY += dx * 0.006;
     this.rotX = Math.max(-1.2, Math.min(1.2, this.rotX + dy * 0.006));
     this.velY = dx * 0.006;
-    if ('touches' in e && e.cancelable) e.preventDefault();
+    if ("touches" in e && e.cancelable) e.preventDefault();
   }
 
   private onGlobePointerUp(): void {
@@ -1277,10 +1591,12 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.reducedMotion) {
       this.velY = 0;
     }
-    this.globeCanvasRef?.nativeElement.classList.remove('drag');
+    this.globeCanvasRef?.nativeElement.classList.remove("drag");
   }
 
-  private async loadSingleCompanyFromDirectorio(companyId: number): Promise<void> {
+  private async loadSingleCompanyFromDirectorio(
+    companyId: number,
+  ): Promise<void> {
     this.isLoading = true;
     this.searchError = null;
     this.showPlans = false;
@@ -1290,17 +1606,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isLoading = false;
 
     if (result.error || !result.company) {
-      this.searchError = result.message || 'No se encontro la empresa solicitada.';
+      this.currentQuery = `Empresa #${companyId}`;
+      this.filteredResults = [];
+      this.searchError =
+        result.message || "No se encontro la empresa solicitada.";
       return;
     }
 
-    // Reusa exactamente el mismo camino que un resultado de busqueda normal: llenar
-    // filteredResults/facetas/etc via updateStateFromData. Como currentQuery queda con
-    // el titulo de la empresa, el hero y <app-search-chat> se ocultan solos (misma
-    // condicion *ngIf="!currentQuery" que ya existe en el html) sin tocar el template.
     this.currentQuery = result.company.title || `Empresa #${companyId}`;
-    this.currentCategory = '';
-    this.currentLocation = '';
+    this.currentCategory = "";
+    this.currentLocation = "";
     this.currentSearchId = null;
 
     this.updateStateFromData({
@@ -1316,12 +1631,19 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       sortBy: this.currentSortOrder,
     });
 
-    this.onboardingService.completeOnboardingStepByKey('FIND_LEADS');
+    this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
   }
 
   private clearDirectorioParamsFromUrl(): void {
-    if (this.route.snapshot.queryParamMap.has('companyId') || this.route.snapshot.queryParamMap.has('directorio')) {
-      this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+    if (
+      this.route.snapshot.queryParamMap.has("companyId") ||
+      this.route.snapshot.queryParamMap.has("directorio")
+    ) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {},
+        replaceUrl: true,
+      });
     }
   }
 }
