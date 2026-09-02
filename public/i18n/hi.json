@@ -14,7 +14,7 @@
     "WIN_DEALS": "डील जीतें",
     "MEETINGS": "मीटिंग",
     "CONVERSATIONS": "बातचीत",
-    "DEALS": "डील",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "टूल्स और ऑटोमेशन",
     "TASKS": "टास्क",
     "WORKFLOWS": "वर्कफ़्लो",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "एजेंट",
     "MEETINGS_TOOLTIP": "मीटिंग शेड्यूल करें",
     "CONVERSATIONS_TOOLTIP": "बातचीत",
-    "DEALS_TOOLTIP": "डील मैनेज करें",
+    "DEALS_TOOLTIP": "आपका AI CRM",
     "PLANS_TOOLTIP": "प्लान",
     "REDEEM_CODE_TOOLTIP": "इनविटेशन कोड रिडीम करें",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "सब्सक्रिप्शन सेटिंग्स",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "खर्च किए गए क्रेडिट"
   },
   "DEALS": {
-    "TITLE": "डील",
+    "TITLE": "AI CRM",
     "SUBTITLE": "अपनी सेल्स पाइपलाइन मैनेज करें",
     "ACTION": {
       "IMPORT_CSV": "CSV इंपोर्ट करें",
@@ -835,7 +835,8 @@
         "OWNER": "स्वामी",
         "CAMPAIGN": "कैंपेन",
         "CLOSE": "बनाई गई"
-      }
+      },
+      "CREATED": "बनाया गया"
     },
     "CREATE": {
       "TITLE": "डील बनाएँ",
@@ -1036,7 +1037,8 @@
     "YES": "हाँ",
     "NO": "नहीं",
     "FINISH": "समाप्त",
-    "AND": "और"
+    "AND": "और",
+    "CLOSE": "बंद करें"
   },
   "MODALS": {
     "CLOSE": "बंद करें",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "सेव हो रहा है...",
     "SAVE_NOTE_BUTTON": "नोट सेव करें",
     "NOTE_META": "{{author}} द्वारा {{date}} को",
-    "NO_NOTES_MESSAGE": "इस डील के लिए अभी कोई नोट नहीं है।"
+    "NO_NOTES_MESSAGE": "इस डील के लिए अभी कोई नोट नहीं है।",
+    "JOIN_MEETING": "मीटिंग में शामिल हों",
+    "EV_NOTE": "नोट"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "एडमिन डैशबोर्ड",

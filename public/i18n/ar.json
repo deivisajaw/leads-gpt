@@ -14,7 +14,7 @@
     "WIN_DEALS": "إغلاق الصفقات",
     "MEETINGS": "الاجتماعات",
     "CONVERSATIONS": "المحادثات",
-    "DEALS": "الصفقات",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "الأدوات والأتمتة",
     "TASKS": "المهام",
     "WORKFLOWS": "سير العمل",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "الوكلاء",
     "MEETINGS_TOOLTIP": "جدولة الاجتماعات",
     "CONVERSATIONS_TOOLTIP": "المحادثات",
-    "DEALS_TOOLTIP": "إدارة الصفقات",
+    "DEALS_TOOLTIP": "نظام CRM بالذكاء الاصطناعي",
     "PLANS_TOOLTIP": "الباقات",
     "REDEEM_CODE_TOOLTIP": "استخدام رمز الدعوة",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "إعدادات الاشتراك",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "الرصيد المستهلك"
   },
   "DEALS": {
-    "TITLE": "الصفقات",
+    "TITLE": "AI CRM",
     "SUBTITLE": "أدر مسار مبيعاتك",
     "ACTION": {
       "IMPORT_CSV": "استيراد CSV",
@@ -835,7 +835,8 @@
         "OWNER": "المسؤول",
         "CAMPAIGN": "الحملة",
         "CLOSE": "تاريخ الإنشاء"
-      }
+      },
+      "CREATED": "تاريخ الإنشاء"
     },
     "CREATE": {
       "TITLE": "إنشاء صفقة",
@@ -1036,7 +1037,8 @@
     "YES": "نعم",
     "NO": "لا",
     "FINISH": "إنهاء",
-    "AND": "و"
+    "AND": "و",
+    "CLOSE": "إغلاق"
   },
   "MODALS": {
     "CLOSE": "إغلاق",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "جارٍ الحفظ...",
     "SAVE_NOTE_BUTTON": "حفظ الملاحظة",
     "NOTE_META": "بواسطة {{author}} في {{date}}",
-    "NO_NOTES_MESSAGE": "لا توجد ملاحظات لهذه الصفقة بعد."
+    "NO_NOTES_MESSAGE": "لا توجد ملاحظات لهذه الصفقة بعد.",
+    "JOIN_MEETING": "الانضمام إلى الاجتماع",
+    "EV_NOTE": "ملاحظة"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "لوحة تحكم المسؤول",

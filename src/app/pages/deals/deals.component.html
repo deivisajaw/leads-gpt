@@ -200,12 +200,6 @@
       </div>
 
       <!-- Add column button -->
-      <div class="kanban-col col-add">
-        <button class="btn-add-col" (click)="openStageModal()">
-          <i class="fas fa-plus"></i>
-          {{ "DEALS.ACTION.ADD_STAGE" | translate }}
-        </button>
-      </div>
     </div>
   </div>
 
@@ -925,6 +919,7 @@
 <app-deal-detail-modal
   *ngIf="selectedDeal"
   [deal]="selectedDeal"
+  [stages]="stageConfigs"
   (closeModal)="onModalClose()"
 >
 </app-deal-detail-modal>

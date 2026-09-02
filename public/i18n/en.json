@@ -14,7 +14,7 @@
     "WIN_DEALS": "WIN DEALS",
     "MEETINGS": "Meetings",
     "CONVERSATIONS": "Conversations",
-    "DEALS": "Deals",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "TOOLS & AUTOMATIONS",
     "TASKS": "Tasks",
     "WORKFLOWS": "Workflows",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "Agents",
     "MEETINGS_TOOLTIP": "Schedule meetings",
     "CONVERSATIONS_TOOLTIP": "Conversations",
-    "DEALS_TOOLTIP": "Manage deals",
+    "DEALS_TOOLTIP": "Your AI CRM",
     "PLANS_TOOLTIP": "Plans",
     "REDEEM_CODE_TOOLTIP": "Redeem Invitation Code",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "Subscription Settings",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "Credits spent"
   },
   "DEALS": {
-    "TITLE": "Deals",
+    "TITLE": "AI CRM",
     "SUBTITLE": "Manage your sales pipeline",
     "ACTION": {
       "IMPORT_CSV": "Import CSV",
@@ -835,7 +835,8 @@
         "OWNER": "Owner",
         "CAMPAIGN": "Campaign",
         "CLOSE": "Created"
-      }
+      },
+      "CREATED": "Created"
     },
     "CREATE": {
       "TITLE": "Create deal",
@@ -1036,7 +1037,8 @@
     "YES": "Yes",
     "NO": "No",
     "FINISH": "Finish",
-    "AND": "and"
+    "AND": "and",
+    "CLOSE": "Close"
   },
   "MODALS": {
     "CLOSE": "Close",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "Saving...",
     "SAVE_NOTE_BUTTON": "Save Note",
     "NOTE_META": "By {{author}} on {{date}}",
-    "NO_NOTES_MESSAGE": "No notes for this deal yet."
+    "NO_NOTES_MESSAGE": "No notes for this deal yet.",
+    "JOIN_MEETING": "Join meeting",
+    "EV_NOTE": "Note"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "Admin Dashboard",

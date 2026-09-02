@@ -1,89 +1,406 @@
-/* General Modal Styles */
-:host { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Ficha del trato — AI CRM
+   Iconos Lucide (los mismos del sidebar). El engranaje AJAW en blanco marca
+   todo lo que hizo la IA. Sin emojis y sin el azul genérico de antes.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-.modal-overlay {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(9, 30, 66, 0.54);
-  display: flex; justify-content: center; align-items: center;
-  animation: fadeIn 0.2s ease-out;
+:host {
+  --dd-indigo: #3E34F9;
+  --dd-soft: #7871FB;
+  --dd-deep: #251F95;
+  --dd-pink: #F9348C;
+  --dd-ink: #1D1D1F;
+  --dd-ink2: #6E6E73;
+  --dd-ink3: #86868B;
+  --dd-line: #E5E5EA;
+  --dd-line2: #D2D2D7;
+  --dd-canvas: #FBFBFD;
+  --dd-ease: cubic-bezier(.16, 1, .3, 1);
 }
 
-.modal-content {
-  background-color: #f4f5f7;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(9, 30, 66, 0.25);
-  width: 90%; max-width: 1100px; max-height: 90vh;
-  display: flex; flex-direction: column; overflow: hidden;
-  animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+.dd-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 29, 31, .42);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  animation: dd-fade .18s ease both;
 }
 
-.modal-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1rem 1.5rem; border-bottom: 1px solid #dfe1e6;
-  background-color: #ffffff; flex-shrink: 0;
-}
-
-.modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: #172b4d; }
-.close-button { background: none; border: none; font-size: 1.8rem; font-weight: 400; line-height: 1; cursor: pointer; padding: 0; color: #6c757d; }
-
-/* NESTED SCROLL IMPLEMENTATION: Main body scrolls */
-.modal-body {
+.dd-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(940px, calc(100vw - 40px));
+  max-height: calc(100vh - 56px);
   display: flex;
-  flex-direction: row;
-  padding: 1.5rem;
-  gap: 1.5rem;
-  overflow-y: auto; /* The entire body has a primary scrollbar */
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  z-index: 1001;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 24px 60px -18px rgba(37, 31, 149, .34);
+  animation: dd-in .34s var(--dd-ease) both;
 }
 
-.main-content { flex: 1; min-width: 0; }
-
-.sidebar-content { flex: 0 0 380px; min-width: 0; display: flex; flex-direction: column; }
-
-/* Section Styling */
-.detail-section { background-color: #ffffff; border-radius: 5px; border: 1px solid #dfe1e6; margin-bottom: 1.5rem; overflow: hidden; }
-.detail-section:last-child { margin-bottom: 0; }
-
-.detail-section h4 {
-  font-size: 0.9rem; font-weight: 600; color: #092c66;
-  margin: 0; padding: 0.8rem 1rem;
-  background-color: #d9e8ff; /* User-approved color */
-  border-bottom: 1px solid #b8d6ff;
+@keyframes dd-fade { from { opacity: 0 } }
+@keyframes dd-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 14px)) scale(.985) }
 }
 
-.detail-grid { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
-.detail-item label { display: block; font-size: 0.75rem; font-weight: 600; color: #5e6c84; margin-bottom: 0.3rem; text-transform: uppercase; }
-.detail-item p { margin: 0; font-size: 0.9rem; color: #172b4d; }
+.lucide { width: 16px; height: 16px; flex: none }
 
-/* Stage Badges (Unchanged) */
-.deal-stage { font-weight: 600; padding: 3px 10px; border-radius: 12px; display: inline-block; font-size: 0.75rem !important; text-transform: uppercase; letter-spacing: 0.5px; }
-.stage-NEW, .stage-CONTACTED { background-color: #deebff; color: #0747a6; }
-.stage-PROPOSAL_SENT, .stage-NEGOTIATION { background-color: #fff0b3; color: #975f00; }
-.stage-MEETING_SCHEDULED { background-color: #e6fcff; color: #00687a; }
-.stage-WON { background-color: #e3fcef; color: #006644; }
-.stage-LOST { background-color: #ffebe6; color: #bf2600; }
+/* ── Encabezado ─────────────────────────────────────────────────────────── */
 
-/* Notes Section Specific Styles */
-.notes-section { flex: 1; display: flex; flex-direction: column; margin-bottom: 0; }
-.notes-container { display: flex; flex-direction: column; height: 100%; }
-.add-note-form { padding: 1rem; border-bottom: 1px solid #dfe1e6; }
-
-.add-note-form textarea { width: 100%; padding: 0.75rem; border: 1px solid #dfe1e6; border-radius: 4px; font-size: 0.9rem; min-height: 70px; margin-bottom: 0.5rem; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-.add-note-form textarea:focus { outline: none; border-color: #5b4fe5; box-shadow: 0 0 0 2px rgba(91, 79, 229, 0.2); }
-.add-note-form button { display: block; margin-left: auto; padding: 0.5rem 1rem; background-color: #5b4fe5; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
-.add-note-form button:disabled { background-color: #a5adba; cursor: not-allowed; }
-
-/* NESTED SCROLL IMPLEMENTATION: Notes history scrolls independently */
-.notes-history {
-  padding: 1rem;
-  overflow-y: auto;      /* Enable independent scroll for notes */
-  max-height: 45vh;      /* Set a max height to trigger the scrollbar */
+.dd-hero {
+  position: relative;
+  padding: 20px 22px;
+  color: #fff;
+  background: linear-gradient(168deg, var(--dd-soft) 0%, var(--dd-deep) 100%);
+  flex: none;
 }
 
-.note-item { background-color: #f7f8fa; border: 1px solid #dfe1e6; border-left: 3px solid #5b4fe5; border-radius: 4px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; }
-.note-body { margin: 0 0 0.5rem 0; font-size: 0.85rem; white-space: pre-wrap; color: #172b4d; }
-.note-meta { margin: 0; font-size: 0.7rem; color: #5e6c84; text-align: right; }
-.no-notes { color: #5e6c84; text-align: center; padding: 1.5rem; font-style: italic; font-size: 0.85rem; }
+.dd-x {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  cursor: pointer;
+  transition: background .16s ease;
+}
+.dd-x:hover { background: rgba(255, 255, 255, .22) }
+.dd-x .lucide { width: 15px; height: 15px }
 
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideIn { from { transform: translateY(-20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+.dd-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-right: 40px;
+}
+
+.dd-name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.25;
+}
+
+.dd-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  opacity: .82;
+  min-width: 0;
+}
+.dd-sub .lucide { width: 12px; height: 12px }
+.dd-dot { opacity: .6 }
+.dd-desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+
+.dd-hero-r { text-align: right; flex: none }
+
+.dd-amt {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.dd-amt small { font-size: 13px; font-weight: 600; opacity: .75 }
+
+.dd-close-date {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  opacity: .8;
+}
+.dd-close-date .lucide { width: 12px; height: 12px }
+
+/* Barra de etapas: refleja las etapas reales del backend. */
+.dd-stages { display: flex; gap: 4px; margin-top: 18px }
+
+.dd-st {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .26);
+  transition: background .3s var(--dd-ease), box-shadow .3s var(--dd-ease);
+}
+.dd-st.done { background: #fff }
+.dd-st.now  { background: #fff; box-shadow: 0 0 0 3.5px rgba(255, 255, 255, .28) }
+
+.dd-stage-lbl {
+  display: flex;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, .72);
+}
+.dd-stage-lbl span {
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 2px;
+}
+.dd-stage-lbl span:first-child { text-align: left }
+.dd-stage-lbl span:last-child  { text-align: right }
+.dd-stage-lbl .on { color: #fff; font-weight: 700 }
+
+/* ── Cuerpo ─────────────────────────────────────────────────────────────── */
+
+.dd-body {
+  display: grid;
+  grid-template-columns: 302px 1fr;
+  min-height: 0;
+  flex: 1;
+}
+
+.dd-left {
+  padding: 20px 22px;
+  border-right: 1px solid var(--dd-line);
+  overflow-y: auto;
+}
+
+.dd-right {
+  padding: 20px 22px;
+  background: var(--dd-canvas);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dd-sec {
+  margin: 0 0 13px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--dd-ink3);
+}
+.dd-kv + .dd-sec { margin-top: 24px }
+
+.dd-kv {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 11px 12px;
+  margin: 0;
+  font-size: 13.5px;
+  align-items: baseline;
+}
+.dd-kv dt { color: var(--dd-ink3); font-size: 11.5px }
+.dd-kv dd { margin: 0; font-weight: 500; word-break: break-word; color: var(--dd-ink) }
+.dd-kv a { color: var(--dd-indigo); text-decoration: none; font-weight: 500 }
+.dd-kv a:hover { text-decoration: underline }
+.dd-empty { color: var(--dd-ink3); font-weight: 400 }
+
+.dd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.dd-chip-dot { width: 6px; height: 6px; border-radius: 50%; flex: none }
+
+/* ── Línea de tiempo ────────────────────────────────────────────────────── */
+
+.dd-none {
+  font-size: 13px;
+  color: var(--dd-ink3);
+  padding: 18px 0;
+  margin: 0;
+}
+
+.dd-tl {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 32px;
+  flex: 1;
+}
+.dd-tl::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--dd-line);
+}
+
+.dd-ev { position: relative; margin-bottom: 14px }
+.dd-ev:last-child { margin-bottom: 0 }
+
+.dd-ev-i {
+  position: absolute;
+  left: -32px;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--dd-canvas);
+}
+.dd-ev-i .lucide { width: 14px; height: 14px }
+.dd-gear { width: 15px; height: 15px; display: block }
+
+.k-meeting { background: linear-gradient(150deg, #5B4FE5, #3F37B0) }
+.k-ai      { background: linear-gradient(150deg, var(--dd-pink), #C4257A) }
+.k-call    { background: linear-gradient(150deg, #34C759, #1E9E43) }
+.k-message { background: #25D366 }
+.k-note    { background: #8E8E93 }
+
+.dd-ev-card {
+  background: #fff;
+  border: 1px solid var(--dd-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.dd-ev-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+.dd-ev-t { font-size: 13px; font-weight: 700; letter-spacing: -.01em; color: var(--dd-ink) }
+.dd-when { margin-left: auto; font-size: 11px; color: var(--dd-ink3); white-space: nowrap }
+
+.dd-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  background: rgba(249, 52, 140, .1);
+  color: var(--dd-pink);
+}
+/* El engranaje es blanco: lo teñimos de rosa para el chip. */
+.dd-badge img {
+  width: 10px;
+  height: 10px;
+  filter: brightness(0) saturate(100%) invert(34%) sepia(72%) saturate(4000%)
+          hue-rotate(316deg) brightness(99%) contrast(96%);
+}
+
+.dd-f {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 5px 10px;
+  margin: 0;
+  font-size: 12.5px;
+}
+.dd-f dt { color: var(--dd-ink3); font-size: 11.5px }
+.dd-f dd { margin: 0; color: var(--dd-ink); word-break: break-word }
+.dd-f a { color: var(--dd-indigo); text-decoration: none; font-weight: 500 }
+.dd-f a:hover { text-decoration: underline }
+
+.dd-ev-body {
+  margin: 7px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--dd-ink2);
+  white-space: pre-line;
+}
+
+.dd-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(155deg, var(--dd-soft), var(--dd-deep));
+  transition: transform .16s var(--dd-ease), box-shadow .16s ease;
+}
+.dd-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -6px rgba(37, 31, 149, .5) }
+.dd-cta .lucide { width: 13px; height: 13px }
+
+.dd-by { margin: 8px 0 0; font-size: 11px; color: var(--dd-ink3) }
+
+/* ── Escribir nota ──────────────────────────────────────────────────────── */
+
+.dd-compose { display: flex; gap: 8px; margin-top: 16px; flex: none }
+
+.dd-compose input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--dd-line2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--dd-ink);
+  background: #fff;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.dd-compose input:focus {
+  outline: none;
+  border-color: var(--dd-soft);
+  box-shadow: 0 0 0 3px rgba(120, 113, 251, .18);
+}
+
+.dd-compose button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(155deg, var(--dd-soft), var(--dd-deep));
+  transition: transform .16s var(--dd-ease), opacity .16s ease;
+}
+.dd-compose button:hover:not(:disabled) { transform: translateY(-1px) }
+.dd-compose button:disabled { opacity: .5; cursor: not-allowed }
+.dd-compose button .lucide { width: 14px; height: 14px }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 840px) {
+  .dd-modal { width: calc(100vw - 24px); max-height: calc(100vh - 32px) }
+  .dd-body { grid-template-columns: 1fr; overflow-y: auto }
+  .dd-left { border-right: 0; border-bottom: 1px solid var(--dd-line); overflow: visible }
+  .dd-right { overflow: visible }
+  .dd-hero-top { flex-direction: column; gap: 10px; padding-right: 40px }
+  .dd-hero-r { text-align: left }
+  .dd-close-date { justify-content: flex-start }
+  .dd-stage-lbl { font-size: 9.5px }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-modal, .dd-overlay { animation: none }
+  .dd-st, .dd-cta, .dd-compose button, .dd-compose input { transition: none }
+}

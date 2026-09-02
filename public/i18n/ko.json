@@ -14,7 +14,7 @@
     "WIN_DEALS": "거래 성사",
     "MEETINGS": "미팅",
     "CONVERSATIONS": "대화",
-    "DEALS": "거래",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "도구 및 자동화",
     "TASKS": "작업",
     "WORKFLOWS": "워크플로",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "에이전트",
     "MEETINGS_TOOLTIP": "미팅 예약",
     "CONVERSATIONS_TOOLTIP": "대화",
-    "DEALS_TOOLTIP": "거래 관리",
+    "DEALS_TOOLTIP": "AI CRM",
     "PLANS_TOOLTIP": "요금제",
     "REDEEM_CODE_TOOLTIP": "초대 코드 등록",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "구독 설정",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "사용한 크레딧"
   },
   "DEALS": {
-    "TITLE": "거래",
+    "TITLE": "AI CRM",
     "SUBTITLE": "영업 파이프라인을 관리하세요",
     "ACTION": {
       "IMPORT_CSV": "CSV 가져오기",
@@ -835,7 +835,8 @@
         "OWNER": "담당자",
         "CAMPAIGN": "캠페인",
         "CLOSE": "생성일"
-      }
+      },
+      "CREATED": "생성일"
     },
     "CREATE": {
       "TITLE": "거래 만들기",
@@ -1036,7 +1037,8 @@
     "YES": "예",
     "NO": "아니요",
     "FINISH": "완료",
-    "AND": "및"
+    "AND": "및",
+    "CLOSE": "닫기"
   },
   "MODALS": {
     "CLOSE": "닫기",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "저장 중...",
     "SAVE_NOTE_BUTTON": "메모 저장",
     "NOTE_META": "{{author}} · {{date}}",
-    "NO_NOTES_MESSAGE": "이 거래에는 아직 메모가 없습니다."
+    "NO_NOTES_MESSAGE": "이 거래에는 아직 메모가 없습니다.",
+    "JOIN_MEETING": "회의 참여",
+    "EV_NOTE": "메모"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "관리자 대시보드",

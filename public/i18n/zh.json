@@ -14,7 +14,7 @@
     "WIN_DEALS": "赢得商机",
     "MEETINGS": "会议",
     "CONVERSATIONS": "会话",
-    "DEALS": "商机",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "工具与自动化",
     "TASKS": "任务",
     "WORKFLOWS": "工作流",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "智能体",
     "MEETINGS_TOOLTIP": "安排会议",
     "CONVERSATIONS_TOOLTIP": "会话",
-    "DEALS_TOOLTIP": "管理商机",
+    "DEALS_TOOLTIP": "你的 AI CRM",
     "PLANS_TOOLTIP": "套餐",
     "REDEEM_CODE_TOOLTIP": "兑换邀请码",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "订阅设置",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "消耗积分"
   },
   "DEALS": {
-    "TITLE": "商机",
+    "TITLE": "AI CRM",
     "SUBTITLE": "管理您的销售管道",
     "ACTION": {
       "IMPORT_CSV": "导入 CSV",
@@ -835,7 +835,8 @@
         "OWNER": "负责人",
         "CAMPAIGN": "营销活动",
         "CLOSE": "创建时间"
-      }
+      },
+      "CREATED": "创建时间"
     },
     "CREATE": {
       "TITLE": "创建商机",
@@ -1036,7 +1037,8 @@
     "YES": "是",
     "NO": "否",
     "FINISH": "完成",
-    "AND": "和"
+    "AND": "和",
+    "CLOSE": "关闭"
   },
   "MODALS": {
     "CLOSE": "关闭",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "正在保存…",
     "SAVE_NOTE_BUTTON": "保存备注",
     "NOTE_META": "由 {{author}} 于 {{date}} 添加",
-    "NO_NOTES_MESSAGE": "该商机暂无备注。"
+    "NO_NOTES_MESSAGE": "该商机暂无备注。",
+    "JOIN_MEETING": "加入会议",
+    "EV_NOTE": "备注"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "管理仪表板",

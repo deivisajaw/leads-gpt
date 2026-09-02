@@ -14,7 +14,7 @@
     "WIN_DEALS": "商談獲得",
     "MEETINGS": "ミーティング",
     "CONVERSATIONS": "会話",
-    "DEALS": "商談",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "ツールと自動化",
     "TASKS": "タスク",
     "WORKFLOWS": "ワークフロー",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "エージェント",
     "MEETINGS_TOOLTIP": "ミーティングを予約",
     "CONVERSATIONS_TOOLTIP": "会話",
-    "DEALS_TOOLTIP": "商談を管理",
+    "DEALS_TOOLTIP": "AI CRM",
     "PLANS_TOOLTIP": "プラン",
     "REDEEM_CODE_TOOLTIP": "招待コードを利用",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "サブスクリプション設定",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "使用クレジット"
   },
   "DEALS": {
-    "TITLE": "商談",
+    "TITLE": "AI CRM",
     "SUBTITLE": "営業パイプラインを管理します",
     "ACTION": {
       "IMPORT_CSV": "CSVをインポート",
@@ -835,7 +835,8 @@
         "OWNER": "担当者",
         "CAMPAIGN": "キャンペーン",
         "CLOSE": "作成日"
-      }
+      },
+      "CREATED": "作成日"
     },
     "CREATE": {
       "TITLE": "商談を作成",
@@ -1036,7 +1037,8 @@
     "YES": "はい",
     "NO": "いいえ",
     "FINISH": "完了",
-    "AND": "および"
+    "AND": "および",
+    "CLOSE": "閉じる"
   },
   "MODALS": {
     "CLOSE": "閉じる",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "保存中...",
     "SAVE_NOTE_BUTTON": "メモを保存",
     "NOTE_META": "{{author}} · {{date}}",
-    "NO_NOTES_MESSAGE": "この商談にはまだメモがありません。"
+    "NO_NOTES_MESSAGE": "この商談にはまだメモがありません。",
+    "JOIN_MEETING": "会議に参加",
+    "EV_NOTE": "メモ"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "管理ダッシュボード",

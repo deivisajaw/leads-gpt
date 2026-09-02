@@ -14,7 +14,7 @@
     "WIN_DEALS": "DEALS WINNEN",
     "MEETINGS": "Afspraken",
     "CONVERSATIONS": "Gesprekken",
-    "DEALS": "Deals",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "TOOLS & AUTOMATISERING",
     "TASKS": "Taken",
     "WORKFLOWS": "Workflows",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "Agents",
     "MEETINGS_TOOLTIP": "Afspraken inplannen",
     "CONVERSATIONS_TOOLTIP": "Gesprekken",
-    "DEALS_TOOLTIP": "Deals beheren",
+    "DEALS_TOOLTIP": "Jouw AI-CRM",
     "PLANS_TOOLTIP": "Abonnementen",
     "REDEEM_CODE_TOOLTIP": "Uitnodigingscode inwisselen",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "Abonnementsinstellingen",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "Credits besteed"
   },
   "DEALS": {
-    "TITLE": "Deals",
+    "TITLE": "AI CRM",
     "SUBTITLE": "Beheer je salespipeline",
     "ACTION": {
       "IMPORT_CSV": "CSV importeren",
@@ -835,7 +835,8 @@
         "OWNER": "Eigenaar",
         "CAMPAIGN": "Campagne",
         "CLOSE": "Aangemaakt"
-      }
+      },
+      "CREATED": "Aangemaakt"
     },
     "CREATE": {
       "TITLE": "Deal maken",
@@ -1036,7 +1037,8 @@
     "YES": "Ja",
     "NO": "Nee",
     "FINISH": "Afronden",
-    "AND": "en"
+    "AND": "en",
+    "CLOSE": "Sluiten"
   },
   "MODALS": {
     "CLOSE": "Sluiten",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "Opslaan...",
     "SAVE_NOTE_BUTTON": "Notitie opslaan",
     "NOTE_META": "Door {{author}} op {{date}}",
-    "NO_NOTES_MESSAGE": "Nog geen notities voor deze deal."
+    "NO_NOTES_MESSAGE": "Nog geen notities voor deze deal.",
+    "JOIN_MEETING": "Deelnemen aan meeting",
+    "EV_NOTE": "Notitie"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "Beheerdersdashboard",

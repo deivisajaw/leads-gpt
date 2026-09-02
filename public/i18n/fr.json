@@ -14,7 +14,7 @@
     "WIN_DEALS": "GAGNER DES AFFAIRES",
     "MEETINGS": "Réunions",
     "CONVERSATIONS": "Conversations",
-    "DEALS": "Affaires",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "OUTILS ET AUTOMATISATIONS",
     "TASKS": "Tâches",
     "WORKFLOWS": "Flux de travail",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "Agents",
     "MEETINGS_TOOLTIP": "Planifier des réunions",
     "CONVERSATIONS_TOOLTIP": "Conversations",
-    "DEALS_TOOLTIP": "Gérer les affaires",
+    "DEALS_TOOLTIP": "Votre CRM avec IA",
     "PLANS_TOOLTIP": "Forfaits",
     "REDEEM_CODE_TOOLTIP": "Utiliser un code d'invitation",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "Paramètres d'abonnement",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "Crédits dépensés"
   },
   "DEALS": {
-    "TITLE": "Affaires",
+    "TITLE": "AI CRM",
     "SUBTITLE": "Gérez votre pipeline de ventes",
     "ACTION": {
       "IMPORT_CSV": "Importer un CSV",
@@ -835,7 +835,8 @@
         "OWNER": "Responsable",
         "CAMPAIGN": "Campagne",
         "CLOSE": "Créée le"
-      }
+      },
+      "CREATED": "Créé"
     },
     "CREATE": {
       "TITLE": "Créer une affaire",
@@ -1036,7 +1037,8 @@
     "YES": "Oui",
     "NO": "Non",
     "FINISH": "Terminer",
-    "AND": "et"
+    "AND": "et",
+    "CLOSE": "Fermer"
   },
   "MODALS": {
     "CLOSE": "Fermer",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "Enregistrement...",
     "SAVE_NOTE_BUTTON": "Enregistrer la note",
     "NOTE_META": "Par {{author}} le {{date}}",
-    "NO_NOTES_MESSAGE": "Aucune note pour cette affaire pour le moment."
+    "NO_NOTES_MESSAGE": "Aucune note pour cette affaire pour le moment.",
+    "JOIN_MEETING": "Rejoindre la réunion",
+    "EV_NOTE": "Note"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "Tableau de bord administrateur",

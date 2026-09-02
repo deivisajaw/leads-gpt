@@ -14,7 +14,7 @@
     "WIN_DEALS": "DEALS GEWINNEN",
     "MEETINGS": "Termine",
     "CONVERSATIONS": "Konversationen",
-    "DEALS": "Deals",
+    "DEALS": "AI CRM",
     "TOOLS_AUTOMATIONS": "TOOLS & AUTOMATISIERUNGEN",
     "TASKS": "Aufgaben",
     "WORKFLOWS": "Workflows",
@@ -53,7 +53,7 @@
     "AGENTS_TOOLTIP": "Agenten",
     "MEETINGS_TOOLTIP": "Termine planen",
     "CONVERSATIONS_TOOLTIP": "Konversationen",
-    "DEALS_TOOLTIP": "Deals verwalten",
+    "DEALS_TOOLTIP": "Dein KI-CRM",
     "PLANS_TOOLTIP": "Tarife",
     "REDEEM_CODE_TOOLTIP": "Einladungscode einlösen",
     "SUBSCRIPTION_SETTINGS_TOOLTIP": "Abonnement-Einstellungen",
@@ -806,7 +806,7 @@
     "CREDITS_SPENT": "Verbrauchtes Guthaben"
   },
   "DEALS": {
-    "TITLE": "Deals",
+    "TITLE": "AI CRM",
     "SUBTITLE": "Verwalten Sie Ihre Vertriebspipeline",
     "ACTION": {
       "IMPORT_CSV": "CSV importieren",
@@ -835,7 +835,8 @@
         "OWNER": "Verantwortlich",
         "CAMPAIGN": "Kampagne",
         "CLOSE": "Erstellt"
-      }
+      },
+      "CREATED": "Erstellt"
     },
     "CREATE": {
       "TITLE": "Deal erstellen",
@@ -1036,7 +1037,8 @@
     "YES": "Ja",
     "NO": "Nein",
     "FINISH": "Fertigstellen",
-    "AND": "und"
+    "AND": "und",
+    "CLOSE": "Schließen"
   },
   "MODALS": {
     "CLOSE": "Schließen",
@@ -1176,7 +1178,9 @@
     "SAVING_NOTE_BUTTON": "Wird gespeichert...",
     "SAVE_NOTE_BUTTON": "Notiz speichern",
     "NOTE_META": "Von {{author}} am {{date}}",
-    "NO_NOTES_MESSAGE": "Für diesen Deal gibt es noch keine Notizen."
+    "NO_NOTES_MESSAGE": "Für diesen Deal gibt es noch keine Notizen.",
+    "JOIN_MEETING": "Meeting beitreten",
+    "EV_NOTE": "Notiz"
   },
   "ADMIN_DASHBOARD": {
     "TITLE": "Admin-Dashboard",
