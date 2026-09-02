@@ -26,7 +26,7 @@
 
       <div class="dd-hero-r">
         <div class="dd-amt">
-          {{ (deal.amount || 0) | number:'1.0-0' }}<small> USD</small>
+          <span class="dd-cur">$</span>{{ (deal.amount || 0) | number:'1.0-0' }}<small>USD</small>
         </div>
         <p class="dd-close-date" *ngIf="deal.expectedCloseDate">
           <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
