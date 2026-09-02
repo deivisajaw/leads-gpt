@@ -154,7 +154,7 @@
 
           <div class="dd-ev-card">
             <div class="dd-ev-top">
-              <span class="dd-ev-t">{{ e.title }}</span>
+              <span class="dd-ev-t">{{ e.title || ("DEAL_DETAIL_MODAL.EV_NOTE" | translate) }}</span>
               <span class="dd-badge" *ngIf="e.byAi">
                 <img src="/images/gear_white.png" alt="">IA
               </span>

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Deal, DealNote, DealStageConfig } from '../../services/deals.service';
@@ -31,7 +31,7 @@ export interface TimelineEvent {
   templateUrl: './deal-detail-modal.component.html',
   styleUrls: ['./deal-detail-modal.component.css'],
 })
-export class DealDetailModalComponent {
+export class DealDetailModalComponent implements OnChanges {
   @Input() deal: Deal | null = null;
   /**
    * Las etapas reales del tablero, ya ordenadas por sortOrder. Vienen de
@@ -90,9 +90,15 @@ export class DealDetailModalComponent {
    * título + pares etiqueta/valor + enlace, sin tocar el backend: el campo
    * sigue siendo un `note: string` cualquiera.
    */
-  get events(): TimelineEvent[] {
+  events: TimelineEvent[] = [];
+
+  ngOnChanges(ch: SimpleChanges): void {
+    if (ch['deal']) this.rebuildEvents();
+  }
+
+  private rebuildEvents(): void {
     const notes = this.deal?.notes ?? [];
-    return notes.map(n => this.parseNote(n));
+    this.events = notes.map(n => this.parseNote(n));
   }
 
   /** ¿La línea es "Etiqueta: valor"? Una URL no lo es, aunque tenga dos puntos. */
@@ -105,7 +111,7 @@ export class DealDetailModalComponent {
     const raw = (n.note || '').replace(/\r/g, '');
     const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
 
-    const title = lines.length ? lines[0] : this.translate.instant('DEAL_DETAIL_MODAL.EV_NOTE');
+    const title = lines.length ? lines[0] : '';
     const fields: TimelineEvent['fields'] = [];
     const rest: string[] = [];
     let meetUrl: string | undefined;
@@ -189,6 +195,7 @@ export class DealDetailModalComponent {
       const newNote: DealNote = await this.dealsService.addDealNote(this.deal.id, noteText);
       if (newNote && this.deal) {
         this.deal.notes.unshift(newNote);
+        this.rebuildEvents();
         this.notificationService.showSuccess(
           this.translate.instant('DEAL_DETAIL_MODAL.NOTE_ADDED_SUCCESS'));
       }
