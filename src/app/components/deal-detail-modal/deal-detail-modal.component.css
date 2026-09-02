@@ -115,6 +115,9 @@
 .dd-hero-r { text-align: right; flex: none }
 
 .dd-amt {
+  /* Space Grotesk, como .metric-value y .deal-kpi-value en styles.css:66.
+     Sin esto el monto sale en Inter y no cuadra con el resto de la app. */
+  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -.035em;
