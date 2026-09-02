@@ -237,14 +237,14 @@
           [class.active]="activeTab === 'login'"
           (click)="setActiveTab('login')"
         >
-          Iniciar sesión
+          {{ "LOGIN_V2.TAB_LOGIN" | translate }}
         </button>
         <button
           class="tab-button"
           [class.active]="activeTab === 'signup'"
           (click)="setActiveTab('signup')"
         >
-          Crear cuenta
+          {{ "LOGIN_V2.TAB_SIGNUP" | translate }}
         </button>
       </div>
 
@@ -450,12 +450,13 @@
 
           <!-- Password Validation Checklist -->
           <div class="password-validation-checklist" *ngIf="signupPassword.dirty || signupRepeatPasswordModel.dirty">
-            <div *ngIf="!passwordValidationState.length" class="validation-item">{{ "LOGIN_V2.V_LENGTH" | translate }}</div>
-            <div *ngIf="!passwordValidationState.uppercase" class="validation-item">{{ "LOGIN_V2.V_UPPER" | translate }}</div>
-            <div *ngIf="!passwordValidationState.lowercase" class="validation-item">{{ "LOGIN_V2.V_LOWER" | translate }}</div>
-            <div *ngIf="!passwordValidationState.number" class="validation-item">{{ "LOGIN_V2.V_NUMBER" | translate }}</div>
-            <div *ngIf="!passwordValidationState.symbol" class="validation-item">Un símbolo (&#64;$!%*?&.)</div>
-            <div *ngIf="!passwordValidationState.match" class="validation-item">{{ "LOGIN_V2.V_MATCH" | translate }}</div>
+            <!-- Siempre visibles: se ponen en verde al cumplirse, no desaparecen. -->
+            <div class="validation-item" [class.is-met]="passwordValidationState.length">{{ "LOGIN_V2.V_LENGTH" | translate }}</div>
+            <div class="validation-item" [class.is-met]="passwordValidationState.uppercase">{{ "LOGIN_V2.V_UPPER" | translate }}</div>
+            <div class="validation-item" [class.is-met]="passwordValidationState.lowercase">{{ "LOGIN_V2.V_LOWER" | translate }}</div>
+            <div class="validation-item" [class.is-met]="passwordValidationState.number">{{ "LOGIN_V2.V_NUMBER" | translate }}</div>
+            <div class="validation-item" [class.is-met]="passwordValidationState.symbol">{{ "LOGIN_V2.V_SYMBOL" | translate }} (&#64;$!%*?&amp;.)</div>
+            <div class="validation-item" [class.is-met]="passwordValidationState.match">{{ "LOGIN_V2.V_MATCH" | translate }}</div>
           </div>
 
           <div *ngIf="signupErrorMessage" class="error-message general-error">
@@ -471,18 +472,13 @@
             {{ (signupLoading ? "LOGIN_V2.SUBMITTING" : "LOGIN_V2.SUBMIT") | translate }}
           </button>
 
-          <div class="terms-text">
-            Al enviar este formulario, aceptas nuestros
-            Términos de uso y
-            Política de privacidad, y das tu consentimiento
-            para recibir comunicaciones de marketing de nuestra parte.
-          </div>
+          <div class="terms-text">{{ "LOGIN_V2.TERMS" | translate }}</div>
         </form>
       </div>
 
       <!-- Footer -->
       <div class="modal-footer">
-        <p>© Ajaw 2026 · Privacidad · Términos de uso</p>
+        <p>© Ajaw 2026 · {{ "LOGIN_V2.FOOTER" | translate }}</p>
       </div>
 
     </div>

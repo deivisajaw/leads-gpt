@@ -747,8 +747,10 @@
 .form-panel {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Sin align-items/justify-content: center. Cuando el formulario es mas alto
+     que la ventana (signup en pantallas bajas), el centrado de flex recorta por
+     arriba y esa parte queda inalcanzable aunque haya scroll. El centrado lo
+     hace .form-card con margin:auto, que si respeta el overflow. */
   overflow-y: auto;
   overflow-x: hidden;
   padding: 40px 26px;
@@ -759,6 +761,7 @@
   position: relative;
   z-index: 3;
   width: min(440px, 100%);
+  margin: auto;
   display: flex;
   flex-direction: column;
   animation: card-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1025,13 +1028,38 @@
 }
 
 .validation-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 12.5px;
+  line-height: 1.7;
   color: var(--text-secondary);
+  transition: color 180ms ease;
 }
 
 .validation-item::before {
-  content: "○ ";
+  content: "○";
   color: var(--warning-color);
+  font-size: 11px;
+  line-height: 1;
+  transition: color 180ms ease, transform 180ms cubic-bezier(.22,1,.36,1);
+}
+
+/* Cumplido: verde y palomita. Antes el requisito desaparecia con *ngIf, asi que
+   el usuario nunca veia confirmacion — solo lineas que se borraban. */
+.validation-item.is-met {
+  color: var(--success-color, #13A463);
+}
+
+.validation-item.is-met::before {
+  content: "\2713";
+  color: var(--success-color, #13A463);
+  transform: scale(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .validation-item,
+  .validation-item::before { transition: none; }
 }
 
 .terms-text {
