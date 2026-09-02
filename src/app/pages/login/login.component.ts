@@ -131,10 +131,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   setActiveTab(tab: 'login' | 'signup'): void {
+    const queryParams = this.route.snapshot.queryParams;
     if (tab === 'signup') {
-      this.router.navigate(['/signup']);
+      this.router.navigate(['/signup'], { queryParams });
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], { queryParams });
     }
   }
 
@@ -231,6 +232,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         // Si el login automático falla, mostramos mensaje y redirigimos al tab de login
         this.loginMessage = '¡Registro exitoso! Por favor, inicia sesión con tus nuevas credenciales.';
         this.router.navigate(['/login'], {
+          queryParams: this.route.snapshot.queryParams,
           state: {
             signupSuccessMessage: '¡Registro exitoso! Por favor, inicia sesión con tus nuevas credenciales.'
           }
