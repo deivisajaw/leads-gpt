@@ -38,12 +38,12 @@
     </div>
 
     <!-- Etapas reales del tablero: si Axelor cambia, esto cambia solo. -->
-    <div class="dd-stages" *ngIf="stages.length">
+    <div class="dd-stages" *ngIf="stages.length && stageIndex >= 0">
       <span class="dd-st" *ngFor="let s of stages; let i = index; trackBy: trackStage"
             [class.done]="stageState(i) === 'done'"
             [class.now]="stageState(i) === 'now'"></span>
     </div>
-    <div class="dd-stage-lbl" *ngIf="stages.length">
+    <div class="dd-stage-lbl" *ngIf="stages.length && stageIndex >= 0">
       <span *ngFor="let s of stages; let i = index; trackBy: trackStage"
             [class.on]="stageState(i) === 'now'">{{ s.label }}</span>
     </div>
