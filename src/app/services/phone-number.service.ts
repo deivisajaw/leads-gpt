@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 export interface PhoneNumber {
   id: number;
@@ -19,7 +20,7 @@ export class PhoneNumberService {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include', 
       headers: {
@@ -51,7 +52,7 @@ export class PhoneNumberService {
   }
 
   async getAvailablePhoneNumbers(): Promise<any[]> {
-    const response = await fetch(this.apiConfig.availablePhoneNumbersWebhookUrl, {
+    const response = await fetchWithTimeout(this.apiConfig.availablePhoneNumbersWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ export class PhoneNumberService {
   }
 
   async acquirePhoneNumber(phoneNumber: string, companyDataId: number): Promise<any> {
-    const response = await fetch(this.apiConfig.acquirePhoneNumberWebhookUrl, {
+    const response = await fetchWithTimeout(this.apiConfig.acquirePhoneNumberWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES
@@ -87,7 +88,7 @@ export class MessageService {
     if (!apiKey) return false;
 
     // 2. Llamar a /profile con ese apiKey para obtener el accountId
-    const resp = await fetch(this.apiConfig.chatwootProfileUrl, {
+    const resp = await fetchWithTimeout(this.apiConfig.chatwootProfileUrl, {
       method: 'GET',
       headers: { 'api_access_token': apiKey }
     });
@@ -106,7 +107,7 @@ export class MessageService {
   async getInboxes(): Promise<ChatwootInbox[]> {
     this.ensureCredentials();
     const url = `${this.apiConfig.chatwootBaseUrl}/api/v1/accounts/${this.chatwootAccountId}/inboxes`;
-    const resp = await fetch(url, {
+    const resp = await fetchWithTimeout(url, {
       method: 'GET',
       headers: { 'api_access_token': this.chatwootApiKey! }
     });
@@ -150,7 +151,7 @@ export class MessageService {
       ]
     };
 
-    const resp = await fetch(url, {
+    const resp = await fetchWithTimeout(url, {
       method: 'POST',
       headers: {
         'Content-Type':    'application/json',
@@ -214,7 +215,7 @@ export class MessageService {
 
   private async fetchConversationMessages(conversationId: number): Promise<ChatwootMessage[]> {
     const url = `${this.apiConfig.chatwootBaseUrl}/api/v1/accounts/${this.chatwootAccountId}/conversations/${conversationId}/messages`;
-    const resp = await fetch(url, {
+    const resp = await fetchWithTimeout(url, {
       method: 'GET',
       headers: { 'api_access_token': this.chatwootApiKey! }
     });
@@ -233,7 +234,7 @@ export class MessageService {
   async setConversationStatus(conversationId: number, status: 'resolved' | 'open' | 'pending'): Promise<void> {
     this.ensureCredentials();
     const url = `${this.apiConfig.chatwootBaseUrl}/api/v1/accounts/${this.chatwootAccountId}/conversations/${conversationId}/toggle_status`;
-    const resp = await fetch(url, {
+    const resp = await fetchWithTimeout(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -330,7 +331,7 @@ export class MessageService {
   private async fetchData(action: string, data: any): Promise<any> {
     const token = localStorage.getItem('csrfToken');
     if (!token) throw new Error('No authentication token found');
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },

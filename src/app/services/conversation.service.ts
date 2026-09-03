@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { fetchWithTimeout } from './http-timeout';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES
@@ -63,7 +64,7 @@ const MOCK_CONVERSATIONS: Conversation[] = [
       { name: 'Jodianne Smith',  email: 'j.smith@bandwidth.com',  speakingPercent: 21, speakingMinutes: 7  },
       { name: 'Ana Torres',      email: 'a.torres@bandwidth.com', speakingPercent: 12, speakingMinutes: 4  },
     ],
-    summary: 'En la conversación se discute en detalle el modelo de precios de Bandwidth con Giuliano Gomez. Jodianne explica que Bandwidth opera con un modelo de facturación postpago con un compromiso mínimo de $3,500 al mes. Este monto es inclusivo del volumen de servicios utilizados, como SMS y llamadas. Jodianne aclara que incluso si el uso de Giuliano no alcanza ese mínimo en un mes determinado, se le seguirá cobrando el monto mínimo de $3,500. Giuliano consulta la posibilidad de comenzar con un plan menor, pero Jodianne confirma que el compromiso mínimo es fijo. También discuten el gasto actual de Giuliano con Twilio, que ronda entre $2,000 y $3,000 mensuales, y su interés en migrar a Bandwidth debido a mejores tarifas.',
+    summary: 'En la conversación se discute en detalle el modelo de precios de Bandwidth con Giuliano Gomez. Jodianne explica que Bandwidth opera con un modelo de facturación postpago con un compromiso mínimo de $3,500 al mes. Este monto es inclusivo del volumen de servicios utilizados, como SMS y llamadas. Jodianne aclara que incluso si el uso de Giuliano no alcanza ese mínimo en un mes determinado, se le seguirá cobrando el monto mínimo de $3,500. Giuliano consulta la posibilidad de comenzar con un plan menor, pero Jodianne confirma que el compromiso mínimo es fijo. También discuten el gasto actual de Giuliano con nuestro proveedor actual, que ronda entre $2,000 y $3,000 mensuales, y su interés en migrar a Bandwidth debido a mejores tarifas.',
     nextSteps: [
       {
         ownerName: 'Giuliano Gomez',
@@ -80,11 +81,11 @@ const MOCK_CONVERSATIONS: Conversation[] = [
       }
     ],
     transcript: [
-      { speakerName: 'Giuliano Gomez', timestampSeconds: 12,  text: 'Hola Jodianne, gracias por unirte. Estaba revisando nuestra factura de Twilio y sinceramente los costos están subiendo bastante.' },
+      { speakerName: 'Giuliano Gomez', timestampSeconds: 12,  text: 'Hola Jodianne, gracias por unirte. Estaba revisando nuestra factura de nuestro proveedor actual y sinceramente los costos están subiendo bastante.' },
       { speakerName: 'Jodianne Smith', timestampSeconds: 28,  text: 'Entiendo completamente. Bandwidth tiene un modelo postpago con un mínimo mensual de $3,500, todo incluido — SMS y llamadas.' },
-      { speakerName: 'Giuliano Gomez', timestampSeconds: 55,  text: '¿Hay alguna opción de empezar con un plan menor? Actualmente gastamos entre $2,000 y $3,000 con Twilio.' },
+      { speakerName: 'Giuliano Gomez', timestampSeconds: 55,  text: '¿Hay alguna opción de empezar con un plan menor? Actualmente gastamos entre $2,000 y $3,000 con nuestro proveedor actual.' },
       { speakerName: 'Jodianne Smith', timestampSeconds: 75,  text: 'El compromiso mínimo es fijo en $3,500, no tenemos planes de menor escala por el momento.' },
-      { speakerName: 'Giuliano Gomez', timestampSeconds: 110, text: 'Entendido. Las tarifas siguen siendo más competitivas que Twilio, así que tiene sentido explorar la migración.' },
+      { speakerName: 'Giuliano Gomez', timestampSeconds: 110, text: 'Entendido. Las tarifas siguen siendo más competitivas que nuestro proveedor actual, así que tiene sentido explorar la migración.' },
       { speakerName: 'Ana Torres',     timestampSeconds: 145, text: 'Desde el lado técnico la integración es bastante directa, tenemos SDKs para la mayoría de los stacks.' },
       { speakerName: 'Jodianne Smith', timestampSeconds: 180, text: 'Exacto. Para proceder necesitaríamos el KYC y las direcciones de sus oficinas para el contrato.' },
       { speakerName: 'Giuliano Gomez', timestampSeconds: 210, text: 'Perfecto, los envío esta semana. Muchas gracias a las dos.' },
@@ -184,7 +185,7 @@ export class ConversationService {
   //
   // async getConversations(): Promise<Conversation[]> {
   //   const token = localStorage.getItem('googleAccessToken'); // o tu AuthService
-  //   const response = await fetch(`${this.GOOGLE_MEET_API}/recordings`, {
+  //   const response = await fetchWithTimeout(`${this.GOOGLE_MEET_API}/recordings`, {
   //     headers: { Authorization: `Bearer ${token}` }
   //   });
   //   if (!response.ok) throw new Error(`Google Meet API error: ${response.status}`);
@@ -204,7 +205,7 @@ export class ConversationService {
   //
   // async getConversationById(id: string): Promise<Conversation | null> {
   //   const token = localStorage.getItem('googleAccessToken');
-  //   const resp = await fetch(`${this.GOOGLE_MEET_API}/recordings/${encodeURIComponent(id)}`, {
+  //   const resp = await fetchWithTimeout(`${this.GOOGLE_MEET_API}/recordings/${encodeURIComponent(id)}`, {
   //     headers: { Authorization: `Bearer ${token}` }
   //   });
   //   if (!resp.ok) return null;

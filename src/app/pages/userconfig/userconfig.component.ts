@@ -7,6 +7,7 @@ import { LANGUAGES, AppLanguage, detectLanguage } from '../../services/languages
 import { CurrencyService, CURRENCIES, AppCurrency } from '../../services/currency.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { fetchWithTimeout } from '../../services/http-timeout';
 import { OnboardingService } from "../../services/onboarding.service"; // NEW IMPORT
 
 @Component({
@@ -147,7 +148,7 @@ export class UserconfigComponent implements OnInit, OnDestroy {
         throw new Error('CSRF token not found.');
       }
 
-      const response = await fetch(`${this.authService.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.authService.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -173,11 +174,18 @@ export class UserconfigComponent implements OnInit, OnDestroy {
           const updatedCreditsPerSearch = result.data?.creditsPerSearch || this.creditsPerSearch;
           const updatedHideOnboarding = result.data?.hideOnboardingWidget !== undefined ? result.data.hideOnboardingWidget : this.hideOnboardingWidget;
 
+          // Se comprueba ANTES de mover initialLanguage. Estaba al revés: se
+          // machacaba initialLanguage con el idioma nuevo y luego se comparaba
+          // contra él, así que la condición nunca se cumplía y setLanguage no
+          // llegaba a ejecutarse. El idioma se guardaba en el backend pero la
+          // pantalla seguía igual hasta que uno recargaba a mano.
+          const languageChanged = updatedLanguage !== this.initialLanguage;
+
           this.initialLanguage = updatedLanguage;
           this.initialCreditsPerSearch = updatedCreditsPerSearch;
           this.initialHideOnboardingWidget = updatedHideOnboarding;
 
-          if (this.selectedLanguage !== this.initialLanguage) {
+          if (languageChanged) {
             this.languageService.setLanguage(updatedLanguage);
           }
 
@@ -188,8 +196,15 @@ export class UserconfigComponent implements OnInit, OnDestroy {
           });
 
           this.isError = false;
-          this.message = 'Configuration updated successfully.';
+          this.message = this.translate.instant('USERCONFIG.SAVED');
           this.onboardingService.completeOnboardingStepByKey('CONFIGURE_PROFILE');
+
+          // Los pipes | translate cambian solos, pero varias pantallas fijan sus
+          // textos con translate.instant() al construirse y ésas se quedarían en
+          // el idioma viejo. Recargamos una vez para que todo quede parejo.
+          if (languageChanged) {
+            setTimeout(() => window.location.reload(), 700);
+          }
         } else {
           this.isError = true;
           this.message = result.data?.message || result.message || 'Failed to update config due to backend error.';

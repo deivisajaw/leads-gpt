@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ApiConfigService } from "./api-config.service";
+import { fetchWithTimeout, SEARCH_TIMEOUT_MS } from './http-timeout';
 
 export interface People {
   id: number;
@@ -134,7 +135,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -154,7 +155,7 @@ export class PeopleService {
             searchId: searchId || undefined,
           },
         }),
-      });
+      }, SEARCH_TIMEOUT_MS);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -183,7 +184,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -234,7 +235,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -251,7 +252,7 @@ export class PeopleService {
             sortBy: sortBy,
           },
         }),
-      });
+      }, SEARCH_TIMEOUT_MS);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -283,7 +284,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -339,7 +340,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -375,7 +376,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -437,7 +438,7 @@ export class PeopleService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: "POST",
         credentials: "include",
         headers: {

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class PlanService {
     }
 
     try {
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {

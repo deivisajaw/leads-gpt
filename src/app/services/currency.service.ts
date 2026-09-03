@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { fetchWithTimeout } from './http-timeout';
 
 /**
  * Moneda de VISUALIZACIÓN.
@@ -108,7 +109,7 @@ export class CurrencyService {
     } catch { /* noop */ }
 
     try {
-      const r = await fetch(RATES_URL);
+      const r = await fetchWithTimeout(RATES_URL);
       const j = await r.json();
       if (j?.result === 'success' && j.rates) {
         this.rates = j.rates;

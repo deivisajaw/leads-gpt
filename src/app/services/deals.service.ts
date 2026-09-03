@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES
@@ -233,7 +234,9 @@ export class DealsService {
     const token = localStorage.getItem('csrfToken');
     if (!token) throw new Error('No authentication token found');
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    // fetchWithTimeout aborta si el backend no contesta, para que la pantalla
+    // muestre un error en vez de quedarse con el engranaje girando.
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: {

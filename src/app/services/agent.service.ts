@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; // Import HttpClient
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 import { Observable } from 'rxjs'; // Import Observable
 
 export interface Agent {
@@ -81,7 +82,7 @@ export class AgentService {
   }
 
   async freeUpAgent(agentId: number): Promise<void> {
-    const response = await fetch(this.apiConfig.freeUpAgentUrl, {
+    const response = await fetchWithTimeout(this.apiConfig.freeUpAgentUrl, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ agentId })
@@ -128,7 +129,7 @@ export class AgentService {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: {

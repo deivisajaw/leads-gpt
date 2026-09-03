@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 export interface SavedPeople {
   id: number
@@ -58,7 +59,7 @@ export class MyListPeopleService {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -91,7 +92,7 @@ export class MyListPeopleService {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -124,7 +125,7 @@ export class MyListPeopleService {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -157,7 +158,7 @@ export class MyListPeopleService {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {

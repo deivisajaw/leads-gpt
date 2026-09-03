@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ApiConfigService } from './api-config.service';
 import { from, Observable } from 'rxjs';
+import { fetchWithTimeout } from './http-timeout';
 
 export type AbandonedCheckoutStatus = 'PLANNED' | 'IN_PROGRESS' | 'STOPED';
 export type FollowupType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
@@ -141,7 +142,7 @@ export class AbandonedCheckoutService {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: {

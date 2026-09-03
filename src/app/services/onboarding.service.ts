@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
 import { AuthService } from './auth.service';
 import { OnboardingStepStatus } from '../models/user-profile.model';
+import { fetchWithTimeout } from './http-timeout';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class OnboardingService {
     const data = { _stepKey: stepKey };
 
     try {
-      const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
         method: 'POST',
         credentials: 'include',
         headers: {

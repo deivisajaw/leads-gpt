@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiConfigService } from './api-config.service';
+import { fetchWithTimeout } from './http-timeout';
 
 export interface GoogleCalendarEvent {
   id: string;
@@ -52,6 +53,24 @@ export class MeetingService {
 
   private cache: GoogleCalendarEvent[] = [];
 
+  /**
+   * Cuándo se refrescó por última vez el token de cada calendario.
+   *
+   * Antes se refrescaban TODOS en cada carga de la pantalla. Con 6 calendarios
+   * conectados eso son 6 llamadas al webhook de OAuth que tardan entre 0,6 s y
+   * 12,2 s, y la pantalla espera a la más lenta: doce segundos en blanco cada
+   * vez que entras. Las peticiones a nuestro propio backend, en comparación,
+   * tardan 60 ms.
+   *
+   * Los tokens de Google duran una hora, así que refrescar como mucho cada 30
+   * minutos es seguro y deja la segunda visita en menos de medio segundo.
+   */
+  private lastRefreshed = new Map<number, number>();
+  private static readonly REFRESH_TTL_MS = 30 * 60 * 1000;
+
+  /** Lo último que se cargó en esta sesión, para pintar sin esperar a Google. */
+  get cached(): GoogleCalendarEvent[] { return this.cache; }
+
   constructor(private apiConfig: ApiConfigService) {}
 
   // ─────────────────────────────────────────────
@@ -74,10 +93,21 @@ export class MeetingService {
         try {
           // 2. Refresh token via webhook using the BD record id
           console.debug(`[MeetingService] STEP 2 — refreshing token for id: ${ci.id} calendarId: "${ci.calendarId}"`);
-          const refreshResult = await this.refreshToken(ci.id);
-          console.debug(`[MeetingService] STEP 2 — refresh result:`, refreshResult);
+          const refreshedAt = this.lastRefreshed.get(ci.id) ?? 0;
+          const stillFresh = Date.now() - refreshedAt < MeetingService.REFRESH_TTL_MS;
+
+          const refreshResult = stillFresh
+            ? { success: true as const, accessToken: ci.accessToken }
+            : await this.refreshToken(ci.id);
+          console.debug(`[MeetingService] STEP 2 — refresh result (cached: ${stillFresh}):`, refreshResult);
+
+          if (refreshResult.success && !stillFresh) {
+            this.lastRefreshed.set(ci.id, Date.now());
+          }
 
           if (!refreshResult.success) {
+            // Si falla el refresco, se olvida para reintentar en la próxima visita.
+            this.lastRefreshed.delete(ci.id);
             console.warn(
               `[MeetingService] Token refresh failed for calendar "${ci.calendarId}":`,
               refreshResult.error
@@ -165,7 +195,7 @@ export class MeetingService {
 
   private async refreshToken(calendarIntegrationId: number): Promise<TokenRefreshResult> {
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${this.apiConfig.refreshCalendarTokenUrl}?calendarId=${calendarIntegrationId}`,
         { method: 'GET' }
       );
@@ -229,7 +259,7 @@ export class MeetingService {
     const token = localStorage.getItem('csrfToken');
     if (!token) throw new Error('No authentication token found');
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -274,7 +304,7 @@ export class MeetingService {
     const url = `${baseUrl}?${params.toString()}`;
     console.debug(`[MeetingService] STEP 4 — Google API URL: ${url}`);
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });

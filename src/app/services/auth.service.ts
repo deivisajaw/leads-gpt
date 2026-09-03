@@ -7,6 +7,7 @@ import { ApiConfigService } from './api-config.service';
 import { LanguageService } from './language.service';
 import { UserProfile } from '../models/user-profile.model';
 import { DirectorioRedirectService } from './directorio-redirect.service';
+import { fetchWithTimeout } from './http-timeout';
 
 declare const clarity: any;
 
@@ -90,7 +91,7 @@ export class AuthService {
     body.append('password', password);
 
     try {
-      const response = await fetch(`${this.apiConfig.baseUrl}/login.jsp`, {
+      const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/login.jsp`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -150,7 +151,12 @@ export class AuthService {
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error(`Error fetching profile: ${response.statusText}`);
+          // Se marca si de verdad es un problema de sesión. Un 500 o un corte de
+          // red NO lo son, y antes cualquiera de los dos cerraba la sesión.
+          const err: any = new Error(`Error fetching profile: ${response.statusText}`);
+          err.status = response.status;
+          err.isAuthFailure = response.status === 401 || response.status === 403;
+          throw err;
         }
         return response.json();
       })
@@ -182,7 +188,14 @@ export class AuthService {
       })
       .catch(error => {
         console.error('AuthService: Error fetching user profile:', error);
-        this.logout();
+        // Antes esto era `this.logout()` a secas: CUALQUIER fallo de esta única
+        // llamada —un 500, un corte de red, el servidor reiniciándose— echaba al
+        // usuario de la sesión sin avisar. Ahora sólo se cierra la sesión cuando
+        // el servidor dice que la sesión no vale (401/403) o cuando la respuesta
+        // no trae usuario. Un fallo pasajero deja la sesión en pie.
+        if (error?.isAuthFailure || error?.message === 'User profile data is invalid') {
+          this.logout();
+        }
         throw error;
       })
       .finally(() => {
@@ -211,7 +224,7 @@ export class AuthService {
     };
 
     try {
-      const response = await fetch(this.apiConfig.recoveryPasswordUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.recoveryPasswordUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +261,7 @@ export class AuthService {
     };
 
     try {
-      const response = await fetch(this.apiConfig.recoveryPasswordUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.recoveryPasswordUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -339,7 +352,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await fetch(`${this.apiConfig.baseUrl}/logout`, {
+      await fetchWithTimeout(`${this.apiConfig.baseUrl}/logout`, {
         method: 'POST',
         credentials: 'include',
       });

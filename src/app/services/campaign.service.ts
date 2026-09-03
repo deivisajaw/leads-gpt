@@ -5,6 +5,7 @@ import { ApiConfigService } from './api-config.service';
 import { SavedPeople } from './my-list-people.service';
 import { SavedCompany } from './my-list-company.service';
 import { from, Observable } from 'rxjs';
+import { fetchWithTimeout } from './http-timeout';
 
 export type CampaignStatus = 'planned' | 'in_progress' | 'finished' | 'cancelled';
 
@@ -227,7 +228,7 @@ export class CampaignService {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${this.apiConfig.baseUrl}/ws/action`, {
+    const response = await fetchWithTimeout(`${this.apiConfig.baseUrl}/ws/action`, {
       method: 'POST',
       credentials: 'include',
       headers: {
