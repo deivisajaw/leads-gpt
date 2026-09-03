@@ -602,16 +602,25 @@ app-aside .collapse-btn {
   margin-bottom: 16px;
 }
 
+/* Un solo tamaño para el botón principal de cada página. Antes no fijaba
+   font-size ni alto, así que "Agregar nuevo" salía más pequeño en Agentes que
+   en Números o Campañas según el tamaño de letra de cada cabecera. */
 .btn-primary {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 12px;
+  height: 40px;
+  padding: 0 16px;
   background: var(--primary-blue);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
