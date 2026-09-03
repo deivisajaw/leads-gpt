@@ -97,101 +97,38 @@
         </button>
       </div>
 
-      <!-- Results Table -->
-      <div
-        *ngIf="!isLoading && filteredHistoryItems.length > 0"
-        style="
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        "
-      >
-        <div style="flex: 1; overflow: auto; background: white">
-          <table style="width: 100%; border-collapse: collapse">
-            <thead
-              style="
-                position: sticky;
-                top: 0;
-                z-index: 10;
-              "
-            >
-              <tr style="border-bottom: 1px solid #e2e8f0">
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    font-size: 12px;
-                    text-transform: uppercase;
-                    min-width: 250px;
-                  "
-                >
-                  {{ "HISTORY.TABLE_HEADERS.QUERY" | translate }}
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    font-size: 12px;
-                    text-transform: uppercase;
-                    min-width: 120px;
-                  "
-                >
-                  {{ "HISTORY.TABLE_HEADERS.DATE" | translate }}
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    font-size: 12px;
-                    text-transform: uppercase;
-                    min-width: 100px;
-                  "
-                >
-                  {{ "HISTORY.TABLE_HEADERS.ACTIONS" | translate }}
-                </th>
+      <!-- Tabla de busquedas: mismo lenguaje que la tabla de Listas
+           (cabecera en versalitas, monograma con degradado, hover que tinta la
+           fila y pone el nombre en indigo, fechas en cifras tabulares). Antes
+           iba con estilos en linea y grises de Tailwind, por eso desentonaba. -->
+      <div class="hres" *ngIf="!isLoading && filteredHistoryItems.length > 0">
+        <div class="htablewrap">
+          <table class="htbl">
+            <thead>
+              <tr>
+                <th>{{ "HISTORY.TABLE_HEADERS.QUERY" | translate }}</th>
+                <th style="width:180px">{{ "HISTORY.TABLE_HEADERS.DATE" | translate }}</th>
+                <th style="width:90px">{{ "HISTORY.TABLE_HEADERS.ACTIONS" | translate }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                *ngFor="let item of filteredHistoryItems; let i = index"
-                class="rowin"
-                [class.play]="rowsRevealed"
-                [style.animation-delay.ms]="i * 30"
-                [style.background]="i % 2 === 0 ? '#f8fafc' : 'white'"
-                style="border-bottom: 1px solid #e2e8f0; cursor: pointer"
-                (click)="viewDetails(item.id)"
-              >
-                <td
-                  style="
-                    padding: 12px;
-                    font-weight: 500;
-                    color: #1e293b;
-                    text-decoration: underline;
-                  "
-                >
-                  {{ item.searchString }}
+              <tr *ngFor="let item of filteredHistoryItems; let i = index"
+                  class="rowin" [class.play]="rowsRevealed"
+                  [style.animation-delay.ms]="i * 30"
+                  (click)="viewDetails(item.id)">
+                <td>
+                  <div class="hwho">
+                    <span class="hmono">{{ (item.searchString || '?').charAt(0) }}</span>
+                    <span class="hnm">{{ item.searchString }}</span>
+                  </div>
                 </td>
-                <td style="padding: 12px;">
-                  {{ formatDate(item.createdOn) }}
-                </td>
+                <td><span class="hdate">{{ formatDate(item.createdOn) }}</span></td>
                 <td (click)="$event.stopPropagation()">
-                  <button
-                    (click)="viewDetails(item.id)"
-                    style="
-                      background: none;
-                      border: 1px solid #e2e8f0;
-                      padding: 6px;
-                      border-radius: 4px;
-                      cursor: pointer;
-                      color: #64748b;
-                    "
-                    title="{{ 'HISTORY.VIEW_DETAILS_BUTTON' | translate }}"
-                  >
-                    <i class="fas fa-eye"></i>
+                  <button class="hact" (click)="viewDetails(item.id)"
+                          [attr.title]="'HISTORY.VIEW_DETAILS_BUTTON' | translate">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                 </td>
               </tr>
@@ -199,59 +136,17 @@
           </table>
         </div>
 
-        <!-- Pagination -->
-        <div
-          style="
-            padding: 16px 20px;
-            border-top: 1px solid #e2e8f0;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div style="color: #64748b; font-size: 14px">
-            {{ getStartIndex() }} - {{ getEndIndex() }} of
-            {{ getFormattedTotal() }}
-          </div>
-          <div style="display: flex; gap: 8px">
-            <button
-              (click)="goToPage(currentPage - 1)"
-              [disabled]="currentPage === 1"
-              [style.cursor]="currentPage === 1 ? 'not-allowed' : 'pointer'"
-              [style.color]="currentPage === 1 ? '#94a3b8' : '#64748b'"
-              style="
-                padding: 8px 12px;
-                border: 1px solid #e2e8f0;
-                background: white;
-                border-radius: 4px;
-              "
-            >
-              <i class="fas fa-chevron-left"></i>
+        <div class="hpager">
+          <span class="hcount">{{ getStartIndex() }} – {{ getEndIndex() }} / {{ getFormattedTotal() }}</span>
+          <div class="hpg">
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <span
-              style="padding: 8px 12px; color: #64748b; font-size: 14px"
-            >
-              {{ "HISTORY.PAGE" | translate }} {{ currentPage }}
-              {{ "HISTORY.OF" | translate }} {{ totalPages }}
-            </span>
-            <button
-              (click)="goToPage(currentPage + 1)"
-              [disabled]="currentPage === totalPages"
-              [style.cursor]="
-                currentPage === totalPages ? 'not-allowed' : 'pointer'
-              "
-              [style.color]="
-                currentPage === totalPages ? '#94a3b8' : '#64748b'
-              "
-              style="
-                padding: 8px 12px;
-                border: 1px solid #e2e8f0;
-                background: white;
-                border-radius: 4px;
-              "
-            >
-              <i class="fas fa-chevron-right"></i>
+            <span class="hnow">{{ "HISTORY.PAGE" | translate }} {{ currentPage }}</span>
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage >= totalPages">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
         </div>

@@ -257,3 +257,123 @@ tbody tr:hover {
   color: #64748b;
   font-size: 14px;
 }
+/* ═══ Tabla del historial ═══════════════════════════════════════════════════
+   Mismo lenguaje que la tabla de Listas: tokens de AJAW (indigo #3E34F9,
+   degradado #7871FB→#251F95, grises Apple), Space Grotesk en cabeceras y
+   numeros. Antes iba con estilos en linea y los grises slate de Tailwind, por
+   eso desentonaba con el resto de la app.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hres {
+  background: #fff;
+  border: 1px solid #E5E5EA;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+}
+.htablewrap { overflow-x: auto }
+.htbl { width: 100%; border-collapse: collapse }
+
+.htbl th {
+  padding: 12px 18px;
+  border-bottom: 1px solid #E5E5EA;
+  background: #FBFBFD;
+  color: #86868B;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.htbl td {
+  padding: 13px 18px;
+  border-top: 1px solid #E5E5EA;
+  font-size: 13.5px;
+  color: #1D1D1F;
+  vertical-align: middle;
+}
+.htbl tbody tr { cursor: pointer; transition: background .13s ease }
+.htbl tbody tr:hover { background: #F4F3FF }
+.htbl tbody tr:first-child td { border-top: 0 }
+
+.hwho { display: flex; align-items: center; gap: 11px; min-width: 0 }
+
+.hmono {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(150deg, #7871FB, #251F95);
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hnm {
+  font-weight: 600;
+  color: #1D1D1F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.htbl tbody tr:hover .hnm { color: #3E34F9 }
+
+.hdate { color: #6E6E73; font-variant-numeric: tabular-nums }
+
+.hact {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #E5E5EA;
+  border-radius: 8px;
+  background: #fff;
+  color: #86868B;
+  cursor: pointer;
+  transition: border-color .14s ease, color .14s ease;
+}
+.hact svg { width: 15px; height: 15px }
+.hact:hover { border-color: #7871FB; color: #3E34F9 }
+
+/* ── Paginación ────────────────────────────────────────────────────────── */
+
+.hpager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 1px solid #E5E5EA;
+}
+.hcount { font-size: 12.5px; color: #86868B; font-variant-numeric: tabular-nums }
+.hpg { display: flex; align-items: center; gap: 8px }
+.hpg button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #D2D2D7;
+  border-radius: 9px;
+  background: #fff;
+  color: #1D1D1F;
+  cursor: pointer;
+  transition: border-color .14s ease, color .14s ease;
+}
+.hpg button svg { width: 15px; height: 15px }
+.hpg button:hover:not(:disabled) { border-color: #7871FB; color: #3E34F9 }
+.hpg button:disabled { opacity: .4; cursor: default }
+.hnow {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1D1D1F;
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+}
