@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from "@angular/router";
 import {
   PeopleService,
@@ -36,6 +36,7 @@ import {
   SearchReadyResult,
 } from "../../components/search-chat/search-chat.component";
 import { ExportService } from "../../services/export.service";
+import { CreditsPillComponent } from '../../components/shared/credits-pill/credits-pill.component';
 
 export interface FacetOption {
   value: string;
@@ -45,13 +46,12 @@ export interface FacetOption {
 @Component({
   selector: "app-people",
   standalone: true,
-  imports: [
-    CommonModule,
+  imports: [CommonModule,
     FormsModule,
     TranslateModule,
     PlansComponent,
     SearchChatComponent,
-  ],
+    CreditsPillComponent],
   templateUrl: "./people.component.html",
   styleUrl: "./people.component.css",
 })
@@ -301,6 +301,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   private boundOnGlobePointerUp = () => this.onGlobePointerUp();
 
   constructor(
+    private translate: TranslateService,
     private peopleService: PeopleService,
     private myListPeopleService: MyListPeopleService,
     private savedListService: SavedListService,
@@ -370,6 +371,7 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this.stopSearchPolling();
     if (this.userProfileSubscription) {
       this.userProfileSubscription.unsubscribe();
     }
@@ -457,6 +459,9 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onChatStarted(): void {
     this.chatActive = true;
+    this.peopleService.getMySearchHistoryPeoples(0, 1, 'createdOn_desc')
+      .then(h => { this.searchIdBeforeChat = h?.history?.[0]?.id ?? null; })
+      .catch(() => { this.searchIdBeforeChat = null; });
   }
 
   // ─── Llamado por el chat cuando el agente tiene el query listo ───
@@ -464,6 +469,47 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchQuery = result.query;
     this.currentCategory = result.category;
     this.currentLocation = result.location;
+
+    // El agente a veces manda los tres campos vacios. onSearch() lo toma como
+    // "no hay nada que buscar", llama a resetSearchState() y la pantalla vuelve
+    // a la portada: el chat desaparece y no se ve ningun resultado.
+    const nothingToSearch =
+      !this.searchQuery.trim() &&
+      !this.currentCategory.trim() &&
+      !this.currentLocation.trim();
+
+    if (nothingToSearch) {
+      this.searchQuery = (this.lastUserMessage || '').trim();
+      if (!this.searchQuery) return;
+    }
+
+    // Si la busqueda directa ya corre o ya trajo filas, no se repite.
+    if (this.searchPollTimer || this.filteredResults.length > 0) return;
+
+    this.onSearch();
+  }
+
+  /** Lo ultimo que escribio el usuario en el chat. */
+  lastUserMessage = '';
+
+  /**
+   * El usuario escribio y le dio enter: se busca YA, sin esperar al agente.
+   *
+   * Antes el unico camino a los resultados pasaba por el agente: tenia que
+   * llamar finalize_search para que la pantalla pintara algo. Cuando el agente
+   * solo contesta "buscando eso ahora" —cosa que hace seguido— la busqueda se
+   * ejecuta, queda guardada con sus resultados, y la pantalla se queda vacia.
+   *
+   * Un buscador no puede depender de que un modelo se acuerde de llamar una
+   * herramienta. El agente sigue ahi para conversar y afinar, pero ya no decide
+   * si ves algo.
+   */
+  onUserAsked(text: string): void {
+    this.lastUserMessage = text;
+    if (this.isLoading || this.searchPollTimer) return;
+    this.searchQuery = text;
+    this.currentCategory = '';
+    this.currentLocation = '';
     this.onSearch();
   }
 
@@ -523,8 +569,23 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
         break;
 
-      case "SEARCH_NOT_FOUND":
+      // El scrape corre en el servidor y tarda; mientras tanto responde
+      // SEARCH_IN_PROGRESS. Antes caia en la MISMA rama que "no encontrado":
+      // se borraban los resultados y se tiraba el searchId, asi que la pantalla
+      // quedaba vacia para siempre aunque la busqueda terminara con miles de
+      // filas. Solo se veian entrando por Historial.
       case "SEARCH_IN_PROGRESS":
+        this.searchStatus = "running";
+        this.isLoading = true;
+        this.currentSearchId = response.data?.searchId ?? this.currentSearchId;
+        if (this.currentSearchId) {
+          this.startSearchPolling();
+        } else {
+          this.resolveSearchIdThenPoll();
+        }
+        break;
+
+      case "SEARCH_NOT_FOUND":
         this.filteredResults = [];
         this.displayResults = [];
         this.totalResultsInServer = 0;
@@ -1589,4 +1650,110 @@ export class PeopleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
+
+  // ── Sondeo de la busqueda ────────────────────────────────────────────────
+
+  private searchPollTimer: ReturnType<typeof setInterval> | null = null;
+  private searchPollDeadline = 0;
+
+  /**
+   * Espera a que la busqueda termine leyendo el endpoint BARATO.
+   *
+   * Volver a llamar a runSearchPeople para "ver si ya termino" NO consulta el
+   * resultado: relanza el scrape, ~35 s y creditos otra vez.
+   * getMySearchHistoryPeopleDetails devuelve las mismas filas en ~140 ms,
+   * porque solo lee lo que el scrape ya guardo. Ademas pinta lo que va llegando.
+   */
+  private startSearchPolling(): void {
+    this.stopSearchPolling();
+    this.searchPollDeadline = Date.now() + 5 * 60 * 1000;
+
+    const tick = async () => {
+      if (!this.currentSearchId) { this.stopSearchPolling(); return; }
+      if (Date.now() > this.searchPollDeadline) {
+        this.stopSearchPolling();
+        this.isLoading = false;
+        this.searchError = this.translate.instant('SEARCH.STILL_RUNNING');
+        return;
+      }
+      try {
+        const res = await this.peopleService.getMySearchHistoryPeopleDetails(
+          this.currentSearchId,
+          this.currentOffset,
+          this.itemsPerPage,
+          this.currentSortOrder,
+        );
+        if (res?.error) return;
+        if (res?.results?.length) {
+          this.isLoading = false;
+          this.updateStateFromData(res);
+        }
+        if (res?.statusSelect !== 1) {
+          this.stopSearchPolling();
+          this.isLoading = false;
+          this.searchStatus = '';
+        }
+      } catch { /* un fallo suelto no corta el sondeo */ }
+    };
+
+    tick();
+    this.searchPollTimer = setInterval(tick, 2000);
+  }
+
+  private stopSearchPolling(): void {
+    if (this.searchPollTimer) {
+      clearInterval(this.searchPollTimer);
+      this.searchPollTimer = null;
+    }
+  }
+
+  /** Recupera el id de la busqueda recien lanzada y arranca el sondeo. */
+  private async resolveSearchIdThenPoll(): Promise<void> {
+    try {
+      const hist = await this.peopleService.getMySearchHistoryPeoples(0, 1, 'createdOn_desc');
+      const newest = hist?.history?.[0];
+      if (newest?.id) {
+        this.currentSearchId = newest.id;
+        this.startSearchPolling();
+        return;
+      }
+    } catch { /* cae al aviso */ }
+    this.isLoading = false;
+    this.searchError = this.translate.instant('SEARCH.STILL_RUNNING');
+  }
+
+  /** Red de seguridad: el agente contesto sin pedir pintar resultados. */
+  private searchIdBeforeChat: number | null = null;
+
+  async onAgentRepliedWithoutResults(): Promise<void> {
+    try {
+      const hist = await this.peopleService.getMySearchHistoryPeoples(0, 1, 'createdOn_desc');
+      const newest = hist?.history?.[0];
+      if (!newest?.id) return;
+      if (this.searchIdBeforeChat !== null && newest.id === this.searchIdBeforeChat) return;
+      this.currentSearchId = newest.id;
+      this.isLoading = true;
+      this.startSearchPolling();
+    } catch { /* sin red de seguridad, como antes */ }
+  }
+
+  /** Las secciones arrancan cerradas, como en Apollo. */
+  /**
+   * Filtros que todavia no tienen datos detras. Con candado y "Proximamente"
+   * en vez de escondidos: ensenan a donde va el producto sin prometer un
+   * filtro que hoy volveria vacio.
+   */
+  public readonly lockedFilters: { key: string }[] = [
+    { key: 'EMPLOYEES' }, { key: 'REVENUE' }, { key: 'FUNDING' },
+    { key: 'TECH' }, { key: 'JOB_POSTS' }, { key: 'INTENT' },
+    { key: 'CO_LOOKALIKE' }, { key: 'PE_LOOKALIKE' },
+  ];
+
+  onLockedFilter(): void {
+    this.notificationService.showInfo(this.translate.instant('SEARCH.LOCKED_HINT'));
+  }
+
+  public showJobFacet = false;
+  public showLocFacet = false;
+  public showEmailFacet2 = false;
 }

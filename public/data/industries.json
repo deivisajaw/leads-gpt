@@ -1,0 +1,741 @@
+{
+ "groups": [
+  {
+   "key": "retail",
+   "icon": "🛒",
+   "es": "Comercio y consumo",
+   "pt": "Comércio e consumo",
+   "en": "Retail & Consumer"
+  },
+  {
+   "key": "food",
+   "icon": "🍽️",
+   "es": "Restaurantes y hotelería",
+   "pt": "Restaurantes e hotelaria",
+   "en": "Food & Hospitality"
+  },
+  {
+   "key": "health",
+   "icon": "🩺",
+   "es": "Salud",
+   "pt": "Saúde",
+   "en": "Healthcare"
+  },
+  {
+   "key": "beauty",
+   "icon": "💅",
+   "es": "Belleza y cuidado personal",
+   "pt": "Beleza e cuidados pessoais",
+   "en": "Beauty & Personal Care"
+  },
+  {
+   "key": "tech",
+   "icon": "💻",
+   "es": "Tecnología",
+   "pt": "Tecnologia",
+   "en": "Technology"
+  },
+  {
+   "key": "marketing",
+   "icon": "📣",
+   "es": "Marketing y creatividad",
+   "pt": "Marketing e criação",
+   "en": "Marketing & Creative"
+  },
+  {
+   "key": "professional",
+   "icon": "💼",
+   "es": "Servicios profesionales",
+   "pt": "Serviços profissionais",
+   "en": "Professional Services"
+  },
+  {
+   "key": "finance",
+   "icon": "🏦",
+   "es": "Finanzas",
+   "pt": "Finanças",
+   "en": "Finance"
+  },
+  {
+   "key": "property",
+   "icon": "🏗️",
+   "es": "Inmobiliario y construcción",
+   "pt": "Imobiliário e construção",
+   "en": "Real Estate & Construction"
+  },
+  {
+   "key": "industry",
+   "icon": "🏭",
+   "es": "Manufactura e industria",
+   "pt": "Manufatura e indústria",
+   "en": "Manufacturing"
+  },
+  {
+   "key": "logistics",
+   "icon": "🚚",
+   "es": "Transporte y logística",
+   "pt": "Transporte e logística",
+   "en": "Transport & Logistics"
+  },
+  {
+   "key": "energy",
+   "icon": "⚡",
+   "es": "Energía y medio ambiente",
+   "pt": "Energia e meio ambiente",
+   "en": "Energy & Environment"
+  },
+  {
+   "key": "agri",
+   "icon": "🌾",
+   "es": "Agro",
+   "pt": "Agro",
+   "en": "Agriculture"
+  },
+  {
+   "key": "education",
+   "icon": "🎓",
+   "es": "Educación",
+   "pt": "Educação",
+   "en": "Education"
+  },
+  {
+   "key": "public",
+   "icon": "🏛️",
+   "es": "Sector público y ONG",
+   "pt": "Setor público e ONG",
+   "en": "Public Sector & Nonprofit"
+  },
+  {
+   "key": "services",
+   "icon": "🔧",
+   "es": "Otros servicios",
+   "pt": "Outros serviços",
+   "en": "Other Services"
+  }
+ ],
+ "industries": [
+  {
+   "key": "apparel-retail",
+   "group": "retail",
+   "es": "Ropa y moda",
+   "pt": "Roupas e moda",
+   "en": "Apparel & Fashion"
+  },
+  {
+   "key": "footwear-leather",
+   "group": "retail",
+   "es": "Calzado y marroquinería",
+   "pt": "Calçados e couro",
+   "en": "Footwear & Leather"
+  },
+  {
+   "key": "supermarkets-grocery",
+   "group": "retail",
+   "es": "Supermercados y abarrotes",
+   "pt": "Supermercados e mercearias",
+   "en": "Supermarkets & Grocery"
+  },
+  {
+   "key": "consumer-electronics",
+   "group": "retail",
+   "es": "Electrónica y computadores",
+   "pt": "Eletrônicos e computadores",
+   "en": "Consumer Electronics"
+  },
+  {
+   "key": "home-furniture",
+   "group": "retail",
+   "es": "Hogar, muebles y decoración",
+   "pt": "Casa, móveis e decoração",
+   "en": "Home & Furniture"
+  },
+  {
+   "key": "automotive-retail",
+   "group": "retail",
+   "es": "Vehículos y repuestos",
+   "pt": "Veículos e autopeças",
+   "en": "Automotive Retail & Parts"
+  },
+  {
+   "key": "pharmacies",
+   "group": "retail",
+   "es": "Droguerías y farmacias",
+   "pt": "Farmácias e drogarias",
+   "en": "Pharmacies & Drugstores"
+  },
+  {
+   "key": "cosmetics-retail",
+   "group": "retail",
+   "es": "Cosméticos y cuidado personal",
+   "pt": "Cosméticos e higiene",
+   "en": "Cosmetics & Personal Care Retail"
+  },
+  {
+   "key": "office-books",
+   "group": "retail",
+   "es": "Papelería y librería",
+   "pt": "Papelaria e livraria",
+   "en": "Office Supplies & Books"
+  },
+  {
+   "key": "sporting-goods",
+   "group": "retail",
+   "es": "Artículos deportivos",
+   "pt": "Artigos esportivos",
+   "en": "Sporting Goods"
+  },
+  {
+   "key": "wholesale-distribution",
+   "group": "retail",
+   "es": "Mayoristas y distribución",
+   "pt": "Atacado e distribuição",
+   "en": "Wholesale & Distribution"
+  },
+  {
+   "key": "retail-general",
+   "group": "retail",
+   "es": "Comercio — general",
+   "pt": "Comércio — geral",
+   "en": "Retail — general"
+  },
+  {
+   "key": "restaurants",
+   "group": "food",
+   "es": "Restaurantes",
+   "pt": "Restaurantes",
+   "en": "Restaurants"
+  },
+  {
+   "key": "cafes-bakeries",
+   "group": "food",
+   "es": "Cafeterías y panaderías",
+   "pt": "Cafeterias e padarias",
+   "en": "Cafes & Bakeries"
+  },
+  {
+   "key": "bars-nightlife",
+   "group": "food",
+   "es": "Bares y vida nocturna",
+   "pt": "Bares e vida noturna",
+   "en": "Bars & Nightlife"
+  },
+  {
+   "key": "catering-events",
+   "group": "food",
+   "es": "Catering y eventos",
+   "pt": "Buffet e eventos",
+   "en": "Catering & Events"
+  },
+  {
+   "key": "hotels-lodging",
+   "group": "food",
+   "es": "Hoteles y alojamiento",
+   "pt": "Hotéis e hospedagem",
+   "en": "Hotels & Lodging"
+  },
+  {
+   "key": "travel-tourism",
+   "group": "food",
+   "es": "Turismo y agencias de viajes",
+   "pt": "Turismo e agências de viagem",
+   "en": "Travel & Tourism"
+  },
+  {
+   "key": "food-production",
+   "group": "food",
+   "es": "Producción de alimentos y bebidas",
+   "pt": "Produção de alimentos e bebidas",
+   "en": "Food & Beverage Production"
+  },
+  {
+   "key": "medical-practice",
+   "group": "health",
+   "es": "Consultorios y práctica médica",
+   "pt": "Consultórios e prática médica",
+   "en": "Medical Practice"
+  },
+  {
+   "key": "hospitals-clinics",
+   "group": "health",
+   "es": "Clínicas y hospitales",
+   "pt": "Clínicas e hospitais",
+   "en": "Hospitals & Clinics"
+  },
+  {
+   "key": "dental",
+   "group": "health",
+   "es": "Odontología",
+   "pt": "Odontologia",
+   "en": "Dental"
+  },
+  {
+   "key": "cosmetic-surgery",
+   "group": "health",
+   "es": "Cirugía plástica y estética",
+   "pt": "Cirurgia plástica e estética",
+   "en": "Cosmetic & Plastic Surgery"
+  },
+  {
+   "key": "optical-hearing",
+   "group": "health",
+   "es": "Ópticas y audiología",
+   "pt": "Óticas e audiologia",
+   "en": "Optical & Hearing"
+  },
+  {
+   "key": "veterinary",
+   "group": "health",
+   "es": "Veterinaria",
+   "pt": "Veterinária",
+   "en": "Veterinary"
+  },
+  {
+   "key": "pharma-devices",
+   "group": "health",
+   "es": "Farmacéutica y dispositivos médicos",
+   "pt": "Farmacêutica e dispositivos médicos",
+   "en": "Pharma & Medical Devices"
+  },
+  {
+   "key": "health-general",
+   "group": "health",
+   "es": "Salud — general",
+   "pt": "Saúde — geral",
+   "en": "Healthcare — general"
+  },
+  {
+   "key": "salons-barbers",
+   "group": "beauty",
+   "es": "Salones de belleza y peluquerías",
+   "pt": "Salões de beleza e barbearias",
+   "en": "Salons & Barbershops"
+  },
+  {
+   "key": "spa-wellness",
+   "group": "beauty",
+   "es": "Spa y bienestar",
+   "pt": "Spa e bem-estar",
+   "en": "Spa & Wellness"
+  },
+  {
+   "key": "nails-lashes",
+   "group": "beauty",
+   "es": "Uñas y pestañas",
+   "pt": "Unhas e cílios",
+   "en": "Nails & Lashes"
+  },
+  {
+   "key": "software",
+   "group": "tech",
+   "es": "Software y desarrollo",
+   "pt": "Software e desenvolvimento",
+   "en": "Software & Development"
+  },
+  {
+   "key": "it-services",
+   "group": "tech",
+   "es": "Servicios y soporte TI",
+   "pt": "Serviços e suporte de TI",
+   "en": "IT Services & Support"
+  },
+  {
+   "key": "telecom",
+   "group": "tech",
+   "es": "Telecomunicaciones",
+   "pt": "Telecomunicações",
+   "en": "Telecommunications"
+  },
+  {
+   "key": "internet-ecommerce",
+   "group": "tech",
+   "es": "Internet y e-commerce",
+   "pt": "Internet e e-commerce",
+   "en": "Internet & E-commerce"
+  },
+  {
+   "key": "device-repair",
+   "group": "tech",
+   "es": "Reparación de equipos y celulares",
+   "pt": "Reparo de equipamentos e celulares",
+   "en": "Device & Phone Repair"
+  },
+  {
+   "key": "marketing-advertising",
+   "group": "marketing",
+   "es": "Marketing y publicidad",
+   "pt": "Marketing e publicidade",
+   "en": "Marketing & Advertising"
+  },
+  {
+   "key": "design-web",
+   "group": "marketing",
+   "es": "Diseño gráfico y web",
+   "pt": "Design gráfico e web",
+   "en": "Design & Web"
+  },
+  {
+   "key": "media-publishing",
+   "group": "marketing",
+   "es": "Medios y editorial",
+   "pt": "Mídia e editorial",
+   "en": "Media & Publishing"
+  },
+  {
+   "key": "photo-video",
+   "group": "marketing",
+   "es": "Fotografía y video",
+   "pt": "Fotografia e vídeo",
+   "en": "Photography & Video"
+  },
+  {
+   "key": "printing",
+   "group": "marketing",
+   "es": "Impresión y artes gráficas",
+   "pt": "Impressão e artes gráficas",
+   "en": "Printing"
+  },
+  {
+   "key": "legal",
+   "group": "professional",
+   "es": "Servicios legales",
+   "pt": "Serviços jurídicos",
+   "en": "Legal Services"
+  },
+  {
+   "key": "accounting",
+   "group": "professional",
+   "es": "Contabilidad y auditoría",
+   "pt": "Contabilidade e auditoria",
+   "en": "Accounting & Audit"
+  },
+  {
+   "key": "management-consulting",
+   "group": "professional",
+   "es": "Consultoría empresarial",
+   "pt": "Consultoria empresarial",
+   "en": "Management Consulting"
+  },
+  {
+   "key": "hr-staffing",
+   "group": "professional",
+   "es": "Recursos humanos y selección",
+   "pt": "RH e recrutamento",
+   "en": "HR & Staffing"
+  },
+  {
+   "key": "architecture-engineering",
+   "group": "professional",
+   "es": "Arquitectura e ingeniería",
+   "pt": "Arquitetura e engenharia",
+   "en": "Architecture & Engineering"
+  },
+  {
+   "key": "research-development",
+   "group": "professional",
+   "es": "Investigación y desarrollo",
+   "pt": "Pesquisa e desenvolvimento",
+   "en": "Research & Development"
+  },
+  {
+   "key": "business-support",
+   "group": "professional",
+   "es": "Servicios de apoyo empresarial",
+   "pt": "Serviços de apoio empresarial",
+   "en": "Business Support Services"
+  },
+  {
+   "key": "professional-general",
+   "group": "professional",
+   "es": "Servicios profesionales — general",
+   "pt": "Serviços profissionais — geral",
+   "en": "Professional Services — general"
+  },
+  {
+   "key": "banking",
+   "group": "finance",
+   "es": "Banca",
+   "pt": "Bancos",
+   "en": "Banking"
+  },
+  {
+   "key": "insurance",
+   "group": "finance",
+   "es": "Seguros",
+   "pt": "Seguros",
+   "en": "Insurance"
+  },
+  {
+   "key": "investment-markets",
+   "group": "finance",
+   "es": "Inversión y mercado de valores",
+   "pt": "Investimentos e mercado de capitais",
+   "en": "Investment & Capital Markets"
+  },
+  {
+   "key": "financial-services",
+   "group": "finance",
+   "es": "Servicios financieros",
+   "pt": "Serviços financeiros",
+   "en": "Financial Services"
+  },
+  {
+   "key": "real-estate",
+   "group": "property",
+   "es": "Inmobiliario",
+   "pt": "Imobiliário",
+   "en": "Real Estate"
+  },
+  {
+   "key": "construction-building",
+   "group": "property",
+   "es": "Construcción de edificaciones",
+   "pt": "Construção de edificações",
+   "en": "Building Construction"
+  },
+  {
+   "key": "civil-engineering",
+   "group": "property",
+   "es": "Obras civiles e infraestructura",
+   "pt": "Obras civis e infraestrutura",
+   "en": "Civil Engineering & Infrastructure"
+  },
+  {
+   "key": "specialty-trades",
+   "group": "property",
+   "es": "Instalaciones y acabados",
+   "pt": "Instalações e acabamentos",
+   "en": "Specialty Trades"
+  },
+  {
+   "key": "building-materials",
+   "group": "property",
+   "es": "Materiales de construcción y ferretería",
+   "pt": "Materiais de construção e ferragens",
+   "en": "Building Materials & Hardware"
+  },
+  {
+   "key": "apparel-manufacturing",
+   "group": "industry",
+   "es": "Confección y textil",
+   "pt": "Confecção e têxtil",
+   "en": "Apparel & Textile Manufacturing"
+  },
+  {
+   "key": "chemicals-plastics",
+   "group": "industry",
+   "es": "Químicos y plásticos",
+   "pt": "Químicos e plásticos",
+   "en": "Chemicals & Plastics"
+  },
+  {
+   "key": "metals-machinery",
+   "group": "industry",
+   "es": "Metalmecánica y maquinaria",
+   "pt": "Metalurgia e máquinas",
+   "en": "Metals & Machinery"
+  },
+  {
+   "key": "electrical-equipment",
+   "group": "industry",
+   "es": "Equipos eléctricos y electrónicos",
+   "pt": "Equipamentos elétricos e eletrônicos",
+   "en": "Electrical & Electronic Equipment"
+  },
+  {
+   "key": "furniture-wood",
+   "group": "industry",
+   "es": "Muebles y madera",
+   "pt": "Móveis e madeira",
+   "en": "Furniture & Wood"
+  },
+  {
+   "key": "manufacturing-general",
+   "group": "industry",
+   "es": "Manufactura — general",
+   "pt": "Manufatura — geral",
+   "en": "Manufacturing — general"
+  },
+  {
+   "key": "freight-trucking",
+   "group": "logistics",
+   "es": "Transporte de carga",
+   "pt": "Transporte de carga",
+   "en": "Freight & Trucking"
+  },
+  {
+   "key": "passenger-transport",
+   "group": "logistics",
+   "es": "Transporte de pasajeros",
+   "pt": "Transporte de passageiros",
+   "en": "Passenger Transport"
+  },
+  {
+   "key": "courier-delivery",
+   "group": "logistics",
+   "es": "Mensajería y entregas",
+   "pt": "Correio e entregas",
+   "en": "Courier & Delivery"
+  },
+  {
+   "key": "warehousing",
+   "group": "logistics",
+   "es": "Almacenamiento y bodegaje",
+   "pt": "Armazenagem",
+   "en": "Warehousing"
+  },
+  {
+   "key": "customs-trade",
+   "group": "logistics",
+   "es": "Comercio exterior y aduanas",
+   "pt": "Comércio exterior e aduana",
+   "en": "Import/Export & Customs"
+  },
+  {
+   "key": "logistics-general",
+   "group": "logistics",
+   "es": "Transporte — general",
+   "pt": "Transporte — geral",
+   "en": "Transport — general"
+  },
+  {
+   "key": "oil-energy",
+   "group": "energy",
+   "es": "Energía y combustibles",
+   "pt": "Energia e combustíveis",
+   "en": "Oil & Energy"
+  },
+  {
+   "key": "utilities-water",
+   "group": "energy",
+   "es": "Agua y servicios públicos",
+   "pt": "Água e saneamento",
+   "en": "Utilities & Water"
+  },
+  {
+   "key": "mining",
+   "group": "energy",
+   "es": "Minería",
+   "pt": "Mineração",
+   "en": "Mining"
+  },
+  {
+   "key": "environmental",
+   "group": "energy",
+   "es": "Medio ambiente y residuos",
+   "pt": "Meio ambiente e resíduos",
+   "en": "Environmental Services"
+  },
+  {
+   "key": "farming-livestock",
+   "group": "agri",
+   "es": "Agricultura y ganadería",
+   "pt": "Agricultura e pecuária",
+   "en": "Farming & Livestock"
+  },
+  {
+   "key": "fishing",
+   "group": "agri",
+   "es": "Pesca y acuicultura",
+   "pt": "Pesca e aquicultura",
+   "en": "Fishing & Aquaculture"
+  },
+  {
+   "key": "schools-k12",
+   "group": "education",
+   "es": "Colegios y jardines infantiles",
+   "pt": "Escolas e educação infantil",
+   "en": "Schools & Early Education"
+  },
+  {
+   "key": "higher-education",
+   "group": "education",
+   "es": "Educación superior",
+   "pt": "Ensino superior",
+   "en": "Higher Education"
+  },
+  {
+   "key": "training-courses",
+   "group": "education",
+   "es": "Capacitación y cursos",
+   "pt": "Treinamento e cursos",
+   "en": "Training & Courses"
+  },
+  {
+   "key": "government",
+   "group": "public",
+   "es": "Sector público",
+   "pt": "Setor público",
+   "en": "Government"
+  },
+  {
+   "key": "nonprofit",
+   "group": "public",
+   "es": "ONG y asociaciones",
+   "pt": "ONGs e associações",
+   "en": "Nonprofit & Associations"
+  },
+  {
+   "key": "religious",
+   "group": "public",
+   "es": "Organizaciones religiosas",
+   "pt": "Organizações religiosas",
+   "en": "Religious Organizations"
+  },
+  {
+   "key": "security-services",
+   "group": "services",
+   "es": "Seguridad y vigilancia",
+   "pt": "Segurança e vigilância",
+   "en": "Security Services"
+  },
+  {
+   "key": "facilities-cleaning",
+   "group": "services",
+   "es": "Aseo y mantenimiento",
+   "pt": "Limpeza e manutenção",
+   "en": "Facilities & Cleaning"
+  },
+  {
+   "key": "repair-services",
+   "group": "services",
+   "es": "Reparación y mantenimiento",
+   "pt": "Reparos e manutenção",
+   "en": "Repair & Maintenance"
+  },
+  {
+   "key": "arts-entertainment",
+   "group": "services",
+   "es": "Arte y entretenimiento",
+   "pt": "Arte e entretenimento",
+   "en": "Arts & Entertainment"
+  },
+  {
+   "key": "sports-recreation",
+   "group": "services",
+   "es": "Deporte y recreación",
+   "pt": "Esporte e recreação",
+   "en": "Sports & Recreation"
+  },
+  {
+   "key": "funeral-services",
+   "group": "services",
+   "es": "Servicios funerarios",
+   "pt": "Serviços funerários",
+   "en": "Funeral Services"
+  },
+  {
+   "key": "other-services",
+   "group": "services",
+   "es": "Otros servicios",
+   "pt": "Outros serviços",
+   "en": "Other Services"
+  },
+  {
+   "key": "unclassified",
+   "group": "services",
+   "es": "Sin clasificar",
+   "pt": "Não classificado",
+   "en": "Unclassified"
+  }
+ ]
+}

@@ -607,19 +607,23 @@
 }
 
 .qsummary .qi {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: linear-gradient(150deg, #7c6df0, var(--ind));
+  /* Antes una estrella generica; ahora el engranaje de AJAW sobre el degradado
+     de marca, igual que la pildora de creditos. */
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7871FB, #251F95);
+  box-shadow: 0 2px 8px -2px rgba(37, 31, 149, .45);
   display: grid;
   place-items: center;
-  color: #fff;
   flex: none;
 }
 
-.qsummary .qi svg {
-  width: 14px;
-  height: 14px;
+
+.qsummary .qi img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
 }
 
 .qsummary .qt {
@@ -1017,18 +1021,23 @@
 }
 
 .fhead {
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 9px;
-  background: transparent;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
   border: 0;
-  padding: 11px 8px;
-  font-size: 12.5px;
-  font-weight: 650;
-  color: var(--ink-2);
-  cursor: default;
+  background: none;
+  color: #1D1D1F;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease;
 }
+
 
 .facet:last-of-type .fhead {
   cursor: pointer;
@@ -1116,18 +1125,24 @@
 }
 
 .fc {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--ind-d);
-  background: var(--ind-50);
-  border: 1px solid var(--ind-100);
-  border-radius: 7px;
-  padding: 4px 9px;
-  display: inline-flex;
+  /* Los valores del registro llegan crudos y larguisimos. Como fichas que se
+     envuelven quedaban ilegibles; ahora cada uno es una fila de una sola linea. */
+  display: flex;
   align-items: center;
-  gap: 6px;
-  animation: chipin .4s var(--ez) both;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  margin: 0 0 2px;
+  border-radius: 8px;
+  border: 1px solid #D8D6FE;
+  background: #F4F3FF;
+  color: #251F95;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease;
 }
+
 
 .fc .rm {
   color: var(--ind);
@@ -1141,11 +1156,12 @@
 }
 
 .fc.ghost {
-  background: #fff;
-  color: var(--muted);
-  border: 1px dashed var(--line-2);
-  cursor: pointer;
+  border-color: transparent;
+  background: none;
+  color: #6E6E73;
+  font-weight: 400;
 }
+
 
 .fc.ghost:hover {
   border-color: #bcb6f5;
@@ -1825,4 +1841,34 @@
 @keyframes credits-flash {
   0%   { color: #5b4fe5; }
   100% { color: inherit; }
+}
+.fc .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.fhead > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.facet { border-top: 1px solid #F0F0F2 }
+.facet:first-of-type { border-top: 0 }
+
+/* ── Filtros que aun no tienen datos ───────────────────────────────────── */
+
+.rail .lockhead {
+  padding: 18px 16px 6px;
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: #A1A1A6;
+}
+.rail button.facet.locked {
+  display: block; width: 100%; margin: 0; padding: 0; border: 0;
+  border-top: 1px solid #F0F0F2; background: none; text-align: left; cursor: pointer;
+}
+.rail button.facet.locked .fhead {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  height: 40px; padding: 0 16px; color: #A1A1A6;
+  font-size: 12.5px; font-weight: 500;
+}
+.rail button.facet.locked:hover .fhead { background: #FAFAFC }
+.rail button.facet.locked .fi { width: 14px; height: 14px; flex: none; opacity: .7 }
+.rail button.facet.locked .soon {
+  flex: none; padding: 2px 7px; border-radius: 99px;
+  background: #F4F3FF; color: #7871FB;
+  font-family: var(--font-display); font-size: 9px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
 }

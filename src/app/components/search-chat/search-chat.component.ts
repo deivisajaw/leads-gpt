@@ -5,6 +5,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiConfigService } from '../../services/api-config.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 export interface ChatMessage {
   role: 'assistant' | 'user';
@@ -28,13 +30,29 @@ export type SearchChatMode = 'people' | 'companies';
 @Component({
   selector: 'app-search-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './search-chat.component.html',
   styleUrl: './search-chat.component.css',
 })
 export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   @Input() mode: SearchChatMode = 'people';
   @Output() searchReady = new EventEmitter<SearchReadyResult>();
+
+  /**
+   * El agente contestó pero NO pidió pintar resultados.
+   *
+   * El prompt le prohíbe expresamente responder "buscando eso ahora" sin
+   * llamar a finalize_search, porque el turno termina y el usuario se queda
+   * esperando algo que nunca llega. Aun así lo hace: contesta esa frase exacta,
+   * la búsqueda queda creada con resultados y la pantalla nunca los muestra.
+   *
+   * La interfaz no puede depender de que el modelo se porte bien. Con esto, el
+   * contenedor va a mirar si se creó una búsqueda y la pinta igual.
+   */
+  @Output() repliedWithoutResults = new EventEmitter<void>();
+
+  /** Lo que escribio el usuario, por si el agente devuelve los campos vacios. */
+  @Output() userAsked = new EventEmitter<string>();
   // Se emite una sola vez, justo cuando el usuario envía su primer mensaje — el componente
   // padre lo usa para ocultar el resto del contenido (globo, stats, sugeridos) y dejar la
   // pantalla en blanco con solo el header arriba, como pide el diseño.
@@ -61,9 +79,9 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
   private history: { role: 'user' | 'assistant'; content: string }[] = [];
 
   greeting = '';
-  title = '¿A quién quieres encontrar hoy?';
-  subtitle = 'Encuentra al tomador de decisión correcto en cualquier empresa de Latinoamérica — cada búsqueda llena tu mapa de leads.';
-  inputPlaceholder = 'Busca por nombre, cargo o empresa…';
+  title = '';
+  subtitle = '';
+  inputPlaceholder = '';
   // IMPORTANTE: quickPrompts se calcula UNA sola vez (ngOnInit) y se guarda como propiedad
   // estable, no como getter. Un getter usado en *ngFor crea un array (y objetos) nuevos en
   // cada ciclo de change detection —Angular no puede saber que son "los mismos" chips porque
@@ -72,14 +90,37 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
   // termina congelando la pestaña con solo mover el mouse. Con una propiedad fija esto no pasa.
   quickPrompts: QuickPrompt[] = [];
 
-  constructor(private apiConfig: ApiConfigService, private renderer: Renderer2) { }
+  private langSub?: Subscription;
+
+  constructor(
+    private apiConfig: ApiConfigService,
+    private renderer: Renderer2,
+    private translate: TranslateService,
+  ) { }
 
   ngOnInit(): void {
+    // Estos textos se arman una sola vez con translate.instant(), no con el pipe
+    // (el título y los chips no deben cambiar en cada ciclo de detección).
+    //
+    // Pero instant() devuelve la CLAVE si el archivo de idioma todavía no llegó,
+    // y nada en el arranque espera a que llegue: en una carga en frío la portada
+    // habría mostrado "SEARCH_CHAT.CALM_CO_1". Por eso esperamos con get(), que
+    // resuelve cuando el idioma activo está cargado, y volvemos a armarlos si el
+    // usuario cambia de idioma.
+    this.translate.get('SEARCH_CHAT.CALM_CO_1').subscribe(() => this.buildCopy());
+    this.langSub = this.translate.onLangChange.subscribe(() => this.buildCopy());
+
+    window.addEventListener('resize', this.resizeListener);
+  }
+
+  private buildCopy(): void {
     this.title = this.pickWittyTitle();
+    this.subtitle = this.t(this.mode === 'companies' ? 'SUB_CO' : 'SUB_PE');
+    this.inputPlaceholder = this.t(this.mode === 'companies' ? 'PH_CO' : 'PH_PE');
     this.greeting = this.computeGreeting();
     this.quickPrompts = this.buildQuickPrompts();
-    this.startConversation();
-    window.addEventListener('resize', this.resizeListener);
+    // Sólo se saluda una vez: si ya hay conversación, no se pisa.
+    if (!this.messages.length) this.startConversation();
   }
 
   ngAfterViewChecked(): void {
@@ -92,6 +133,7 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
     window.removeEventListener('resize', this.resizeListener);
     // Si el composer quedó portado a body, hay que quitarlo a mano — Angular no sabe que lo
     // movimos fuera de su lugar original en el DOM.
@@ -123,9 +165,19 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
 
   private computeGreeting(): string {
     const hour = new Date().getHours();
-    if (hour >= 22 || hour < 5) { return 'Modo nocturno 🌙'; }
-    const label = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
-    return `${label} 👋`;
+    if (hour >= 22 || hour < 5) { return this.t('NIGHT_MODE') + ' 🌙'; }
+    const key = hour < 12 ? 'MORNING' : hour < 19 ? 'AFTERNOON' : 'EVENING';
+    return `${this.t(key)} 👋`;
+  }
+
+  /** Atajo: todas las cadenas de este componente cuelgan de SEARCH_CHAT. */
+  private t(key: string): string {
+    return this.translate.instant('SEARCH_CHAT.' + key);
+  }
+
+  /** Una de las N variantes de una clave, al azar. */
+  private pick(baseKey: string, n: number): string {
+    return this.t(`${baseKey}_${1 + Math.floor(Math.random() * n)}`);
   }
 
   // Titulo rotativo estilo asistente (patron ChatGPT: mayoria de lineas calmadas,
@@ -135,57 +187,28 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
     const night = hour >= 22 || hour < 5;
     const isCompanies = this.mode === 'companies';
 
-    if (night) {
-      const nightPool = isCompanies
-        ? ['¿Una empresa más antes de cerrar el día?', 'Los mejores mercados se encuentran de noche.', '¿Qué empresa quieres encontrar?']
-        : ['¿Un contacto más antes de cerrar el día?', 'Mientras otros duermen, tú llenas el pipeline.', '¿A quién quieres encontrar?'];
-      return nightPool[Math.floor(Math.random() * nightPool.length)];
-    }
-
-    const calmPool = isCompanies
-      ? [
-        '¿Qué empresa quieres encontrar hoy?',
-        '¿Por dónde empezamos hoy?',
-        '¿Qué mercado exploramos hoy?',
-        'Lista cuando tú lo estés.'
-      ]
-      : [
-        '¿A quién quieres encontrar hoy?',
-        '¿Por dónde empezamos hoy?',
-        '¿A quién buscamos hoy?',
-        'Lista cuando tú lo estés.'
-      ];
-    const spicyPool = isCompanies
-      ? ['¿A qué empresa le vas a vender hoy?', '¿Vamos a ganar más hoy?', 'Tu próximo cliente ya existe. Búscalo.']
-      : ['¿A quién le vas a vender hoy?', '¿Cuántas reuniones vamos a agendar hoy?', 'Tu próximo cliente ya existe. Encuéntralo.'];
+    const who = isCompanies ? 'CO' : 'PE';
+    if (night) return this.pick(`NIGHT_${who}`, 3);
 
     // ~70% calmado, ~30% con sabor
-    const useSpicy = Math.random() < 0.3;
-    const pool = useSpicy ? spicyPool : calmPool;
-    return pool[Math.floor(Math.random() * pool.length)];
+    return Math.random() < 0.3
+      ? this.pick(`SPICY_${who}`, 3)
+      : this.pick(`CALM_${who}`, 4);
   }
 
   private buildQuickPrompts(): QuickPrompt[] {
-    return this.mode === 'people'
-      ? [
-        { label: 'CEOs · Bogotá', query: 'CEOs y dueños de empresas en Bogotá' },
-        { label: 'Gerentes de ventas', query: 'Gerentes de ventas en Colombia' },
-        { label: 'Fundadores · Medellín', query: 'Fundadores de empresas en Medellín' },
-        { label: 'Directores de marketing', query: 'Directores de marketing en Colombia con anuncios activos' },
-      ]
-      : [
-        { label: 'Startups · fintech MX', query: 'Startups fintech en México' },
-        { label: 'SaaS B2B · Colombia', query: 'Empresas SaaS B2B en Colombia con más de 50 empleados' },
-        { label: 'Logística en crecimiento', query: 'Compañías logísticas en crecimiento en Latinoamérica' },
-        { label: 'Salud · Medellín', query: 'Clínicas y centros de salud en Medellín' },
-      ];
+    // La etiqueta se traduce; la consulta se manda al agente en el idioma del
+    // usuario, que es el que el backend entiende mejor para buscar.
+    const who = this.mode === 'people' ? 'PE' : 'CO';
+    return [1, 2, 3, 4].map(i => ({
+      label: this.t(`CHIP_${who}_${i}`),
+      query: this.t(`CHIP_${who}_${i}_Q`),
+    }));
   }
 
   // Mensaje de bienvenida fijo y local — no hace falta llamar al agente solo para saludar.
   private startConversation(): void {
-    const greeting = this.mode === 'companies'
-      ? '¡Hola! Cuéntame qué tipo de empresa buscas y en qué ciudad, y te ayudo a encontrarla.'
-      : '¡Hola! Cuéntame a quién buscas (cargo, ciudad, industria…) y te ayudo a encontrarlo.';
+    const greeting = this.t(this.mode === 'companies' ? 'HELLO_CO' : 'HELLO_PE');
 
     this.messages = [{ role: 'assistant', text: greeting }];
     this.history = [{ role: 'assistant', content: greeting }];
@@ -198,6 +221,7 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
   async send(prefill?: string): Promise<void> {
     const text = (prefill ?? this.userInput).trim();
     if (!text || this.isLoading) return;
+    this.userAsked.emit(text);
 
     if (!this.hasStarted) {
       this.chatStarted.emit();
@@ -213,8 +237,12 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
     this.isLoading = false;
 
     if (result.error) {
-      this.pushMsg('assistant', 'Tuve un problema para responder. ¿Puedes intentar de nuevo?');
+      this.pushMsg('assistant', this.t('ERROR_REPLY'));
       return;
+    }
+
+    if (!result.searchReady) {
+      this.repliedWithoutResults.emit();
     }
 
     if (result.searchReady) {
@@ -227,7 +255,7 @@ export class SearchChatComponent implements OnInit, AfterViewChecked, OnDestroy 
       return;
     }
 
-    this.pushMsg('assistant', result.reply || 'Cuéntame un poco más.', result.options);
+    this.pushMsg('assistant', result.reply || this.t('TELL_MORE'), result.options);
     this.history.push({ role: 'assistant', content: result.reply || '' });
   }
 

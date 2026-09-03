@@ -22,10 +22,7 @@
       />
     </div>
     <div class="topbar-spacer"></div>
-    <div class="topbar-credits" [class.pulse]="creditsPulse">
-      <span class="coin"><img src="/images/gear_white.png" alt="" class="coin-gear" /></span>
-      <b>{{ creditsRemaining | number }}</b>&nbsp;Créditos
-    </div>
+    <app-credits-pill [credits]="creditsRemaining" [pulse]="creditsPulse"></app-credits-pill>
   </div>
 
   <!-- ═══════════ HERO / PANTALLA INICIAL ═══════════ -->
@@ -33,28 +30,28 @@
 
     <section class="stats-row" *ngIf="!statsLoading && !chatActive">
       <div class="metric">
-        <div class="m-lbl">Leads scrapeados</div>
+        <div class="m-lbl">{{ "SEARCH.LEADS_SCRAPED" | translate }}</div>
         <div class="m-row">
           <span class="m-val">{{ dashboardStats.leads | number }}</span>
           <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 11 L6 8 L11 9.5 L16 5 L21 7 L25 3 L29 2 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 11 L6 8 L11 9.5 L16 5 L21 7 L25 3 L29 2" stroke="url(#ajawSparkGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
       <div class="metric">
-        <div class="m-lbl">Búsquedas</div>
+        <div class="m-lbl">{{ "SEARCH.SEARCHES" | translate }}</div>
         <div class="m-row">
           <span class="m-val">{{ dashboardStats.searches | number }}</span>
           <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 10 L6 9 L11 6.5 L16 8 L21 5 L25 4.5 L29 3 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 10 L6 9 L11 6.5 L16 8 L21 5 L25 4.5 L29 3" stroke="url(#ajawSparkGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
       <div class="metric">
-        <div class="m-lbl">Teléfonos</div>
+        <div class="m-lbl">{{ "SEARCH.PHONES" | translate }}</div>
         <div class="m-row">
           <span class="m-val">{{ dashboardStats.phones | number }}</span>
           <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 8 L6 10 L11 6 L16 8.5 L21 4.5 L25 6 L29 3.5 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 8 L6 10 L11 6 L16 8.5 L21 4.5 L25 6 L29 3.5" stroke="url(#ajawSparkGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
       <div class="metric">
-        <div class="m-lbl">Emails</div>
+        <div class="m-lbl">{{ "SEARCH.EMAILS" | translate }}</div>
         <div class="m-row">
           <span class="m-val">{{ dashboardStats.emails | number }}</span>
           <svg class="m-spark" viewBox="0 0 30 14" fill="none"><path d="M1 11 L6 7.5 L11 8.5 L16 5.5 L21 6.5 L25 3.5 L29 2.5 L29 13 L1 13 Z" fill="rgba(91,79,229,.12)"/><path d="M1 11 L6 7.5 L11 8.5 L16 5.5 L21 6.5 L25 3.5 L29 2.5" stroke="url(#ajawSparkGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -66,16 +63,18 @@
       <canvas #globeCanvas class="globe-canvas" [class.hide]="chatActive" aria-label="Mapa del mundo"></canvas>
       <div class="globe-hint" *ngIf="!chatActive">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-        Arrastra para girar
+        {{ "SEARCH.DRAG_SPIN" | translate }}
       </div>
 
       <div class="sthero">
-        <app-search-chat *ngIf="!currentQuery" mode="people" (searchReady)="onSearchReady($event)" (chatStarted)="onChatStarted()"></app-search-chat>
+        <app-search-chat *ngIf="!currentQuery" mode="people" (searchReady)="onSearchReady($event)" (chatStarted)="onChatStarted()"
+            (repliedWithoutResults)="onAgentRepliedWithoutResults()"
+            (userAsked)="onUserAsked($event)"></app-search-chat>
       </div>
 
       <ng-container *ngIf="!chatActive">
         <div class="res-head" *ngIf="suggestedProspects.length > 0">
-          <span class="t">Personas sugeridas para ti</span>
+          <span class="t">{{ "SEARCH.SUGGESTED" | translate }}</span>
         </div>
         <div class="stresults" *ngIf="suggestedProspects.length > 0">
           <div class="result rowin" [class.play]="suggestedRevealed" [style.animation-delay.ms]="i * 60" *ngFor="let p of suggestedProspects; let i = index">
@@ -85,7 +84,7 @@
                 {{ p.name }}
                 <span class="verified2" *ngIf="p.verified">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  verificado
+                  {{ "SEARCH.VERIFIED" | translate }}
                 </span>
               </div>
               <div class="res-meta">
@@ -93,7 +92,7 @@
                 {{ p.role }} · {{ p.company }} · {{ p.city }}
               </div>
             </div>
-            <button class="pill-contact" (click)="openSuggestedDetail(p)">Contactar</button>
+            <button class="pill-contact" (click)="openSuggestedDetail(p)">{{ "SEARCH.CONTACT_BTN" | translate }}</button>
           </div>
         </div>
       </ng-container>
@@ -105,7 +104,7 @@
 
     <div class="results-topbar-sticky">
       <div class="page-head">
-        <h1 class="page-title">People</h1>
+        <h1 class="page-title">{{ "SEARCH.PAGE_PEOPLE" | translate }}</h1>
       </div>
 
       <div class="toolbar">
@@ -128,7 +127,7 @@
 
       <div class="toolbar-local-search">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Buscar personas" [(ngModel)]="localFilters.name" (input)="onFilterChange()" />
+        <input type="text" [attr.placeholder]="'SEARCH.PH_SEARCH_PE' | translate" [(ngModel)]="localFilters.name" (input)="onFilterChange()" />
       </div>
 
       <div class="right">
@@ -155,93 +154,106 @@
       <aside class="rail" [class.show]="showFilters" *ngIf="filteredResults && filteredResults.length > 0">
         <button class="railhide" (click)="toggleFilters()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5m7 10-5-5 5-5"/></svg>
-          Ocultar filtros
+          {{ "SEARCH.HIDE_FILTERS" | translate }}
         </button>
 
         <div class="stat">
           <button class="on" type="button">
             <div class="n">{{ totalResultsInServer | number }}</div>
-            <div class="t">Total</div>
+            <div class="t">{{ "SEARCH.TOTAL" | translate }}</div>
           </button>
           <button type="button">
             <div class="n">{{ sessionSavedCount | number }}</div>
-            <div class="t">Guardados</div>
+            <div class="t">{{ "SEARCH.SAVED" | translate }}</div>
           </button>
         </div>
 
-        <div class="facet open" *ngIf="jobTitleFacetOptions.length > 0">
-          <button class="fhead">
+        <div class="facet" [class.open]="showJobFacet" *ngIf="jobTitleFacetOptions.length > 0">
+          <button class="fhead" (click)="showJobFacet = !showJobFacet">
             <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>
-            Cargo
+            <span>{{ "SEARCH.JOB" | translate }}</span>
             <span class="cnt" [class.show]="selectedJobTitleFacets.size > 0">{{ selectedJobTitleFacets.size }}</span>
+            <svg class="fch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           <div class="fbody">
-            <span class="fc" *ngFor="let v of jobTitleFacetSelected">
-              {{ v }}
-              <span class="rm" title="Quitar" (click)="toggleJobTitleFacet(v)">×</span>
+            <span class="fc" *ngFor="let v of jobTitleFacetSelected" [attr.title]="v">
+              <span class="lbl">{{ v }}</span>
+              <span class="rm" [attr.title]="'SEARCH.TT_REMOVE' | translate" (click)="toggleJobTitleFacet(v)">×</span>
             </span>
-            <span class="fc ghost" *ngFor="let v of jobTitleFacetGhost" (click)="toggleJobTitleFacet(v)">+ {{ v }}</span>
+            <span class="fc ghost" *ngFor="let v of jobTitleFacetGhost" [attr.title]="v" (click)="toggleJobTitleFacet(v)"><span class="lbl">{{ v }}</span></span>
           </div>
         </div>
 
-        <div class="facet open" *ngIf="locationFacetOptions.length > 0">
-          <button class="fhead">
+        <div class="facet" [class.open]="showLocFacet" *ngIf="locationFacetOptions.length > 0">
+          <button class="fhead" (click)="showLocFacet = !showLocFacet">
             <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.7 7-12a7 7 0 1 0-14 0c0 5.3 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            Ubicación
+            <span>{{ "SEARCH.LOCATION" | translate }}</span>
             <span class="cnt" [class.show]="selectedLocationFacets.size > 0">{{ selectedLocationFacets.size }}</span>
+            <svg class="fch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           <div class="fbody">
-            <span class="fc" *ngFor="let v of locationFacetSelected">
-              {{ v }}
-              <span class="rm" title="Quitar" (click)="toggleLocationFacet(v)">×</span>
+            <span class="fc" *ngFor="let v of locationFacetSelected" [attr.title]="v">
+              <span class="lbl">{{ v }}</span>
+              <span class="rm" [attr.title]="'SEARCH.TT_REMOVE' | translate" (click)="toggleLocationFacet(v)">×</span>
             </span>
-            <span class="fc ghost" *ngFor="let v of locationFacetGhost" (click)="toggleLocationFacet(v)">+ {{ v }}</span>
+            <span class="fc ghost" *ngFor="let v of locationFacetGhost" [attr.title]="v" (click)="toggleLocationFacet(v)"><span class="lbl">{{ v }}</span></span>
           </div>
         </div>
 
-        <div class="facet open" *ngIf="emailFacetOptions.length > 0">
-          <button class="fhead">
+        <div class="facet" [class.open]="showEmailFacet2" *ngIf="emailFacetOptions.length > 0">
+          <button class="fhead" (click)="showEmailFacet2 = !showEmailFacet2">
             <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
-            Estado de email
+            <span>{{ "SEARCH.EMAIL_STATUS" | translate }}</span>
             <span class="cnt" [class.show]="selectedEmailFacets.size > 0">{{ selectedEmailFacets.size }}</span>
+            <svg class="fch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           <div class="fbody">
-            <span class="fc" *ngFor="let v of emailFacetSelected">
-              {{ v }}
-              <span class="rm" title="Quitar" (click)="toggleEmailFacet(v)">×</span>
+            <span class="fc" *ngFor="let v of emailFacetSelected" [attr.title]="v">
+              <span class="lbl">{{ v }}</span>
+              <span class="rm" [attr.title]="'SEARCH.TT_REMOVE' | translate" (click)="toggleEmailFacet(v)">×</span>
             </span>
-            <span class="fc ghost" *ngFor="let v of emailFacetGhost" (click)="toggleEmailFacet(v)">+ {{ v }}</span>
+            <span class="fc ghost" *ngFor="let v of emailFacetGhost" [attr.title]="v" (click)="toggleEmailFacet(v)"><span class="lbl">{{ v }}</span></span>
           </div>
         </div>
 
         <div class="facet" [class.open]="showMoreFilters">
           <button class="fhead" (click)="toggleMoreFilters()">
             <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-            Más filtros
+            {{ "SEARCH.MORE_FILTERS" | translate }}
             <svg class="fch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           <div class="fbody more-filters">
             <div class="filter-input-group">
-              <label>Nombre</label>
-              <input type="text" [(ngModel)]="localFilters.name" (input)="onFilterChange()" placeholder="Filtrar por nombre..." />
+              <label>{{ "SEARCH.NAME" | translate }}</label>
+              <input type="text" [(ngModel)]="localFilters.name" (input)="onFilterChange()" [attr.placeholder]="'SEARCH.PH_NAME' | translate" />
             </div>
             <div class="filter-input-group">
-              <label>Cargo</label>
-              <input type="text" [(ngModel)]="localFilters.jobTitle" (input)="onFilterChange()" placeholder="Filtrar por cargo..." />
+              <label>{{ "SEARCH.JOB" | translate }}</label>
+              <input type="text" [(ngModel)]="localFilters.jobTitle" (input)="onFilterChange()" [attr.placeholder]="'SEARCH.PH_JOB' | translate" />
             </div>
             <div class="filter-input-group">
-              <label>Empresa</label>
-              <input type="text" [(ngModel)]="localFilters.company" (input)="onFilterChange()" placeholder="Filtrar por empresa..." />
+              <label>{{ "SEARCH.COMPANY" | translate }}</label>
+              <input type="text" [(ngModel)]="localFilters.company" (input)="onFilterChange()" [attr.placeholder]="'SEARCH.PH_COMPANY' | translate" />
             </div>
             <div class="filter-input-group">
-              <label>Ubicación</label>
-              <input type="text" [(ngModel)]="localFilters.location" (input)="onFilterChange()" placeholder="Filtrar por ubicación..." />
+              <label>{{ "SEARCH.LOCATION" | translate }}</label>
+              <input type="text" [(ngModel)]="localFilters.location" (input)="onFilterChange()" [attr.placeholder]="'SEARCH.PH_LOCATION' | translate" />
             </div>
           </div>
         </div>
 
+        <!-- Filtros sin datos todavia: con candado, no escondidos. -->
+        <div class="lockhead">{{ "SEARCH.LOCKED_TITLE" | translate }}</div>
+        <button class="facet locked" *ngFor="let f of lockedFilters" (click)="onLockedFilter()">
+          <span class="fhead">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>{{ "SEARCH.LOCK_" + f.key | translate }}</span>
+            <span class="soon">{{ "SEARCH.SOON" | translate }}</span>
+          </span>
+        </button>
+
         <div class="railfoot">
-          <button class="clr" (click)="clearAllFilters()" *ngIf="hasActiveFilters">Limpiar todo</button>
+          <button class="clr" (click)="clearAllFilters()" *ngIf="hasActiveFilters">{{ "SEARCH.CLEAR_ALL" | translate }}</button>
         </div>
       </aside>
 
@@ -250,17 +262,18 @@
 
         <!-- Resumen del término de búsqueda usado -->
         <div class="qsummary res-card">
-          <span class="qi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.6L19 9.2l-5.4 1.6L12 16l-1.6-5.2L5 9.2l5.4-1.6L12 2Z"/></svg></span>
+          <!-- Era una estrella genérica; ahora es el engranaje de AJAW sobre el degradado de marca. -->
+          <span class="qi"><img src="images/gear_white.png" alt="" /></span>
           <span class="qt">{{ currentQuery }}</span>
           <div class="qactions">
-            <button class="qe" (click)="editSearch()">Editar búsqueda</button>
-            <button class="qe pri" (click)="newSearch()">Nueva búsqueda</button>
+            <button class="qe" (click)="editSearch()">{{ "SEARCH.EDIT_SEARCH" | translate }}</button>
+            <button class="qe pri" (click)="newSearch()">{{ "SEARCH.NEW_SEARCH" | translate }}</button>
           </div>
         </div>
 
         <div *ngIf="isLoading" class="loading-state">
           <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
-          <p>Buscando resultados…</p>
+          <p>{{ "SEARCH.SEARCHING" | translate }}</p>
         </div>
 
         <div class="empty-state" *ngIf="!isLoading && filteredResults.length === 0">
@@ -276,11 +289,11 @@
         </div>
 
         <div class="reshd" *ngIf="!isLoading && filteredResults.length > 0">
-          <div class="ct"><b>{{ totalResultsInServer | number }}</b> coincidencias de alto match</div>
+          <div class="ct"><b>{{ totalResultsInServer | number }}</b> {{ "SEARCH.HIGH_MATCH" | translate }}</div>
           <div class="act">
             <button class="btn" (click)="exportToCsv()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-              Exportar CSV
+              {{ "SEARCH.EXPORT_CSV" | translate }}
             </button>
           </div>
         </div>
@@ -295,12 +308,12 @@
                     <th style="width:34px">
                       <span class="ck" [class.on]="selectAllChecked" (click)="toggleSelectAll()"></span>
                     </th>
-                    <th>Persona</th>
-                    <th>Cargo</th>
-                    <th>Ubicación</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th style="width:110px">Acciones</th>
+                    <th>{{ "SEARCH.COL_PERSON" | translate }}</th>
+                    <th>{{ "SEARCH.JOB" | translate }}</th>
+                    <th>{{ "SEARCH.LOCATION" | translate }}</th>
+                    <th>{{ "SEARCH.COL_EMAIL" | translate }}</th>
+                    <th>{{ "SEARCH.COL_PHONE" | translate }}</th>
+                    <th style="width:110px">{{ "SEARCH.COL_ACTIONS" | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -322,8 +335,8 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
                         {{ person.email }}
                       </span>
-                      <span *ngIf="!person.email && person.hasEmailOnFile === false" class="reveal unavailable" title="No tenemos un email registrado para esta persona">
-                        Email no disponible
+                      <span *ngIf="!person.email && person.hasEmailOnFile === false" class="reveal unavailable" [attr.title]="'SEARCH.TT_NO_EMAIL_PE' | translate">
+                        {{ "SEARCH.NO_EMAIL" | translate }}
                       </span>
                       <button *ngIf="!person.email && person.hasEmailOnFile !== false" class="reveal rev-mail" [class.busy]="isRevealingEmail(person.id)" [disabled]="isRevealingEmail(person.id)" (click)="revealEmail(person)">
                         <svg *ngIf="!isRevealingEmail(person.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
@@ -336,8 +349,8 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
                         {{ person.phone }}
                       </span>
-                      <span *ngIf="!person.phone && person.hasPhoneOnFile === false" class="reveal unavailable" title="No tenemos un teléfono registrado para esta persona">
-                        Teléfono no disponible
+                      <span *ngIf="!person.phone && person.hasPhoneOnFile === false" class="reveal unavailable" [attr.title]="'SEARCH.TT_NO_PHONE_PE' | translate">
+                        {{ "SEARCH.NO_PHONE" | translate }}
                       </span>
                       <button *ngIf="!person.phone && person.hasPhoneOnFile !== false" class="reveal rev-phone" [class.busy]="isRevealingPhone(person.id)" [disabled]="isRevealingPhone(person.id)" (click)="revealPhone(person)">
                         <svg *ngIf="!isRevealingPhone(person.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
@@ -347,14 +360,14 @@
                     </td>
                     <td>
                       <div class="acts">
-                        <button class="ia" title="Agregar a lista" [disabled]="savingSingleId === person.id" (click)="quickAddToList(person)">
+                        <button class="ia" [attr.title]="'SEARCH.TT_ADD_LIST' | translate" [disabled]="savingSingleId === person.id" (click)="quickAddToList(person)">
                           <span class="mini-spin" *ngIf="savingSingleId === person.id"></span>
                           <svg *ngIf="savingSingleId !== person.id" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                         </button>
-                        <button class="ia" title="Crear secuencia (próximamente)" disabled>
+                        <button class="ia" [attr.title]="'SEARCH.TT_SEQ' | translate" disabled>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 3 14 9-14 9V3Z"/></svg>
                         </button>
-                        <button class="ia" title="Ver perfil" (click)="openDetail(person)">
+                        <button class="ia" [attr.title]="'SEARCH.TT_PROFILE' | translate" (click)="openDetail(person)">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
                         </button>
                       </div>
@@ -399,8 +412,8 @@
                   </div>
                 </div>
                 <div style="display:flex;justify-content:flex-end;gap:8px">
-                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" title="Agregar a lista" [disabled]="savingSingleId === person.id" (click)="quickAddToList(person)"><i class="fas fa-list"></i></button>
-                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" title="Ver perfil" (click)="openDetail(person)"><i class="fas fa-ellipsis-h"></i></button>
+                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" [attr.title]="'SEARCH.TT_ADD_LIST' | translate" [disabled]="savingSingleId === person.id" (click)="quickAddToList(person)"><i class="fas fa-list"></i></button>
+                  <button style="background:none;border:1px solid #e2e8f0;padding:8px;border-radius:4px;cursor:pointer;color:#64748b;" [attr.title]="'SEARCH.TT_PROFILE' | translate" (click)="openDetail(person)"><i class="fas fa-ellipsis-h"></i></button>
                 </div>
               </div>
             </div>
@@ -479,24 +492,24 @@
       <div class="dbody">
         <div class="dacts">
           <button class="btn" [disabled]="savingSingleId === pdet.id" (click)="quickAddToList(pdet)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Guardar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> {{ "SEARCH.SAVE" | translate }}
           </button>
-          <button class="btn pri" disabled title="Próximamente">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 3 14 9-14 9V3Z"/></svg> Secuencia
+          <button class="btn pri" disabled [attr.title]="'SEARCH.TT_SOON' | translate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 3 14 9-14 9V3Z"/></svg> {{ "SEARCH.SEQUENCE" | translate }}
           </button>
         </div>
 
         <div class="dcard" *ngIf="pdet.description || pdet.about">
-          <h4>Sobre</h4>
+          <h4>{{ "SEARCH.ABOUT" | translate }}</h4>
           <p style="font-size:13px;color:var(--ink-2);line-height:1.5;margin:0">{{ pdet.about || pdet.description }}</p>
         </div>
 
         <div class="dcard">
-          <h4>Contacto</h4>
+          <h4>{{ "SEARCH.CONTACT" | translate }}</h4>
           <div class="drow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 6 8 6 8-6M4 6h16v12H4z"/></svg>
             <span *ngIf="pdet.email">{{ pdet.email }}</span>
-            <span *ngIf="!pdet.email && pdet.hasEmailOnFile === false" class="reveal unavailable">Email no disponible</span>
+            <span *ngIf="!pdet.email && pdet.hasEmailOnFile === false" class="reveal unavailable">{{ "SEARCH.NO_EMAIL" | translate }}</span>
             <button *ngIf="!pdet.email && pdet.hasEmailOnFile !== false" class="reveal rev-mail" [class.busy]="isRevealingEmail(pdet.id)" [disabled]="isRevealingEmail(pdet.id)" (click)="revealEmail(pdet)">
               <span class="mini-spin" *ngIf="isRevealingEmail(pdet.id)"></span>
               {{ isRevealingEmail(pdet.id) ? 'Verificando…' : 'Acceder email' }}
@@ -505,7 +518,7 @@
           <div class="drow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
             <span *ngIf="pdet.phone">{{ pdet.phone }}</span>
-            <span *ngIf="!pdet.phone && pdet.hasPhoneOnFile === false" class="reveal unavailable">Teléfono no disponible</span>
+            <span *ngIf="!pdet.phone && pdet.hasPhoneOnFile === false" class="reveal unavailable">{{ "SEARCH.NO_PHONE" | translate }}</span>
             <button *ngIf="!pdet.phone && pdet.hasPhoneOnFile !== false" class="reveal rev-phone" [class.busy]="isRevealingPhone(pdet.id)" [disabled]="isRevealingPhone(pdet.id)" (click)="revealPhone(pdet)">
               <span class="mini-spin" *ngIf="isRevealingPhone(pdet.id)"></span>
               {{ isRevealingPhone(pdet.id) ? 'Buscando…' : 'Celular' }}
@@ -517,12 +530,12 @@
           </div>
           <div class="drow" *ngIf="pdet.link">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></svg>
-            <a [href]="pdet.link" target="_blank" rel="noopener">Ver perfil de LinkedIn</a>
+            <a [href]="pdet.link" target="_blank" rel="noopener">{{ "SEARCH.VIEW_LINKEDIN" | translate }}</a>
           </div>
         </div>
 
         <div class="dcard" *ngIf="pdet.education">
-          <h4>Educación</h4>
+          <h4>{{ "SEARCH.EDUCATION" | translate }}</h4>
           <p style="font-size:13px;color:var(--ink-2);line-height:1.5;margin:0">{{ pdet.education }}</p>
         </div>
       </div>
@@ -538,31 +551,31 @@
     <div class="confirm-box" *ngIf="confirmState">
       <p>{{ confirmState.message }}</p>
       <div class="confirm-lists" *ngIf="confirmState.askLists">
-        <label>Agregar a lista (opcional)</label>
+        <label>{{ "SEARCH.ADD_LIST_OPT" | translate }}</label>
         <input
           type="text"
           class="confirm-list-filter"
           *ngIf="availableLists.length > 5"
           [(ngModel)]="confirmListFilter"
-          placeholder="Buscar lista…"
+          [attr.placeholder]="'SEARCH.PH_LIST' | translate"
         />
         <div class="confirm-lists-options" *ngIf="availableLists.length > 0">
           <label class="confirm-list-option" *ngFor="let l of filteredAvailableLists">
             <input type="checkbox" [checked]="confirmSelectedListIds.has(l.id)" (change)="toggleConfirmList(l.id)" />
             <span>{{ l.name }}</span>
           </label>
-          <span class="confirm-list-noresults" *ngIf="filteredAvailableLists.length === 0">Sin coincidencias.</span>
+          <span class="confirm-list-noresults" *ngIf="filteredAvailableLists.length === 0">{{ "SEARCH.NO_MATCHES" | translate }}</span>
         </div>
-        <span class="hint" *ngIf="availableLists.length === 0">Aún no tienes listas creadas.</span>
+        <span class="hint" *ngIf="availableLists.length === 0">{{ "SEARCH.NO_LISTS" | translate }}</span>
         <input
           type="text"
           [(ngModel)]="confirmNewListName"
-          placeholder="o crea una lista nueva…"
+          [attr.placeholder]="'SEARCH.PH_NEW_LIST' | translate"
           (keydown.enter)="runConfirmed()"
         />
       </div>
       <div class="confirm-actions">
-        <button class="btn" (click)="cancelConfirm()">Cancelar</button>
+        <button class="btn" (click)="cancelConfirm()">{{ "SEARCH.CANCEL" | translate }}</button>
         <button class="btn pri" (click)="runConfirmed()">{{ confirmState.confirmLabel }}</button>
       </div>
     </div>

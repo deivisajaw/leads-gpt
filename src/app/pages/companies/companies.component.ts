@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { Router, ActivatedRoute } from "@angular/router";
 import {
   CompaniesService,
@@ -37,6 +37,8 @@ import {
   SearchReadyResult,
 } from "../../components/search-chat/search-chat.component";
 import { ExportService } from "../../services/export.service";
+import { CreditsPillComponent } from '../../components/shared/credits-pill/credits-pill.component';
+import { IndustryTaxonomyService, IndustrySection } from '../../services/industry-taxonomy.service';
 
 export interface FacetOption {
   value: string;
@@ -46,13 +48,12 @@ export interface FacetOption {
 @Component({
   selector: "app-companies",
   standalone: true,
-  imports: [
-    CommonModule,
+  imports: [CommonModule,
     FormsModule,
     TranslateModule,
     PlansComponent,
     SearchChatComponent,
-  ],
+    CreditsPillComponent],
   templateUrl: "./companies.component.html",
   styleUrl: "./companies.component.css",
 })
@@ -100,6 +101,34 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   // reflejan la página visible, no el total de la búsqueda — para reflejar el total real haría
   // falta un endpoint de facetas en el backend.
   public cityFacetOptions: FacetOption[] = [];
+  // ── Filtro de industria (taxonomía propia, 16 grupos / 89 industrias) ──
+  public industrySections: IndustrySection[] = [];
+  public industryOpen = false;
+  /** Las secciones arrancan cerradas, como en Apollo: la columna se lee de un vistazo. */
+  public showCatFacet = false;
+  public showCityFacet = false;
+  public showEmailFacet = false;
+  public industryQuery = '';
+  public selectedIndustryGroups = new Set<string>();
+  /** Sector ISIC crudo -> grupo comprador. El 91% de las filas sólo trae eso. */
+  private sectorToGroup: Record<string, string> = {};
+
+  /**
+   * Filtros que todavía no tienen datos detrás. Se muestran con candado y
+   * "Próximamente" en vez de esconderlos: enseñan a dónde va el producto sin
+   * prometer un resultado que hoy volvería vacío.
+   */
+  public readonly lockedFilters: { key: string; icon: string }[] = [
+    { key: 'EMPLOYEES',   icon: 'users' },
+    { key: 'REVENUE',     icon: 'dollar' },
+    { key: 'FUNDING',     icon: 'trending' },
+    { key: 'TECH',        icon: 'cpu' },
+    { key: 'JOB_POSTS',   icon: 'briefcase' },
+    { key: 'INTENT',      icon: 'target' },
+    { key: 'CO_LOOKALIKE',icon: 'copy' },
+    { key: 'PE_LOOKALIKE',icon: 'userplus' },
+  ];
+
   public categoryFacetOptions: FacetOption[] = [];
   public emailFacetOptions: FacetOption[] = [];
   public selectedCityFacets = new Set<string>();
@@ -306,6 +335,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   private boundOnGlobePointerUp = () => this.onGlobePointerUp();
 
   constructor(
+    private translate: TranslateService,
+    private industryTax: IndustryTaxonomyService,
     private companiesService: CompaniesService,
     private myListCompanyService: MyListCompanyService,
     private savedListService: SavedListService,
@@ -339,6 +370,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadDashboardStats();
     this.loadSuggestedProspects();
     this.loadAvailableLists();
+    this.loadIndustryTaxonomy().then(() => this.onIndustryQueryChange());
 
     const companyIdParam = this.route.snapshot.queryParamMap.get("companyId");
     if (companyIdParam) {
@@ -377,6 +409,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this.stopSearchPolling();
     if (this.userProfileSubscription) {
       this.userProfileSubscription.unsubscribe();
     }
@@ -470,6 +503,10 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onChatStarted(): void {
     this.chatActive = true;
+    // Se anota la última búsqueda existente para reconocer la nueva después.
+    this.companiesService.getMySearchHistoryCompanies(0, 1, 'createdOn_desc')
+      .then(h => { this.searchIdBeforeChat = h?.history?.[0]?.id ?? null; })
+      .catch(() => { this.searchIdBeforeChat = null; });
   }
 
   // ─── Llamado por el chat cuando el agente tiene el query listo ───
@@ -477,6 +514,52 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchQuery = result.query;
     this.currentCategory = result.category;
     this.currentLocation = result.location;
+
+    // El agente dijo que hay que buscar, pero a veces devuelve los tres campos
+    // vacios. onSearch() trata eso como "no hay nada que buscar", llama a
+    // resetSearchState() y la pantalla se vuelve a la portada — justo lo que se
+    // veia: el chat desaparecia y volvia el titulo de inicio, sin resultados.
+    //
+    // Si el agente pidio buscar, se busca. Como ultimo recurso se usa el texto
+    // que escribio el usuario, que siempre lo tenemos.
+    const nothingToSearch =
+      !this.searchQuery.trim() &&
+      !this.currentCategory.trim() &&
+      !this.currentLocation.trim();
+
+    if (nothingToSearch) {
+      this.searchQuery = (this.lastUserMessage || '').trim();
+      if (!this.searchQuery) return;   // sin nada que buscar, no se resetea la pantalla
+    }
+
+    // Si la busqueda directa ya esta corriendo o ya trajo filas, no se repite.
+    if (this.searchPollTimer || this.filteredResults.length > 0) return;
+
+    this.onSearch();
+  }
+
+  /** Lo ultimo que escribio el usuario en el chat. */
+  lastUserMessage = '';
+
+  /**
+   * El usuario escribio y le dio enter: se busca YA, sin esperar al agente.
+   *
+   * Antes el unico camino a los resultados pasaba por el agente de chat: el
+   * agente tenia que llamar finalize_search para que la pantalla pintara algo.
+   * Cuando el agente solo contesta "buscando eso ahora" —cosa que hace seguido—
+   * la busqueda se ejecuta, se guarda con sus resultados, y la pantalla se
+   * queda vacia para siempre. El usuario espera algo que nunca llega.
+   *
+   * Un buscador no puede depender de que un modelo se acuerde de llamar una
+   * herramienta. Se busca directo con lo que el usuario escribio. El agente
+   * sigue ahi para conversar y afinar, pero ya no es el que decide si ves algo.
+   */
+  onUserAsked(text: string): void {
+    this.lastUserMessage = text;
+    if (this.isLoading || this.searchPollTimer) return;   // ya hay una en curso
+    this.searchQuery = text;
+    this.currentCategory = '';
+    this.currentLocation = '';
     this.onSearch();
   }
 
@@ -536,8 +619,26 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
         break;
 
-      case "SEARCH_NOT_FOUND":
+      // El scrape corre en el servidor y tarda; mientras tanto responde
+      // SEARCH_IN_PROGRESS. Antes esto caía en la MISMA rama que "no
+      // encontrado": se borraban los resultados y se tiraba el searchId, así
+      // que la pantalla quedaba vacía para siempre aunque la búsqueda
+      // terminara con 1.075 empresas. Sólo se veían entrando por Historial.
       case "SEARCH_IN_PROGRESS":
+        this.searchStatus = "running";
+        this.isLoading = true;
+        this.currentSearchId = response.data?.searchId ?? this.currentSearchId;
+        // Si el backend no devolvió el id, se toma el de la búsqueda más
+        // reciente del historial: es la que acabamos de lanzar. Cuesta una
+        // llamada de ~50 ms y sin ella no hay forma de leer el resultado.
+        if (this.currentSearchId) {
+          this.startSearchPolling();
+        } else {
+          this.resolveSearchIdThenPoll();
+        }
+        break;
+
+      case "SEARCH_NOT_FOUND":
         this.filteredResults = [];
         this.displayResults = [];
         this.totalResultsInServer = 0;
@@ -1160,6 +1261,16 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public applyLocalFilters(): void {
     let results = [...this.filteredResults];
+
+    // Industria: se filtra por grupo, que es el nivel que existe en todos los
+    // países. Brasil —el 92% de la base— casi nunca trae categoría específica.
+    if (this.selectedIndustryGroups.size > 0) {
+      results = results.filter((c) => {
+        const g = this.groupOfCompany(c);
+        return !!g && this.selectedIndustryGroups.has(g);
+      });
+    }
+
     if (this.localFilters.title)
       results = results.filter((c) =>
         c.title?.toLowerCase().includes(this.localFilters.title.toLowerCase()),
@@ -1257,6 +1368,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.selectedEmailFacets.size;
     if (this.localFilters.title) n++;
     if (this.localFilters.categoryName) n++;
+    n += this.selectedIndustryGroups.size;
     if (this.localFilters.city) n++;
     if (this.localFilters.state) n++;
     if (this.localFilters.countryCode) n++;
@@ -1271,6 +1383,9 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedCityFacets.clear();
     this.selectedCategoryFacets.clear();
     this.selectedEmailFacets.clear();
+    this.selectedIndustryGroups.clear();
+    this.industryQuery = '';
+    this.onIndustryQueryChange();
     this.localFilters = {
       title: "",
       categoryName: "",
@@ -1645,5 +1760,195 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
         replaceUrl: true,
       });
     }
+  }
+
+  // ── Filtro de industria ──────────────────────────────────────────────────
+
+  /** Carga la taxonomía y el mapa de sectores. Si falla, el filtro no aparece. */
+  private async loadIndustryTaxonomy(): Promise<void> {
+    try {
+      this.industrySections = await this.industryTax.sections(this.translate.currentLang || 'es');
+      const res = await fetch('data/sector-map.json');
+      if (res.ok) this.sectorToGroup = (await res.json()).sectorToGroup ?? {};
+    } catch {
+      this.industrySections = [];
+    }
+  }
+
+  toggleIndustryPanel(): void { this.industryOpen = !this.industryOpen; }
+
+  toggleIndustryGroup(key: string): void {
+    this.selectedIndustryGroups.has(key)
+      ? this.selectedIndustryGroups.delete(key)
+      : this.selectedIndustryGroups.add(key);
+    this.applyLocalFilters();
+  }
+
+  isIndustryGroupOn(key: string): boolean {
+    return this.selectedIndustryGroups.has(key);
+  }
+
+  /**
+   * Los grupos que coinciden con lo escrito en el buscador del filtro. Se
+   * calcula bajo demanda y se guarda en un campo, nunca desde la plantilla:
+   * un getter en *ngFor devuelve un array nuevo en cada ciclo de change
+   * detection y eso congela la pestaña.
+   */
+  public visibleIndustrySections: IndustrySection[] = [];
+
+  onIndustryQueryChange(): void {
+    const q = this.industryQuery.trim().toLowerCase();
+    if (!q) { this.visibleIndustrySections = this.industrySections; return; }
+    this.visibleIndustrySections = this.industrySections
+      .map(sec => ({
+        ...sec,
+        industries: sec.industries.filter(i => i.label.toLowerCase().includes(q)),
+      }))
+      .filter(sec => sec.label.toLowerCase().includes(q) || sec.industries.length > 0);
+  }
+
+  /**
+   * A qué grupo pertenece una empresa.
+   *
+   * El 91% de las filas trae sólo la clave gruesa del sector (RETAIL, MANUF…),
+   * sobre todo en Brasil, donde el 98,7% no tiene categoría específica. Para
+   * esas usamos el mapa de sectores. Para el resto —Colombia, Guatemala, US,
+   * México, que sí traen categoría propia— se compara contra las etiquetas de
+   * la taxonomía.
+   */
+  private groupOfCompany(c: Company): string | null {
+    const raw = (c.categoryName || '').trim();
+    if (!raw) return null;
+
+    const bySector = this.sectorToGroup[raw.toUpperCase()];
+    if (bySector) return bySector;
+
+    const needle = raw.toLowerCase();
+    for (const sec of this.industrySections) {
+      if (sec.industries.some(i => needle.includes(i.label.toLowerCase()))) return sec.key;
+    }
+    return null;
+  }
+
+  /** Filtros bloqueados: se avisa y no se hace nada más. */
+  onLockedFilter(): void {
+    this.notificationService.showInfo(this.translate.instant('SEARCH.LOCKED_HINT'));
+  }
+
+  // ── Sondeo de la búsqueda ────────────────────────────────────────────────
+
+  private searchPollTimer: ReturnType<typeof setInterval> | null = null;
+  private searchPollDeadline = 0;
+
+  /**
+   * Espera a que la búsqueda termine leyendo el endpoint BARATO.
+   *
+   * Aquí estaba el error de fondo. Volver a llamar a runSearchCompanies para
+   * "ver si ya terminó" NO consulta el resultado: relanza el scrape. Cada
+   * consulta tardaba 36 segundos y cobraba créditos otra vez.
+   *
+   * getMySearchHistoryCompanyDetails devuelve exactamente las mismas filas en
+   * ~140 ms, porque sólo lee lo que el scrape ya guardó. Es el mismo endpoint
+   * que usa la pantalla de Historial, que siempre fue rápida.
+   *
+   * Además pinta lo que ya haya llegado mientras el scrape sigue: los
+   * resultados aparecen de a poco en vez de esperar al final.
+   */
+  private startSearchPolling(): void {
+    this.stopSearchPolling();
+    this.searchPollDeadline = Date.now() + 5 * 60 * 1000;
+
+    const tick = async () => {
+      if (!this.currentSearchId) { this.stopSearchPolling(); return; }
+      if (Date.now() > this.searchPollDeadline) {
+        this.stopSearchPolling();
+        this.isLoading = false;
+        this.searchError = this.translate.instant('SEARCH.STILL_RUNNING');
+        return;
+      }
+      try {
+        const res = await this.companiesService.getMySearchHistoryCompanyDetails(
+          this.currentSearchId,
+          this.currentOffset,
+          this.itemsPerPage,
+          this.currentSortOrder,
+        );
+        if (res?.error) return;
+
+        // Se pinta lo que haya, aunque el scrape siga corriendo.
+        if (res?.results?.length) {
+          this.isLoading = false;
+          this.updateStateFromData(res);
+        }
+
+        // statusSelect === 1 significa "todavía corriendo".
+        if (res?.statusSelect !== 1) {
+          this.stopSearchPolling();
+          this.isLoading = false;
+          this.searchStatus = '';
+          if (res?.results?.length) {
+            this.onboardingService.completeOnboardingStepByKey('FIND_LEADS');
+          }
+        }
+      } catch {
+        // Un fallo suelto no corta el sondeo; se reintenta al siguiente ciclo.
+      }
+    };
+
+    tick();                                   // primera lectura inmediata
+    this.searchPollTimer = setInterval(tick, 2000);
+  }
+
+  private stopSearchPolling(): void {
+    if (this.searchPollTimer) {
+      clearInterval(this.searchPollTimer);
+      this.searchPollTimer = null;
+    }
+  }
+
+  /** Recupera el id de la búsqueda recién lanzada y arranca el sondeo. */
+  private async resolveSearchIdThenPoll(): Promise<void> {
+    try {
+      const hist = await this.companiesService.getMySearchHistoryCompanies(0, 1, 'createdOn_desc');
+      const newest = hist?.history?.[0];
+      if (newest?.id) {
+        this.currentSearchId = newest.id;
+        this.startSearchPolling();
+        return;
+      }
+    } catch { /* cae al aviso de abajo */ }
+    this.isLoading = false;
+    this.searchError = this.translate.instant('SEARCH.STILL_RUNNING');
+  }
+
+  /**
+   * Red de seguridad cuando el agente contesta sin pintar resultados.
+   *
+   * El agente debe llamar finalize_search, que es lo único que enciende
+   * searchReady y hace que la pantalla muestre algo. Su propio prompt se lo
+   * exige y le prohíbe contestar "buscando eso ahora". Lo hace igual: se queda
+   * en el texto, la búsqueda queda creada en el servidor con sus resultados, y
+   * la pantalla se queda vacía para siempre.
+   *
+   * Aquí miramos si apareció una búsqueda nueva desde que empezó la
+   * conversación. Si la hay, la pintamos nosotros con el endpoint barato
+   * (~140 ms) sin volver a cobrar créditos. La pantalla deja de depender de que
+   * el modelo se acuerde de llamar a la herramienta.
+   */
+  private searchIdBeforeChat: number | null = null;
+
+  async onAgentRepliedWithoutResults(): Promise<void> {
+    try {
+      const hist = await this.companiesService.getMySearchHistoryCompanies(0, 1, 'createdOn_desc');
+      const newest = hist?.history?.[0];
+      if (!newest?.id) return;
+      // Sólo si es una búsqueda NUEVA: si no, estaríamos pintando una vieja.
+      if (this.searchIdBeforeChat !== null && newest.id === this.searchIdBeforeChat) return;
+
+      this.currentSearchId = newest.id;
+      this.currentQuery = newest.searchString || this.currentQuery;
+      this.isLoading = true;
+      this.startSearchPolling();
+    } catch { /* sin red de seguridad, se comporta como antes */ }
   }
 }
