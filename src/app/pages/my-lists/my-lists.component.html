@@ -46,14 +46,15 @@
         <div class="mls-list-card-body">
           <h3 class="mls-list-card-name">{{ list.name }}</h3>
           <p class="mls-list-card-desc" *ngIf="list.description">{{ list.description }}</p>
+          <!-- Antes eran dos números sueltos sin decir de qué. -->
           <div class="mls-list-card-counts">
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>
-              {{ list.companiesCount }}
+              {{ list.companiesCount }} {{ "MY_LISTS.COMPANIES" | translate }}
             </span>
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
-              {{ list.peopleCount }}
+              {{ list.peopleCount }} {{ "MY_LISTS.PEOPLE" | translate }}
             </span>
           </div>
           <div class="mls-list-card-date">{{ "MY_LISTS.CREATED_ON" | translate }} {{ formatDate(list.createdOn) }}</div>

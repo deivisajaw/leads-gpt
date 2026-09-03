@@ -10,11 +10,12 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { OnboardingService } from "../../services/onboarding.service";
+import { CreditsPillComponent } from '../../components/shared/credits-pill/credits-pill.component';
 
 @Component({
   selector: 'app-my-history-search-people-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, CreditsPillComponent],
   templateUrl: './my-history-search-people-details.component.html',
   styleUrl: './my-history-search-people-details.component.css'
 })
@@ -38,6 +39,8 @@ export class MyHistorySearchPeopleDetailsComponent implements OnInit, OnDestroy,
   private pollingInterval: any;
   private pollTimeout: any;
   public isPolling: boolean = false;
+  /** La búsqueda seguía corriendo cuando dejamos de preguntar. */
+  public pollTimedOut = false;
 
   private routeSubscription!: Subscription;
 
@@ -203,12 +206,22 @@ export class MyHistorySearchPeopleDetailsComponent implements OnInit, OnDestroy,
 
     this.isPolling = true;
 
+    // Tope de 2 minutos. Antes se cortaba en silencio y el usuario se quedaba
+    // sin saber si la búsqueda seguía o se murió.
     this.pollTimeout = setTimeout(() => {
+      const stillRunning = this.searchDetails?.statusSelect === 1;
       this.stopPolling();
+      if (stillRunning) this.pollTimedOut = true;
     }, 120000);
 
     this.pollingInterval = setInterval(async () => {
-      this.isLoading = true;
+      // OJO: aquí NO se pone isLoading = true.
+      //
+      // Antes sí, y como el sondeo corre cada 5 segundos, la pantalla volvía al
+      // engranaje de pantalla completa y escondía la tabla una y otra vez. Con
+      // una búsqueda que tardaba, se veía como si estuviera colgada para
+      // siempre aunque los resultados ya estuvieran ahí. El engranaje grande es
+      // sólo para la primera carga; el sondeo se anuncia con isPolling.
       try {
         const result: PeopleSearchResult = await this.peopleService.getMySearchHistoryPeopleDetails(
           this.searchId,
@@ -490,5 +503,16 @@ export class MyHistorySearchPeopleDetailsComponent implements OnInit, OnDestroy,
     } finally {
       this.isSavingAll = false;
     }
+  }
+
+  /** El nombre de la fila lleva a la ficha completa de la persona. */
+  openPerson(peopleId: number): void {
+    this.router.navigate(['/people-details', peopleId]);
+  }
+
+  /** Volver a preguntar por una búsqueda que se pasó del tope de sondeo. */
+  reloadSearch(): void {
+    this.pollTimedOut = false;
+    this.loadSearchDetails();
   }
 }

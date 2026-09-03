@@ -1,475 +1,366 @@
-.mls-lists-shell {
-  --ind: #5b4fe5;
-  --ind-d: #4f46e5;
-  --ind-50: #eef2ff;
-  --ind-100: #e0e7ff;
-  --ink: #0f172a;
-  --ink-2: #334155;
-  --muted: #64748b;
-  --hint: #94a3b8;
-  --line: #eef1f6;
-  --line-2: #e2e8f0;
-  --panel: #fbfcfe;
-  --sh: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .05);
-  --ez: cubic-bezier(.16, 1, .3, 1);
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mis listas
+
+   Antes usaba el índigo genérico (#5b4fe5 / #4f46e5) y los grises slate de
+   Tailwind, que no son los de AJAW. Aquí va sobre los tokens reales de la
+   marca: índigo #3E34F9, degradado #7871FB→#251F95, grises Apple y Space
+   Grotesk en los nombres y en los números.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  --ml-ind: #3E34F9;
+  --ml-soft: #7871FB;
+  --ml-deep: #251F95;
+  --ml-tint: #D8D6FE;
+  --ml-wash: #F4F3FF;
+  --ml-ink: #1D1D1F;
+  --ml-ink2: #6E6E73;
+  --ml-ink3: #86868B;
+  --ml-line: #E5E5EA;
+  --ml-line2: #D2D2D7;
+  --ml-bg: #F5F5F7;
+  --ml-danger: #D9314A;
+  --ml-ez: cubic-bezier(.16, 1, .3, 1);
 
   display: block;
-  min-height: calc(100vh - 65px);
-  background: #f8fafc;
-  font-family: Inter, -apple-system, system-ui, sans-serif;
+  height: 100%;
 }
 
-@keyframes mls-screenin {
-  from { opacity: 0; transform: translateY(10px); filter: blur(8px); }
-  to { opacity: 1; transform: none; filter: none; }
+.mls-lists-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--ml-bg);
 }
 
-.mls-screenin {
-  animation: mls-screenin .5s var(--ez) both;
-}
+/* ── Barra superior ────────────────────────────────────────────────────── */
 
-/* ═══════════ TOP BAR ═══════════ */
 .mls-ltopbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 16px 24px;
+  gap: 16px;
+  padding: 18px 32px;
   background: #fff;
-  border-bottom: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--ml-line);
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
+.mls-ltitle-wrap { flex: 1; min-width: 0 }
 
 .mls-ltitle {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ink);
   margin: 0;
+  color: var(--ml-ink);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.03em;
 }
 
 .mls-btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: var(--ind);
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
   color: #fff;
-  border: none;
-  padding: 9px 16px;
-  border-radius: 9px;
-  font-weight: 650;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background-color .15s var(--ez);
-  flex: none;
+  background: linear-gradient(135deg, var(--ml-soft), var(--ml-deep));
+  box-shadow: 0 4px 14px -6px rgba(37, 31, 149, .55);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
   white-space: nowrap;
+  cursor: pointer;
+  transition: transform .16s var(--ml-ez), box-shadow .16s ease;
 }
-
-.mls-btn-primary svg {
-  width: 15px;
-  height: 15px;
-}
-
 .mls-btn-primary:hover {
-  background: var(--ind-d);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(37, 31, 149, .6);
 }
+.mls-btn-primary:disabled { opacity: .55; cursor: default; transform: none }
+.mls-btn-primary svg { width: 16px; height: 16px; stroke-linecap: round; stroke-linejoin: round }
 
-/* ═══════════ CONTENIDO ═══════════ */
-.mls-lcontent {
-  padding: 20px 24px 40px;
-}
+.mls-lcontent { flex: 1; padding: 24px 32px 48px }
 
-.mls-loading-state {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-  color: var(--muted);
-  font-size: 13.5px;
-}
+/* ── Rejilla ───────────────────────────────────────────────────────────── */
 
-.mls-spinner {
-  width: 36px;
-  height: 36px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--ind);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.mls-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-  height: 360px;
-}
-
-.mls-empty-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--ind-50);
-  color: var(--ind);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.mls-empty-icon svg {
-  width: 26px;
-  height: 26px;
-}
-
-.mls-empty-state h3 {
-  color: var(--ink);
-  margin: 0 0 6px;
-  font-size: 16px;
-}
-
-.mls-empty-state p {
-  margin: 0 0 22px;
-  font-size: 13.5px;
-}
-
-/* ═══════════ GRID DE LISTAS ═══════════ */
 .mls-lists-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
 
 .mls-list-card {
-  background: #fff;
-  border: 1px solid var(--line-2);
-  border-radius: 14px;
-  padding: 18px;
+  position: relative;
   display: flex;
+  align-items: flex-start;
   gap: 14px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--ml-line);
+  border-radius: 18px;
   cursor: pointer;
-  transition: box-shadow .2s var(--ez), transform .2s var(--ez), border-color .2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+  transition: transform .18s var(--ml-ez), box-shadow .18s ease, border-color .18s ease;
 }
-
 .mls-list-card:hover {
-  box-shadow: var(--sh);
   transform: translateY(-2px);
-  border-color: #c7c2f5;
+  border-color: var(--ml-tint);
+  box-shadow: 0 14px 30px -18px rgba(37, 31, 149, .45);
 }
 
 .mls-list-card-icon {
   width: 44px;
   height: 44px;
-  min-width: 44px;
-  border-radius: 10px;
-  background: var(--ind-50);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ind);
+  flex: none;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(150deg, var(--ml-soft), var(--ml-deep));
+  box-shadow: 0 3px 10px -4px rgba(37, 31, 149, .5);
 }
+.mls-list-card-icon svg { width: 21px; height: 21px; stroke-linecap: round; stroke-linejoin: round }
 
-.mls-list-card-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.mls-list-card-body {
-  flex: 1;
-  min-width: 0;
-}
+.mls-list-card-body { flex: 1; min-width: 0 }
 
 .mls-list-card-name {
-  font-size: 15px;
+  margin: 0;
+  color: var(--ml-ink);
+  font-family: var(--font-display);
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 4px;
+  letter-spacing: -.02em;
+  /* Un nombre largo no debe empujar los botones fuera de la tarjeta. */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Deja aire para los dos botones de la esquina. */
+  padding-right: 62px;
 }
 
 .mls-list-card-desc {
-  font-size: 12.5px;
-  color: var(--muted);
-  margin: 0 0 10px;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ml-ink2);
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.mls-list-card-counts {
-  display: flex;
-  gap: 16px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  font-weight: 650;
-  margin-bottom: 8px;
-}
-
+/* Los conteos eran dos números sueltos; ahora dicen de qué son. */
+.mls-list-card-counts { display: flex; gap: 8px; margin: 12px 0 0 }
 .mls-list-card-counts span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--ml-wash);
+  color: var(--ml-deep);
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-
-.mls-list-card-counts svg {
-  width: 13px;
-  height: 13px;
-  color: var(--hint);
-}
+.mls-list-card-counts svg { width: 13px; height: 13px; stroke-linecap: round; stroke-linejoin: round; opacity: .75 }
 
 .mls-list-card-date {
-  font-size: 11px;
-  color: var(--hint);
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--ml-ink3);
 }
 
+/* Los botones aparecen al pasar por encima: antes competían con el nombre. */
 .mls-list-card-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
   display: flex;
-  flex-direction: column;
   gap: 6px;
-  flex: none;
+  opacity: 0;
+  transition: opacity .16s ease;
 }
+.mls-list-card:hover .mls-list-card-actions,
+.mls-list-card:focus-within .mls-list-card-actions { opacity: 1 }
 
 .mls-list-card-action {
   width: 28px;
   height: 28px;
-  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ml-line);
+  border-radius: 8px;
   background: #fff;
-  border-radius: 7px;
-  color: var(--muted);
+  color: var(--ml-ink2);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .15s;
+  transition: border-color .14s ease, color .14s ease, background .14s ease;
 }
-
-.mls-list-card-action svg {
-  width: 13px;
-  height: 13px;
-}
-
-.mls-list-card-action:hover {
-  background: var(--panel);
-  color: var(--ind-d);
-}
-
+.mls-list-card-action svg { width: 14px; height: 14px; stroke-linecap: round; stroke-linejoin: round }
+.mls-list-card-action:hover { border-color: var(--ml-soft); color: var(--ml-ind) }
 .mls-list-card-action.mls-danger:hover {
-  background: #fee2e2;
-  color: #dc2626;
-  border-color: #fecaca;
+  border-color: var(--ml-danger);
+  color: var(--ml-danger);
+  background: rgba(217, 49, 74, .06);
 }
 
-/* ═══════════ MODALES ═══════════ */
-.mls-modal-overlay {
-  /* Redeclaradas porque este modal es hermano de .mls-lists-shell en el DOM, no hijo —
-     sin esto, var(--ind) etc. quedan sin valor y todo se ve sin estilo. */
-  --ind: #5b4fe5;
-  --ind-d: #4f46e5;
-  --ind-50: #eef2ff;
-  --ind-100: #e0e7ff;
-  --ink: #0f172a;
-  --ink-2: #334155;
-  --muted: #64748b;
-  --hint: #94a3b8;
-  --line: #eef1f6;
-  --line-2: #e2e8f0;
-  --panel: #fbfcfe;
-  --sh: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .05);
-  --ez: cubic-bezier(.16, 1, .3, 1);
+/* ── Estados ───────────────────────────────────────────────────────────── */
 
+.mls-loading-state, .mls-empty-state {
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  padding: 80px 20px;
+  text-align: center;
+}
+.mls-loading-state p { margin: 10px 0 0; font-size: 13px; color: var(--ml-ink3) }
+
+.mls-empty-icon {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  color: var(--ml-deep);
+  background: var(--ml-wash);
+  margin-bottom: 8px;
+}
+.mls-empty-icon svg { width: 28px; height: 28px; stroke-linecap: round; stroke-linejoin: round }
+.mls-empty-state h3 {
+  margin: 0;
+  color: var(--ml-ink);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+.mls-empty-state p { margin: 0 0 8px; font-size: 13.5px; color: var(--ml-ink2); max-width: 380px }
+
+/* ── Modales ───────────────────────────────────────────────────────────── */
+
+.mls-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  animation: fadeIn 0.15s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(29, 29, 31, .38);
+  backdrop-filter: blur(3px);
 }
 
 .mls-modal-card {
+  width: min(430px, 100%);
+  padding: 26px;
   background: #fff;
-  border-radius: 16px;
-  padding: 32px 28px 28px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
-  animation: slideUp .2s cubic-bezier(.34, 1.56, .64, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border-radius: 20px;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .35);
   text-align: center;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(16px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
 .mls-modal-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--ind-50);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  color: var(--ind);
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(150deg, var(--ml-soft), var(--ml-deep));
 }
-
-.mls-modal-icon.mls-danger {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.mls-modal-icon svg {
-  width: 24px;
-  height: 24px;
-}
+.mls-modal-icon svg { width: 24px; height: 24px; stroke-linecap: round; stroke-linejoin: round }
+.mls-modal-icon.mls-danger { background: linear-gradient(150deg, #F26A7E, var(--ml-danger)) }
 
 .mls-modal-title {
-  font-size: 17px;
+  margin: 0 0 6px;
+  color: var(--ml-ink);
+  font-family: var(--font-display);
+  font-size: 18px;
   font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 10px;
+  letter-spacing: -.02em;
 }
+.mls-modal-message { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ml-ink2) }
 
-.mls-modal-message {
-  font-size: 13.5px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 0 0 22px;
-}
-
-.mls-modal-form {
-  width: 100%;
-  text-align: left;
-  margin-bottom: 20px;
-}
-
+.mls-modal-form { margin: 18px 0 0; text-align: left }
 .mls-modal-form label {
   display: block;
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--muted);
-  margin-bottom: 5px;
-  margin-top: 12px;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ml-ink3);
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
-
-.mls-modal-form label:first-child {
-  margin-top: 0;
-}
-
-.mls-modal-form input,
-.mls-modal-form textarea {
+.mls-modal-form label + input, .mls-modal-form label + textarea { margin-bottom: 14px }
+.mls-modal-form input, .mls-modal-form textarea {
   width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--line-2);
-  border-radius: 8px;
-  font-size: 13px;
-  box-sizing: border-box;
-  font-family: inherit;
-  resize: vertical;
-}
-
-.mls-modal-form input:focus,
-.mls-modal-form textarea:focus {
-  outline: none;
-  border-color: var(--ind);
-  box-shadow: 0 0 0 2px rgba(91, 79, 229, .15);
-}
-
-.mls-modal-actions {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
-
-.mls-modal-btn-cancel {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid var(--line-2);
+  padding: 11px 13px;
+  border: 1px solid var(--ml-line2);
+  border-radius: 10px;
   background: #fff;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--ink-2);
-  cursor: pointer;
-  transition: background .15s;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ml-ink);
+  box-sizing: border-box;
+  transition: border-color .16s ease, box-shadow .16s ease;
 }
-
-.mls-modal-btn-cancel:hover:not(:disabled) {
-  background: var(--panel);
+.mls-modal-form input:focus, .mls-modal-form textarea:focus {
+  outline: none;
+  border-color: var(--ml-soft);
+  box-shadow: 0 0 0 3px rgba(120, 113, 251, .18);
 }
+.mls-modal-form textarea { resize: vertical; min-height: 60px }
 
-.mls-modal-btn-confirm {
+.mls-modal-actions { display: flex; gap: 10px; margin-top: 20px }
+.mls-modal-btn-cancel, .mls-modal-btn-confirm {
   flex: 1;
-  padding: 10px;
-  border: none;
-  background: var(--ind);
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 650;
-  color: #fff;
+  height: 42px;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background .15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform .16s var(--ml-ez), border-color .16s ease;
+}
+.mls-modal-btn-cancel {
+  border: 1px solid var(--ml-line2);
+  background: #fff;
+  color: var(--ml-ink);
+}
+.mls-modal-btn-cancel:hover { border-color: var(--ml-ink3) }
+.mls-modal-btn-confirm {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ml-soft), var(--ml-deep));
+}
+.mls-modal-btn-confirm:hover { transform: translateY(-1px) }
+.mls-modal-btn-confirm.mls-danger { background: linear-gradient(135deg, #F26A7E, var(--ml-danger)) }
+.mls-modal-btn-cancel:disabled, .mls-modal-btn-confirm:disabled { opacity: .55; cursor: default; transform: none }
+
+/* ── Entradas ──────────────────────────────────────────────────────────── */
+
+.mls-screenin { animation: mls-screenin .28s var(--ml-ez) both }
+@keyframes mls-screenin { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+
+.mls-rowin { opacity: 0 }
+.mls-rowin.mls-play { animation: mls-rowin .32s var(--ml-ez) both }
+@keyframes mls-rowin { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+
+@media (max-width: 720px) {
+  .mls-ltopbar { padding: 14px 16px }
+  .mls-lcontent { padding: 16px 16px 40px }
+  .mls-lists-grid { grid-template-columns: 1fr }
 }
 
-.mls-modal-btn-confirm:hover:not(:disabled) {
-  background: var(--ind-d);
-}
-
-.mls-modal-btn-confirm.mls-danger {
-  background: #dc2626;
-}
-
-.mls-modal-btn-confirm.mls-danger:hover:not(:disabled) {
-  background: #b91c1c;
-}
-
-.mls-modal-btn-confirm:disabled,
-.mls-modal-btn-cancel:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-.mls-btn-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, .3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
-
-/* ═══════════ ANIMACIÓN DE TARJETAS ═══════════ */
-@keyframes mls-rowin {
-  from { opacity: 0; filter: blur(5px); }
-  to { opacity: 1; filter: none; }
-}
-
-.mls-rowin {
-  opacity: 0;
-}
-
-.mls-rowin.mls-play {
-  animation: mls-rowin .5s var(--ez) forwards;
+@media (prefers-reduced-motion: reduce) {
+  .mls-screenin, .mls-rowin.mls-play { animation: none; opacity: 1 }
+  .mls-list-card, .mls-btn-primary, .mls-modal-btn-confirm { transition: none }
 }
