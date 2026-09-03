@@ -511,4 +511,17 @@ export class MyHistorySearchPeopleDetailsComponent implements OnInit, OnDestroy,
     this.pollTimedOut = false;
     this.loadSearchDetails();
   }
+
+  /**
+   * Abre la ficha completa pasando la fila que ya tenemos.
+   *
+   * getMySearchHistoryPeopleDetails devuelve el mismo conjunto de campos
+   * que getPeopleDetails, asi que no hace falta otra consulta — y no
+   * serviria: getPeopleDetails exige que el registro este GUARDADO en
+   * la lista del usuario, y los del Historial no lo estan.
+   */
+  openPerson(record: any): void {
+    if (!record?.id) return;
+    this.router.navigate(['/people-details', record.id], { state: { record } });
+  }
 }

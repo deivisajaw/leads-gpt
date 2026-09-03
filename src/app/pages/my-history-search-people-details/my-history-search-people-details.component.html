@@ -220,14 +220,11 @@
                       "
                     />
                     <div>
-                      <!-- Ojo: NO es un enlace a propósito.
-                           /people-details y /company-details usan getPeopleDetails /
-                           getCompanyDetails, que exigen que el registro este GUARDADO
-                           en la lista del usuario (filtran por savedBy). Los registros
-                           del Historial son resultados de busqueda sin guardar, asi que
-                           la ficha salia vacia. Para verlos hay que agregarlos a la
-                           lista primero. -->
-                      <span class="row-name">{{ people.name }}</span>
+                      <!-- Se le pasa la fila completa por router state: ya trae todos los
+                           campos, asi que la ficha no necesita volver a consultar. -->
+                      <button type="button" class="row-name-link" (click)="openPerson(people)">
+                        {{ people.name }}
+                      </button>
                       <div
                         *ngIf="people.email"
                         style="font-size: 12px; color: #64748b"

@@ -69,6 +69,22 @@ export class CompanyDetailsComponent implements OnInit {
   async loadCompanyDetails() {
     this.isLoading = true;
     try {
+      // Si venimos del Historial, la fila YA trae todos los campos —
+      // getMySearchHistoryCompanyDetails devuelve el mismo conjunto que
+      // getCompanyDetails, salvo savedOn e isInMyList. Se usa eso y no se
+      // consulta de nuevo: getCompanyDetails exige que el registro este
+      // GUARDADO en la lista (filtra por savedBy) y los del Historial no lo
+      // estan, asi que la ficha salia vacia.
+      const passed = history.state?.record;
+      if (passed?.id) {
+        this.company = passed;
+        this.openingDays = this.parseOpeningHours(passed.openingHours);
+        this.extras = this.parseAdditionalInfo(passed.additionalInfo);
+        this.buildChecks();
+        this.loadTouches();
+        return;
+      }
+
       const result = await this.myListCompanyService.getCompanyDetails(this.companyId);
       if (result?.error) {
         console.error('Error loading company details:', result.message);

@@ -57,6 +57,17 @@ export class PeopleDetailsComponent implements OnInit {
   async loadPeopleDetails() {
     this.isLoading = true;
     try {
+      // Igual que en empresas: la fila del Historial ya trae todos los campos,
+      // asi que no hace falta volver a consultar (y getPeopleDetails exige que
+      // el registro este guardado, que no es el caso).
+      const passed = history.state?.record;
+      if (passed?.id) {
+        this.people = passed;
+        this.buildChecks();
+        this.loadTouches();
+        return;
+      }
+
       const result = await this.myListPeopleService.getPeopleDetails(this.peopleId);
       if (result?.error) {
         console.error('Error loading people details:', result.message);

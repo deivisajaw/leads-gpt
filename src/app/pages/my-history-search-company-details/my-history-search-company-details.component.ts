@@ -513,4 +513,17 @@ export class MyHistorySearchCompanyDetailsComponent implements OnInit, OnDestroy
     this.pollTimedOut = false;
     this.loadSearchDetails();
   }
+
+  /**
+   * Abre la ficha completa pasando la fila que ya tenemos.
+   *
+   * getMySearchHistoryCompanyDetails devuelve el mismo conjunto de campos
+   * que getCompanyDetails, asi que no hace falta otra consulta — y no
+   * serviria: getCompanyDetails exige que el registro este GUARDADO en
+   * la lista del usuario, y los del Historial no lo estan.
+   */
+  openCompany(record: any): void {
+    if (!record?.id) return;
+    this.router.navigate(['/company-details', record.id], { state: { record } });
+  }
 }
