@@ -1,98 +1,222 @@
-<div class="people-details-page">
-  <!-- Header -->
-  <div class="people-details-header">
-    <button class="btn-outline" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i>
-      Back to My List
-    </button>
+<div class="rc-app">
+
+  <div class="rc-loading" *ngIf="isLoading">
+    <img class="gear-loader" src="images/gear_hr_256.png" alt="">
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; height: 400px;">
-    <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #5b4fe5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-  </div>
+  <ng-container *ngIf="!isLoading && people">
 
-  <!-- People Details -->
-  <div *ngIf="!isLoading && people" class="people-details-content">
-    <div class="people-header">
-      <img [src]="people.image || people.avatar" [alt]="people.name" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-right: 20px;" />
-      <div>
-        <h1>{{ people.name || people.fullName }}</h1>
-        <p class="people-title">{{ people.title }}</p>
-        <p class="people-location">{{ people.location }}</p>
+    <!-- ═══ Banda superior, a todo lo ancho ═══ -->
+    <header class="rc-top">
+      <nav class="rc-crumb">
+        <a (click)="goBack()">{{ "RECORD.PEOPLE" | translate }}</a>
+        <svg class="lucide sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        <b>{{ displayName }}</b>
+      </nav>
+
+      <div class="rc-head">
+        <img class="rc-av img" *ngIf="avatarUrl" [src]="avatarUrl" [alt]="displayName" (error)="imgFailed = true">
+        <div class="rc-av" *ngIf="!avatarUrl">{{ initials }}</div>
+
+        <div class="rc-htxt">
+          <h1 class="rc-name">{{ displayName }}</h1>
+          <p class="rc-meta" *ngIf="jobTitle || place">
+            <span *ngIf="jobTitle">{{ jobTitle }}</span>
+            <span class="rc-s" *ngIf="jobTitle && place">·</span>
+            <span *ngIf="place">{{ place }}</span>
+          </p>
+        </div>
+
+        <div class="rc-acts">
+          <a class="rc-btn call" *ngIf="people.phone" [href]="'tel:' + people.phone">
+            <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            {{ "RECORD.CALL_NOW" | translate }}
+          </a>
+
+          <button class="rc-btn" (click)="openListPicker()">
+            <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 12H3M16 6H3M16 18H3M18 9v6M21 12h-6"/></svg>
+            {{ "RECORD.ADD_TO_LIST" | translate }}
+          </button>
+
+          <button class="rc-btn" (click)="createCampaign()">
+            <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            {{ "RECORD.CREATE_CAMPAIGN" | translate }}
+          </button>
+
+          <a class="rc-btn" *ngIf="waHref" [href]="waHref" target="_blank" rel="noopener">
+            <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══ Tres columnas que llenan la pantalla ═══ -->
+    <div class="rc-grid">
+
+      <!-- ── Izquierda: cómo alcanzarla ── -->
+      <div class="rc-colstack">
+        <section class="rc-card">
+          <h2 class="rc-st">{{ "RECORD.CONTACT" | translate }}</h2>
+          <dl class="rc-kv">
+            <dt>{{ "RECORD.PHONE" | translate }}</dt>
+            <dd><a *ngIf="people.phone" [href]="'tel:' + people.phone">{{ people.phone }}</a>
+                <span class="rc-none" *ngIf="!people.phone">{{ "RECORD.NO_DATA" | translate }}</span></dd>
+
+            <dt>{{ "RECORD.EMAIL" | translate }}</dt>
+            <dd><a *ngIf="people.email" [href]="'mailto:' + people.email">{{ people.email }}</a>
+                <span class="rc-none" *ngIf="!people.email">{{ "RECORD.NO_DATA" | translate }}</span></dd>
+
+            <dt>LinkedIn</dt>
+            <dd><a *ngIf="linkedIn" [href]="linkedIn" target="_blank" rel="noopener">{{ linkedInLabel }}</a>
+                <span class="rc-none" *ngIf="!linkedIn">{{ "RECORD.NO_DATA" | translate }}</span></dd>
+
+            <dt>{{ "RECORD.LOCATION" | translate }}</dt>
+            <dd>{{ place || ("RECORD.NO_DATA" | translate) }}</dd>
+          </dl>
+        </section>
+
+        <section class="rc-card">
+          <h2 class="rc-st">{{ "RECORD.PROFILE" | translate }}</h2>
+          <dl class="rc-kv">
+            <dt>{{ "RECORD.JOB" | translate }}</dt>
+            <dd>{{ jobTitle || ("RECORD.NO_DATA" | translate) }}</dd>
+
+            <dt>{{ "RECORD.EDUCATION" | translate }}</dt>
+            <dd>
+              <span class="rc-none" *ngIf="!education.length">{{ "RECORD.NO_DATA" | translate }}</span>
+              <span class="rc-line" *ngFor="let e of education">{{ e }}</span>
+            </dd>
+
+            <dt>{{ "RECORD.EXPERIENCE" | translate }}</dt>
+            <dd>
+              <span class="rc-none" *ngIf="!experience.length">{{ "RECORD.NO_DATA" | translate }}</span>
+              <span class="rc-line" *ngFor="let x of experience">{{ x }}</span>
+            </dd>
+          </dl>
+        </section>
+      </div>
+
+      <!-- ── Centro: lo que se lee ── -->
+      <div class="rc-colstack rc-mid">
+        <section class="rc-card">
+          <h2 class="rc-st">{{ "RECORD.ABOUT" | translate }}</h2>
+          <p class="rc-about" [class.clamp]="!expanded" *ngIf="about">{{ about }}</p>
+          <button class="rc-more" *ngIf="about && about.length > 480" (click)="expanded = !expanded">
+            {{ (expanded ? "RECORD.LESS" : "RECORD.MORE") | translate }}
+          </button>
+          <p class="rc-none" *ngIf="!about">{{ "RECORD.NO_ABOUT" | translate }}</p>
+        </section>
+
+        <section class="rc-card" *ngIf="people.snippet && people.snippet !== about">
+          <h2 class="rc-st">{{ "RECORD.SNIPPET" | translate }}</h2>
+          <p class="rc-snip">{{ people.snippet }}</p>
+        </section>
+      </div>
+
+      <!-- ── Derecha: qué hacer con esta persona ── -->
+      <div class="rc-colstack rc-rail">
+        <section class="rc-card accent">
+          <h2 class="rc-st">{{ "RECORD.ACTIVITY" | translate }}</h2>
+
+          <ng-container *ngIf="touches.length">
+            <span class="rc-pill"><span class="d"></span>{{ "RECORD.TOUCHED" | translate }}</span>
+            <ol class="rc-tl" style="margin-top:14px">
+              <li class="rc-ev" *ngFor="let t of recentTouches; trackBy: trackTouch">
+                <span class="rc-ei">
+                  <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <div>
+                  <div class="rc-et">
+                    {{ t.title | translate }}
+                    <span class="rc-oc" [class.ok]="t.positive">{{ t.outcomeKey | translate }}</span>
+                    <span class="rc-ew">{{ t.date | date:'d MMM' }}</span>
+                  </div>
+                  <p class="rc-eb" *ngIf="t.body">{{ t.body }}</p>
+                </div>
+              </li>
+            </ol>
+          </ng-container>
+
+          <!-- Nunca contactada: el hueco se vuelve la acción. -->
+          <div class="rc-never" *ngIf="!touches.length && !loadingTouches">
+            <b>{{ "RECORD.NEVER" | translate }}</b>
+            <small>{{ "RECORD.NEVER_SUB" | translate }}</small>
+            <a class="rc-btn call wide" *ngIf="people.phone" [href]="'tel:' + people.phone">
+              {{ "RECORD.CALL_NOW" | translate }}</a>
+            <button class="rc-btn wide" style="margin-top:8px" (click)="createCampaign()">
+              {{ "RECORD.CREATE_CAMPAIGN" | translate }}</button>
+          </div>
+        </section>
+
+        <section class="rc-card">
+          <h2 class="rc-st">{{ "RECORD.KNOWN" | translate }}</h2>
+          <div class="rc-score">{{ completeness }}%<small>{{ "RECORD.KNOWN_SUB" | translate }}</small></div>
+          <div class="rc-bar"><i [style.width.%]="completeness"></i></div>
+          <ul class="rc-checks">
+            <li *ngFor="let c of checks" [class.has]="c.has">
+              <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <ng-container *ngIf="c.has"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></ng-container>
+                <circle *ngIf="!c.has" cx="12" cy="12" r="10"/></svg>
+              {{ c.key | translate }}
+            </li>
+          </ul>
+        </section>
       </div>
     </div>
+  </ng-container>
 
-    <div class="people-info-grid">
-      <!-- Contact Information -->
-      <div class="info-section">
-        <h3>Contact Information</h3>
-        <div class="info-item" *ngIf="people.email">
-          <label>Email:</label>
-          <span>{{ people.email }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.phone">
-          <label>Phone:</label>
-          <span>{{ people.phone }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.link">
-          <label>LinkedIn:</label>
-          <a [href]="people.link" target="_blank">{{ people.link }}</a>
-        </div>
-      </div>
-
-      <!-- Location -->
-      <div class="info-section">
-        <h3>Location</h3>
-        <div class="info-item" *ngIf="people.location">
-          <label>Location:</label>
-          <span>{{ people.location }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.countryCode">
-          <label>Country:</label>
-          <span>{{ people.countryCode }}</span>
-        </div>
-      </div>
-
-      <!-- Professional Information -->
-      <div class="info-section">
-        <h3>Professional Information</h3>
-        <div class="info-item" *ngIf="people.title">
-          <label>Job Title:</label>
-          <span>{{ people.title }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.snippet">
-          <label>Snippet:</label>
-          <span>{{ people.snippet }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.description">
-          <label>Description:</label>
-          <span>{{ people.description }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.about">
-          <label>About:</label>
-          <span>{{ people.about }}</span>
-        </div>
-      </div>
-
-      <!-- Education & Experience -->
-      <div class="info-section">
-        <h3>Education & Experience</h3>
-        <div class="info-item" *ngIf="people.education">
-          <label>Education:</label>
-          <span>{{ people.education }}</span>
-        </div>
-        <div class="info-item" *ngIf="people.experiencies">
-          <label>Experience:</label>
-          <span>{{ people.experiencies }}</span>
-        </div>
-      </div>
-    </div>
+  <div class="rc-empty" *ngIf="!isLoading && !people">
+    <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+    <h2>{{ "RECORD.NOT_FOUND" | translate }}</h2>
+    <p>{{ "RECORD.NOT_FOUND_SUB" | translate }}</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="!isLoading && !people" style="text-align: center; padding: 40px;">
-    <h3>People not found</h3>
-    <p>The people details could not be loaded.</p>
+  <!-- ═══ Elegir a qué lista se agrega ═══ -->
+  <div class="rc-ov" *ngIf="showListPicker" (click)="showListPicker = false">
+    <div class="rc-modal" (click)="$event.stopPropagation()">
+      <div class="rc-mh">
+        <h2>{{ "RECORD.ADD_TO_LIST" | translate }}</h2>
+        <button class="rc-x" (click)="showListPicker = false" [attr.aria-label]="'RECORD.CLOSE' | translate">
+          <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="rc-mb">
+        <div class="rc-loading" style="min-height:120px" *ngIf="loadingLists">
+          <img class="gear-loader" src="images/gear_hr_256.png" alt="">
+        </div>
+        <p class="rc-none" style="padding:20px 12px" *ngIf="!loadingLists && !lists.length">
+          {{ "RECORD.NO_LISTS" | translate }}</p>
+        <button class="rc-li" *ngFor="let l of lists" (click)="addToList(l.id)" [disabled]="savingToList">
+          <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          {{ l.name }}
+        </button>
+      </div>
+
+      <div class="rc-mf">
+        <button class="rc-btn wide" (click)="goToLists()">
+          <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>
+          {{ "RECORD.NEW_LIST" | translate }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
