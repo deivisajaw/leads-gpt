@@ -63,9 +63,13 @@ export interface CompanySearchHistoryResponse {
 }
 
 export interface CompanySearchResponse {
+  // Estos son los estados que el backend devuelve HOY (AiSearchServiceImpl).
+  // Antes habia "SEARCH_NOT_FOUND" y "SEARCH_IN_PROGRESS": venian de cuando la
+  // busqueda la hacia n8n de forma asincrona. Ese flujo ya no existe — la
+  // busqueda es sincrona y devuelve los resultados en la misma respuesta. Que
+  // siguieran declarados aqui hizo que el front tuviera ramas para manejar algo
+  // que nunca llega.
   status:
-    | "SEARCH_NOT_FOUND"
-    | "SEARCH_IN_PROGRESS"
     | "SUCCESS"
     | "INSUFFICIENT_CREDITS"
     | "UNAUTHORIZED"

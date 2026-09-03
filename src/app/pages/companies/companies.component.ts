@@ -619,33 +619,11 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.onboardingService.completeOnboardingStepByKey("FIND_LEADS");
         break;
 
-      // El scrape corre en el servidor y tarda; mientras tanto responde
-      // SEARCH_IN_PROGRESS. Antes esto caía en la MISMA rama que "no
-      // encontrado": se borraban los resultados y se tiraba el searchId, así
-      // que la pantalla quedaba vacía para siempre aunque la búsqueda
-      // terminara con 1.075 empresas. Sólo se veían entrando por Historial.
-      case "SEARCH_IN_PROGRESS":
-        this.searchStatus = "running";
-        this.isLoading = true;
-        this.currentSearchId = response.data?.searchId ?? this.currentSearchId;
-        // Si el backend no devolvió el id, se toma el de la búsqueda más
-        // reciente del historial: es la que acabamos de lanzar. Cuesta una
-        // llamada de ~50 ms y sin ella no hay forma de leer el resultado.
-        if (this.currentSearchId) {
-          this.startSearchPolling();
-        } else {
-          this.resolveSearchIdThenPoll();
-        }
-        break;
 
-      case "SEARCH_NOT_FOUND":
-        this.filteredResults = [];
-        this.displayResults = [];
-        this.totalResultsInServer = 0;
-        this.currentSearchId = null;
-        this.currentOffset = 0;
-        this.searchStatus = "";
-        break;
+      // El backend ya no devuelve SEARCH_NOT_FOUND ni SEARCH_IN_PROGRESS: eso
+      // era del flujo asincrono con n8n, que ya no existe. Hoy la busqueda es
+      // sincrona y "no hubo resultados" llega como SUCCESS con la lista vacia
+      // (statusSelect 3), asi que se maneja en updateStateFromData.
 
       case "INSUFFICIENT_CREDITS":
         this.searchError =
@@ -1906,20 +1884,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /** Recupera el id de la búsqueda recién lanzada y arranca el sondeo. */
-  private async resolveSearchIdThenPoll(): Promise<void> {
-    try {
-      const hist = await this.companiesService.getMySearchHistoryCompanies(0, 1, 'createdOn_desc');
-      const newest = hist?.history?.[0];
-      if (newest?.id) {
-        this.currentSearchId = newest.id;
-        this.startSearchPolling();
-        return;
-      }
-    } catch { /* cae al aviso de abajo */ }
-    this.isLoading = false;
-    this.searchError = this.translate.instant('SEARCH.STILL_RUNNING');
-  }
+
 
   /**
    * Red de seguridad cuando el agente contesta sin pintar resultados.

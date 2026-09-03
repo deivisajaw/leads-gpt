@@ -620,9 +620,13 @@
 }
 
 
-.qsummary .qi svg {
-  width: 16px;
-  height: 16px;
+.qsummary .qi img {
+  /* El marcado usa <img> con el engranaje, no un <svg>. La regla apuntaba a svg,
+     asi que la imagen salia a su tamano natural (256 px) y se desbordaba de la
+     tarjeta. */
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
 }
 
 

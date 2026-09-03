@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MyListPeopleService } from '../../services/my-list-people.service';
+import { PeopleService } from '../../services/people.service';
 import { ContactActivityService, ContactTouch } from '../../services/contact-activity.service';
 import { SavedListService, SavedListSummary } from '../../services/saved-list.service';
 import { NotificationService } from '../../services/notification.service';
@@ -41,6 +42,7 @@ export class PeopleDetailsComponent implements OnInit {
     private router: Router,
     private location: Location,
     private myListPeopleService: MyListPeopleService,
+    private peopleService: PeopleService,
     private activity: ContactActivityService,
     private savedLists: SavedListService,
     private notify: NotificationService,
@@ -57,8 +59,15 @@ export class PeopleDetailsComponent implements OnInit {
   async loadPeopleDetails() {
     this.isLoading = true;
     try {
-      const result = await this.myListPeopleService.getPeopleDetails(this.peopleId);
-      if (result.error) {
+      // getPeopleDetails exige que el registro este GUARDADO en la lista del
+      // usuario. Los que se abren desde el Historial son resultados de busqueda
+      // sin guardar, asi que devolvia "no encontrado" y la ficha salia vacia.
+      // getPeopleResultById lee la misma tabla con el mismo id, sin ese filtro.
+      let result = await this.myListPeopleService.getPeopleDetails(this.peopleId);
+      if (result?.error) {
+        result = await this.peopleService.getPeopleResultById(this.peopleId);
+      }
+      if (result?.error) {
         console.error('Error loading people details:', result.message);
       } else {
         this.people = result;

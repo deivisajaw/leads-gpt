@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MyListCompanyService } from '../../services/my-list-company.service';
+import { CompaniesService } from '../../services/companies.service';
 import { SavedListService, SavedListSummary } from '../../services/saved-list.service';
 import { NotificationService } from '../../services/notification.service';
 import { ContactActivityService, ContactTouch } from '../../services/contact-activity.service';
@@ -53,6 +54,7 @@ export class CompanyDetailsComponent implements OnInit {
     private router: Router,
     private location: Location,
     private myListCompanyService: MyListCompanyService,
+    private companiesService: CompaniesService,
     private savedLists: SavedListService,
     private notify: NotificationService,
     private translate: TranslateService,
@@ -69,8 +71,19 @@ export class CompanyDetailsComponent implements OnInit {
   async loadCompanyDetails() {
     this.isLoading = true;
     try {
-      const result = await this.myListCompanyService.getCompanyDetails(this.companyId);
-      if (result.error) {
+      // getCompanyDetails exige que el registro este GUARDADO en la lista del
+      // usuario (filtra por SavedCompanyResult.savedBy). Los registros que se
+      // abren desde el Historial son resultados de busqueda que el usuario no
+      // guardo, asi que devolvia "no encontrado" y la ficha salia vacia.
+      //
+      // getCompanyResultById lee la misma tabla con el mismo id, pero sin pedir
+      // que este guardado. Se intenta primero el que trae savedOn e isInMyList,
+      // y si no aparece se cae al otro.
+      let result = await this.myListCompanyService.getCompanyDetails(this.companyId);
+      if (result?.error) {
+        result = await this.companiesService.getCompanyResultById(this.companyId);
+      }
+      if (result?.error) {
         console.error('Error loading company details:', result.message);
       } else {
         this.company = result;
