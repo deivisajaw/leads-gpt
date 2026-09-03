@@ -1,0 +1,51 @@
+.credits-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2, #6E6E73);
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 999px;
+  padding: 6px 14px 6px 7px;
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+.credits-pill:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 14px -4px rgba(91, 79, 229, .3);
+}
+.credits-pill b {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--ink, #1D1D1F);
+  font-variant-numeric: tabular-nums;
+}
+.credits-pill .coin {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7871fb, #251f95);
+  box-shadow: 0 1px 4px rgba(37, 31, 149, .3);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.credits-pill .coin-gear { width: 13px; height: 13px; object-fit: contain }
+.credits-pill.pulse .coin { animation: coin-pulse .8s ease-out }
+.credits-pill.pulse b { animation: credits-flash .8s ease-out }
+
+@keyframes coin-pulse {
+  0% { transform: scale(1) }
+  40% { transform: scale(1.25) }
+  100% { transform: scale(1) }
+}
+@keyframes credits-flash {
+  0% { color: #3E34F9 }
+  100% { color: var(--ink, #1D1D1F) }
+}
+@media (prefers-reduced-motion: reduce) {
+  .credits-pill.pulse .coin, .credits-pill.pulse b { animation: none }
+}

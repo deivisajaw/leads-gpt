@@ -28,13 +28,26 @@ export class MeetingsComponent implements OnInit {
 
   activeFilter: 'all' | 'today' | 'tomorrow' | 'upcoming' = 'all';
   searchQuery = '';
+  /** Ya hay datos en pantalla y estamos trayendo la versión fresca por detrás. */
+  isRefreshing = false;
 
   async ngOnInit() {
     await this.load();
   }
 
   async load() {
-    this.isLoading = true;
+    // Si ya cargamos en esta sesión, se pinta al instante lo que hay y el
+    // refresco ocurre por detrás. Antes la pantalla quedaba en blanco hasta que
+    // los 6 webhooks de OAuth terminaban — hasta 12 segundos.
+    const previous = this.svc.cached;
+    if (previous.length) {
+      this.meetings = previous;
+      this.upcomingMeetings = this.svc.getUpcomingMeetings(this.meetings);
+      this.applyFilter();
+    }
+
+    this.isLoading = previous.length === 0;
+    this.isRefreshing = previous.length > 0;
     this.error = null;
     try {
       this.meetings         = await this.svc.getAllMeetings();
@@ -44,6 +57,7 @@ export class MeetingsComponent implements OnInit {
       this.error = e.message || this.translate.instant('MEETINGS.ERROR.LOAD');
     } finally {
       this.isLoading = false;
+      this.isRefreshing = false;
     }
   }
 

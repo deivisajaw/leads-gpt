@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <h1 class="ig-title">¡Cuenta conectada!</h1>
+    <h1 class="ig-title">{{ "IG_CONNECTED.OK_TITLE" | translate }}</h1>
 
     <div class="ig-account" *ngIf="username || name">
       <div class="ig-account-avatar">
@@ -31,31 +31,30 @@
     </div>
 
     <p class="ig-desc">
-      Tu cuenta de Instagram ha sido vinculada exitosamente a tu agente de IA en AJAW.
-      A partir de ahora, tu agente podrá responder mensajes automáticamente.
+      {{ "IG_CONNECTED.OK_BODY" | translate }}
     </p>
 
     <div class="ig-steps">
       <div class="ig-step">
         <span class="ig-step-icon"><i class="fas fa-robot"></i></span>
-        <span>Tu agente está listo para responder mensajes</span>
+        <span>{{ "IG_CONNECTED.OK_1" | translate }}</span>
       </div>
       <div class="ig-step">
         <span class="ig-step-icon"><i class="fas fa-bolt"></i></span>
-        <span>Las respuestas automáticas ya están activas</span>
+        <span>{{ "IG_CONNECTED.OK_2" | translate }}</span>
       </div>
       <div class="ig-step">
         <span class="ig-step-icon"><i class="fas fa-shield-alt"></i></span>
-        <span>Conexión segura y cifrada</span>
+        <span>{{ "IG_CONNECTED.OK_3" | translate }}</span>
       </div>
     </div>
 
     <a routerLink="/agents" class="ig-btn">
       <i class="fas fa-arrow-left"></i>
-      Ir a mis agentes
+      {{ "IG_CONNECTED.GO_AGENTS" | translate }}
     </a>
 
-    <p class="ig-close-hint">Puedes cerrar esta ventana de forma segura.</p>
+    <p class="ig-close-hint">{{ "IG_CONNECTED.CLOSE_SAFE" | translate }}</p>
   </div>
 
   <!-- ERROR STATE -->
@@ -71,16 +70,15 @@
       </div>
     </div>
 
-    <h1 class="ig-title">Algo salió mal</h1>
+    <h1 class="ig-title">{{ "IG_CONNECTED.ERR_TITLE" | translate }}</h1>
 
     <p class="ig-desc">
-      No pudimos completar la conexión con Instagram. Por favor regresa a tus
-      agentes e intenta conectar nuevamente.
+      {{ "IG_CONNECTED.ERR_BODY" | translate }}
     </p>
 
     <a routerLink="/agents" class="ig-btn ig-btn-secondary">
       <i class="fas fa-arrow-left"></i>
-      Volver a mis agentes
+      {{ "IG_CONNECTED.BACK_AGENTS" | translate }}
     </a>
   </div>
 

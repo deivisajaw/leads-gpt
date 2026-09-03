@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CampaignService, CampaignCreationData, Lead, Campaign, Agent, TimezoneOption } from '../../services/campaign.service';
 import { NotificationService } from '../../services/notification.service';
 import { OnboardingService } from "../../services/onboarding.service";
@@ -12,7 +13,7 @@ import { ApiConfigService } from '../../services/api-config.service';
   standalone: true,
   templateUrl: './campaigns.component.html',
   styleUrls: ['./campaigns.component.css'],
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule]
 })
 export class CampaignsComponent implements OnInit {
 
@@ -96,6 +97,8 @@ export class CampaignsComponent implements OnInit {
   showValidationErrors: boolean = false;
 
   constructor(
+    private route: ActivatedRoute,
+    private translate: TranslateService,
     private campaignService: CampaignService,
     private notificationService: NotificationService,
     private onboardingService: OnboardingService,
@@ -109,6 +112,32 @@ export class CampaignsComponent implements OnInit {
     this.loadAgentsData();
     this.initializeTimezones();
     this.generateTimeOptions();
+    this.openFromRecordCard();
+  }
+
+  /**
+   * "Crear campaña" desde la ficha de una persona o empresa.
+   *
+   * La ficha no crea la campaña sola —faltan agente, horario y tipo—; nos manda
+   * aquí con el lead en la URL y abrimos el asistente con ese lead ya elegido,
+   * para que sólo quede completar lo que sí hay que decidir.
+   */
+  private openFromRecordCard(): void {
+    const q = this.route.snapshot.queryParamMap;
+    const id = q.get('newLead');
+    const type = q.get('leadType');
+    if (!id || (type !== 'people' && type !== 'company')) return;
+
+    this.showCampaignModal(null).then(() => {
+      this.selectedLeads = [{
+        id,
+        type,
+        name: q.get('leadName') || '',
+        phone: q.get('leadPhone') || '',
+        email: q.get('leadEmail') || '',
+      }];
+      this.activeTab = 'leads';
+    });
   }
 
   async loadCampaigns() {
@@ -275,13 +304,13 @@ export class CampaignsComponent implements OnInit {
   showConfirmationModal(): void {
     if (!this.isStep1Valid()) {
       this.showValidationErrors = true;
-      this.notificationService.showError('Por favor, complete los campos requeridos del Paso 1.');
+      this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_STEP1'));
       this.currentStep = 1;
       return;
     }
     if (!this.isStep2Valid()) {
       this.showValidationErrors = true;
-      this.notificationService.showError('Por favor, complete los campos requeridos de las pestañas Leads y Programar.');
+      this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_STEP2'));
 
       if (this.selectedLeads.length === 0) {
         this.activeTab = 'leads';
@@ -337,7 +366,7 @@ export class CampaignsComponent implements OnInit {
   goToStep(stepNumber: number): void {
     if (stepNumber === 2 && !this.isStep1Valid()) {
       this.showValidationErrors = true;
-      this.notificationService.showError('Por favor, complete los campos requeridos del Paso 1.');
+      this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_STEP1'));
       return;
     }
     this.currentStep = stepNumber;
@@ -356,10 +385,10 @@ export class CampaignsComponent implements OnInit {
     let title = '';
     let data: Lead[] | { people: Lead[], companies: Lead[] } = [];
     if (value === 'people') {
-      title = 'Seleccionar Personas';
+      title = this.translate.instant('CAMPAIGNS.SEL_PEOPLE_TITLE');
       data = this.campaignData.people;
     } else if (value === 'companies') {
-      title = 'Seleccionar Empresas';
+      title = this.translate.instant('CAMPAIGNS.SEL_COMPANIES_TITLE');
       data = this.campaignData.companies;
     } else if (value === 'both') {
       title = 'Seleccionar Personas y Empresas';
@@ -438,7 +467,7 @@ export class CampaignsComponent implements OnInit {
       const header = lines[0].split(',').map((h: string) => h.trim());
 
       if (header.join(',') !== 'name,phone,email') {
-        this.notificationService.showError('El archivo CSV debe tener las columnas: name,phone,email');
+        this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_CSV'));
         return;
       }
 
@@ -492,7 +521,7 @@ export class CampaignsComponent implements OnInit {
 
     if (!this.isStep1Valid() || !this.isStep2Valid()) {
       this.showValidationErrors = true;
-      this.notificationService.showError('Por favor, complete todos los campos requeridos y asegúrese de que la campaña sea válida.');
+      this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_ALL'));
 
       if (!this.isStep1Valid()) {
         this.currentStep = 1;
@@ -543,10 +572,10 @@ export class CampaignsComponent implements OnInit {
       let response: any;
       if (this.editingCampaign) {
         response = await this.campaignService.createCampaign({ ...campaignPayload, _id: this.editingCampaign.id });
-        this.notificationService.showSuccess('¡Campaña actualizada exitosamente!');
+        this.notificationService.showSuccess(this.translate.instant('CAMPAIGNS.OK_UPDATED'));
       } else {
         response = await this.campaignService.createCampaign(campaignPayload);
-        this.notificationService.showSuccess('¡Campaña publicada exitosamente!');
+        this.notificationService.showSuccess(this.translate.instant('CAMPAIGNS.OK_PUBLISHED'));
         this.onboardingService.completeOnboardingStepByKey('CREATE_CAMPAIGN');
       }
 
@@ -660,10 +689,10 @@ export class CampaignsComponent implements OnInit {
     if (confirm('¿Estás seguro de que quieres eliminar esta campaña?')) {
       try {
         await this.campaignService.deleteCampaign(campaignId);
-        this.notificationService.showSuccess('Campaign eliminada con exito');
+        this.notificationService.showSuccess(this.translate.instant('CAMPAIGNS.OK_DELETED'));
         this.loadCampaigns();
       } catch (error) {
-        this.notificationService.showError('Error el eliminar la campaign, si la campaign tiene registros asociados como por ejemplo llamadas no podras eliminarla, elimina las llamadas primero y otros registros asociados');
+        this.notificationService.showError(this.translate.instant('CAMPAIGNS.ERR_DELETE'));
         console.error('Error deleting campaign:', error);
       }
       finally {

@@ -2,8 +2,8 @@
 
   <div class="header-section">
     <div class="header-left">
-      <h1>Campa&ntilde;as</h1>
-      <p>Llamadas y mensajes que tus agentes IA ejecutan solos</p>
+      <h1>{{ "CAMPAIGNS.TITLE" | translate }}</h1>
+      <p>{{ "CAMPAIGNS.SUB" | translate }}</p>
     </div>
     <div class="header-right"></div>
   </div>
@@ -16,35 +16,35 @@
           <div class="metric-ico ico-indigo"><i class="fas fa-bullhorn"></i></div>
           <div class="metric-data">
             <span class="metric-value">{{ totalCampaigns }}</span>
-            <span class="metric-label">Campa&ntilde;as</span>
+            <span class="metric-label">{{ "CAMPAIGNS.TITLE" | translate }}</span>
           </div>
         </div>
         <div class="metric-tile">
           <div class="metric-ico ico-green"><i class="fas fa-bolt"></i></div>
           <div class="metric-data">
             <span class="metric-value">{{ activeCampaigns }}</span>
-            <span class="metric-label">En ejecuci&oacute;n</span>
+            <span class="metric-label">{{ "CAMPAIGNS.RUNNING" | translate }}</span>
           </div>
         </div>
         <div class="metric-tile">
           <div class="metric-ico ico-indigo"><i class="fas fa-users"></i></div>
           <div class="metric-data">
             <span class="metric-value">{{ totalRegisteredLeads | number }}</span>
-            <span class="metric-label">Leads registrados</span>
+            <span class="metric-label">{{ "CAMPAIGNS.LEADS_REG" | translate }}</span>
           </div>
         </div>
         <div class="metric-tile">
           <div class="metric-ico ico-amber"><i class="fas fa-phone-volume"></i></div>
           <div class="metric-data">
             <span class="metric-value">{{ totalConnectedLeads | number }}</span>
-            <span class="metric-label">Leads conectados</span>
+            <span class="metric-label">{{ "CAMPAIGNS.LEADS_CONN" | translate }}</span>
           </div>
         </div>
         <div class="metric-tile">
           <div class="metric-ico ico-pink"><i class="fas fa-calendar-check"></i></div>
           <div class="metric-data">
             <span class="metric-value">{{ totalMeetings | number }}</span>
-            <span class="metric-label">Meetings agendados</span>
+            <span class="metric-label">{{ "CAMPAIGNS.MEETINGS_SET" | translate }}</span>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
                 type="text"
                 id="campaign-search-input"
                 name="campaignSearchText"
-                placeholder="Buscar campa&ntilde;as"
+                [attr.placeholder]="'CAMPAIGNS.PH_SEARCH' | translate"
                 [(ngModel)]="filterSearchText"
               />
             </div>
@@ -68,9 +68,9 @@
               class="campaign-filter-select"
               [(ngModel)]="filterCampaignType"
             >
-              <option value="">Todos los tipos</option>
-              <option value="voice">Voz</option>
-              <option value="text">Texto</option>
+              <option value="">{{ "CAMPAIGNS.ALL_TYPES" | translate }}</option>
+              <option value="voice">{{ "CAMPAIGNS.F_VOICE" | translate }}</option>
+              <option value="text">{{ "CAMPAIGNS.F_TEXT" | translate }}</option>
               <option value="sms">SMS</option>
             </select>
             <select
@@ -79,11 +79,11 @@
               class="campaign-filter-select"
               [(ngModel)]="filterCampaignStatus"
             >
-              <option value="">Todos los estados</option>
-              <option value="planned">Planeada</option>
-              <option value="in_progress">En Ejecuci&oacute;n</option>
-              <option value="finished">Finalizada</option>
-              <option value="cancelled">Cancelada</option>
+              <option value="">{{ "CAMPAIGNS.ALL_STATUSES" | translate }}</option>
+              <option value="planned">{{ "CAMPAIGNS.ST_PLANNED" | translate }}</option>
+              <option value="in_progress">{{ "CAMPAIGNS.ST_RUNNING" | translate }}</option>
+              <option value="finished">{{ "CAMPAIGNS.ST_DONE" | translate }}</option>
+              <option value="cancelled">{{ "CAMPAIGNS.ST_CANCELLED" | translate }}</option>
             </select>
           </div>
           <button
@@ -91,7 +91,7 @@
             class="btn-primary"
             (click)="showCampaignModal()"
           >
-            <i class="fas fa-plus"></i> Agregar Nueva
+            <i class="fas fa-plus"></i> {{ "CAMPAIGNS.ADD_NEW" | translate }}
           </button>
         </div>
 
@@ -109,16 +109,16 @@
           <table>
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Leads Registrados</th>
-                <th>Leads Conectados</th>
-                <th>Meetings Programados</th>
-                <th>Fecha de Inicio</th>
-                <th>Fecha de Fin</th>
-                <th>Procesado</th>
-                <th>Status</th>
-                <th>Acciones</th>
+                <th>{{ "CAMPAIGNS.COL_NAME" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_TYPE" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_LEADS_REG" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_LEADS_CONN" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_MEETINGS" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_START" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_END" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_PROCESSED" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_STATUS" | translate }}</th>
+                <th>{{ "CAMPAIGNS.COL_ACTIONS" | translate }}</th>
               </tr>
             </thead>
             <tbody id="campaigns-tbody">
@@ -148,7 +148,7 @@
                         'status-green': campaign.processed,
                         'status-red': !campaign.processed
                       }"
-                      [title]="campaign.processed ? 'Procesado' : 'Pendiente'"
+                      [title]="(campaign.processed ? 'CAMPAIGNS.COL_PROCESSED' : 'CAMPAIGNS.PENDING') | translate"
                     ></span>
                   </div>
                 </td>
@@ -159,13 +159,13 @@
                     (change)="changeStatus(campaign, $event)"
                     [disabled]="isUpdating"
                   >
-                    <option value="planned">Planeada</option>
-                    <option value="in_progress">En Ejecuci&oacute;n</option>
-                    <option value="finished">Finalizada</option>
-                    <option value="cancelled">Cancelada</option>
+                    <option value="planned">{{ "CAMPAIGNS.ST_PLANNED" | translate }}</option>
+                    <option value="in_progress">{{ "CAMPAIGNS.ST_RUNNING" | translate }}</option>
+                    <option value="finished">{{ "CAMPAIGNS.ST_DONE" | translate }}</option>
+                    <option value="cancelled">{{ "CAMPAIGNS.ST_CANCELLED" | translate }}</option>
                   </select>
                   <span *ngIf="isUpdating && updatingCampaignId === campaign.id"
-                    >Cargando...</span
+                    >{{ "CAMPAIGNS.LOADING" | translate }}</span
                   >
                 </td>
                 <td>
@@ -173,21 +173,21 @@
                     <button
                       class="btn-action edit"
                       (click)="editCampaign(campaign)"
-                      title="Editar"
+                      [attr.title]="'CAMPAIGNS.TT_EDIT' | translate"
                     >
                       <i class="fas fa-edit"></i>
                     </button>
                     <button
                       class="btn-action delete"
                       (click)="deleteCampaign(campaign.id)"
-                      title="Eliminar"
+                      [attr.title]="'CAMPAIGNS.TT_DELETE' | translate"
                     >
                       <i class="fas fa-trash"></i>
                     </button>
                     <button
                       class="btn-action view"
                       [routerLink]="['/campaigns', campaign.id]"
-                      title="Ver Detalles"
+                      [attr.title]="'CAMPAIGNS.TT_VIEW' | translate"
                     >
                       <i class="fas fa-eye"></i>
                     </button>
@@ -202,7 +202,7 @@
             id="empty-state"
             *ngIf="!campaigns || campaigns.length === 0"
           >
-            <p (click)="showCampaignModal()">+ Agregar nueva</p>
+            <p (click)="showCampaignModal()">{{ "CAMPAIGNS.ADD_NEW_PLUS" | translate }}</p>
           </div>
         </div>
       </div>
@@ -240,7 +240,7 @@
                 data-step="1"
               >
                 <div class="step-number">1</div>
-                <span>Selecciona tu tipo de campa&ntilde;a</span>
+                <span>{{ "CAMPAIGNS.PICK_TYPE" | translate }}</span>
               </div>
               <div
                 class="step"
@@ -248,7 +248,7 @@
                 data-step="2"
               >
                 <div class="step-number">2</div>
-                <span>Detalles de la campa&ntilde;a</span>
+                <span>{{ "CAMPAIGNS.DETAILS" | translate }}</span>
               </div>
             </div>
 
@@ -259,11 +259,11 @@
                 class="step-content"
                 [class.active]="currentStep === 1"
               >
-                <h3>Nombre de la campa&ntilde;a</h3>
+                <h3>{{ "CAMPAIGNS.NAME" | translate }}</h3>
                 <div class="campaign-name-section">
                   <div class="form-group">
                     <label for="campaign-name"
-                      >Nombre de la Campa&ntilde;a *</label
+                      >{{ "CAMPAIGNS.NAME_REQ" | translate }}</label
                     >
                     <input
                       type="text"
@@ -272,37 +272,36 @@
                       [(ngModel)]="campaignName"
                     />
                     <div *ngIf="showValidationErrors && !campaignName && currentStep === 1" class="validation-error">
-                      El nombre de la campaña es requerido.
+                      {{ "CAMPAIGNS.ERR_NAME" | translate }}
                     </div>
                   </div>
                 </div>
 
                 <!-- NEW: Agent Select -->
                 <div class="form-group">
-                  <label for="agent-select">Agente *</label>
+                  <label for="agent-select">{{ "CAMPAIGNS.AGENT_REQ" | translate }}</label>
                   <select
                     id="agent-select"
                     required
                     [(ngModel)]="selectedAgentId"
                     [compareWith]="compareWithId"
                   >
-                    <option [ngValue]="null" disabled>Selecciona un agente</option>
+                    <option [ngValue]="null" disabled>{{ "CAMPAIGNS.PICK_AGENT" | translate }}</option>
                     <option *ngFor="let agent of availableAgents" [ngValue]="agent.id">
                       {{ agent.name }}
                     </option>
                   </select>
                   <div *ngIf="showValidationErrors && selectedAgentId === null && currentStep === 1" class="validation-error">
-                    Debe seleccionar un agente.
+                    {{ "CAMPAIGNS.ERR_AGENT" | translate }}
                   </div>
                 </div>
 
-                <h3>Selecciona tu tipo de campa&ntilde;a IA *</h3>
+                <h3>{{ "CAMPAIGNS.PICK_TYPE_REQ" | translate }}</h3>
                 <p>
-                  Elige el mejor tipo de campa&ntilde;a para optimizar tu
-                  alcance y conectar con creadores de manera efectiva.
+                  {{ "CAMPAIGNS.PICK_TYPE_HELP" | translate }}
                 </p>
                 <div *ngIf="showValidationErrors && !selectedCampaignType && currentStep === 1" class="validation-error">
-                  Debe seleccionar un tipo de campaña.
+                  {{ "CAMPAIGNS.ERR_TYPE" | translate }}
                 </div>
 
                 <div class="campaign-types">
@@ -314,10 +313,9 @@
                     data-type="email"
                   >
                     <div class="card-icon"><i class="fas fa-envelope"></i></div>
-                    <h4>Emails IA</h4>
+                    <h4>{{ "CAMPAIGNS.T_EMAIL" | translate }}</h4>
                     <p>
-                      Crea y env&iacute;a emails personalizados con inteligencia
-                      artificial
+                      {{ "CAMPAIGNS.T_EMAIL_D" | translate }}
                     </p>
                     <input
                       type="radio"
@@ -333,9 +331,9 @@
                     data-type="voice"
                   >
                     <div class="card-icon"><i class="fas fa-phone"></i></div>
-                    <h4>Llamadas de Voz IA</h4>
+                    <h4>{{ "CAMPAIGNS.T_VOICE" | translate }}</h4>
                     <p>
-                      Realiza llamadas automatizadas con voz generada por IA
+                      {{ "CAMPAIGNS.T_VOICE_D" | translate }}
                     </p>
                     <input
                       type="radio"
@@ -351,8 +349,8 @@
                     data-type="sms"
                   >
                     <div class="card-icon"><i class="fas fa-sms"></i></div>
-                    <h4>SMS IA</h4>
-                    <p>Env&iacute;a mensajes SMS personalizados usando IA</p>
+                    <h4>{{ "CAMPAIGNS.T_SMS" | translate }}</h4>
+                    <p>{{ "CAMPAIGNS.T_SMS_D" | translate }}</p>
                     <input
                       type="radio"
                       name="campaign-type"
@@ -385,7 +383,7 @@
                       (click)="switchTab('schedule')"
                       data-tab="schedule"
                     >
-                      Programar
+                      {{ "CAMPAIGNS.TAB_SCHEDULE" | translate }}
                     </button>
                   </div>
                   <div class="tab-content-wrapper">
@@ -395,7 +393,7 @@
                       class="tab-content"
                       [class.active]="activeTab === 'leads'"
                     >
-                      <h3>Segmentaci&oacute;n</h3>
+                      <h3>{{ "CAMPAIGNS.TAB_TARGETING" | translate }}</h3>
                       <div class="content-with-sidebar">
                         <div class="main-content">
                           <div class="targeting-section">
@@ -407,7 +405,7 @@
                                     name="targeting"
                                     value="people"
                                     (change)="handleTargetingChange('people')"
-                                  /><span>Personas</span>
+                                  /><span>{{ "CAMPAIGNS.SEL_PEOPLE" | translate }}</span>
                                 </div>
                                 <i
                                   class="fas fa-upload select-leads-icon"
@@ -429,7 +427,7 @@
                                     (change)="
                                       handleTargetingChange('companies')
                                     "
-                                  /><span>Empresas</span>
+                                  /><span>{{ "CAMPAIGNS.SEL_COMPANIES" | translate }}</span>
                                 </div>
                                 <i
                                   class="fas fa-upload select-leads-icon"
@@ -449,7 +447,7 @@
                                     name="targeting"
                                     value="both"
                                     (change)="handleTargetingChange('both')"
-                                  /><span>Personas + Empresas</span>
+                                  /><span>{{ "CAMPAIGNS.SEL_BOTH" | translate }}</span>
                                 </div>
                                 <i
                                   class="fas fa-upload select-leads-icon"
@@ -472,7 +470,7 @@
                                     name="targeting"
                                     value="csv"
                                     (change)="handleTargetingChange('csv')"
-                                  /><span>Subir CSV</span>
+                                  /><span>{{ "CAMPAIGNS.UPLOAD_CSV" | translate }}</span>
                                 </div>
                                 <i class="fas fa-upload select-leads-icon"
                                   data-type="csv"
@@ -483,19 +481,19 @@
                               <div class="csv-instructions">
                                 <div class="csv-info-box">
                                   <p class="csv-info-title">
-                                    <i class="fas fa-info-circle"></i> El archivo CSV debe tener las siguientes columnas:
+                                    <i class="fas fa-info-circle"></i> {{ "CAMPAIGNS.CSV_COLS" | translate }}
                                   </p>
                                   <div class="csv-columns">
                                     <code>name</code><code>phone</code><code>email</code>
                                   </div>
-                                  <p class="csv-example-label">Ejemplo de fila:</p>
+                                  <p class="csv-example-label">{{ "CAMPAIGNS.CSV_ROW" | translate }}</p>
                                   <pre class="csv-example-row">Juan Perez,+573001234567,juan&#64;correo.com</pre>
                                   <p class="csv-delimiter-note">
                                     <i class="fas fa-exclamation-triangle"></i>
-                                    <strong>Importante:</strong> el delimitador debe ser <strong>coma (,)</strong>, no punto y coma (;).
+                                    <strong>{{ "CAMPAIGNS.CSV_IMPORTANT" | translate }}</strong> {{ "CAMPAIGNS.CSV_DELIM" | translate }} <strong>{{ "CAMPAIGNS.CSV_COMMA" | translate }}</strong>{{ "CAMPAIGNS.CSV_NOT_SEMI" | translate }}
                                   </p>
                                   <a href="templates/template_users_campaign.csv" download class="csv-template-link">
-                                    <i class="fas fa-download"></i> Descargar plantilla CSV
+                                    <i class="fas fa-download"></i> {{ "CAMPAIGNS.CSV_TEMPLATE" | translate }}
                                   </a>
                                 </div>
                               </div>
@@ -506,15 +504,14 @@
                               style="display: none"
                             >
                               <p>
-                                Segmentar cuentas espec&iacute;ficas de
-                                Instagram v&iacute;a subida de CSV
+                                {{ "CAMPAIGNS.IG_TARGET" | translate }}
                               </p>
                               <div class="uploaded-file">
                                 <i class="fas fa-file"></i> AUTO IG DM FEELING
                                 GIRL
                               </div>
                               <button class="btn-primary">
-                                + Subir una Nueva Lista de Leads
+                                {{ "CAMPAIGNS.UPLOAD_LIST" | translate }}
                               </button>
                             </div>
                           </div>
@@ -526,7 +523,7 @@
                                 *ngIf="selectedLeads.length === 0"
                                 class="preview-empty-message"
                               >
-                                No hay leads seleccionados
+                                {{ "CAMPAIGNS.NO_LEADS" | translate }}
                               </div>
                               <table
                                 *ngIf="selectedLeads.length > 0"
@@ -534,11 +531,11 @@
                               >
                                 <thead>
                                   <tr>
-                                    <th>Acci&oacute;n</th>
-                                    <th>Tipo</th>
-                                    <th class="large">Nombre</th>
-                                    <th>Correo</th>
-                                    <th>Tel&eacute;fono</th>
+                                    <th>{{ "CAMPAIGNS.COL_ACTION" | translate }}</th>
+                                    <th>{{ "CAMPAIGNS.COL_TYPE" | translate }}</th>
+                                    <th class="large">{{ "CAMPAIGNS.COL_NAME" | translate }}</th>
+                                    <th>{{ "CAMPAIGNS.COL_EMAIL" | translate }}</th>
+                                    <th>{{ "CAMPAIGNS.COL_PHONE" | translate }}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -572,7 +569,7 @@
                               </table>
                             </div>
                             <div *ngIf="showValidationErrors && selectedLeads.length === 0 && activeTab === 'leads'" class="validation-error">
-                              Debe seleccionar al menos un lead.
+                              {{ "CAMPAIGNS.ERR_LEADS" | translate }}
                             </div>
                             <div class="preview-actions">
                               <button
@@ -581,7 +578,7 @@
                                 class="btn-secondary"
                                 (click)="clearAllLeads()"
                               >
-                                Limpiar Todo
+                                {{ "CAMPAIGNS.CLEAR_ALL" | translate }}
                               </button>
                             </div>
                           </div>
@@ -596,13 +593,12 @@
                     >
                       <div class="schedule-section">
                         <h3>
-                          ¿Cu&aacute;ndo deber&iacute;a ejecutarse tu
-                          campa&ntilde;a?
+                          {{ "CAMPAIGNS.WHEN" | translate }}
                         </h3>
                         <div class="form-group">
-                          <label>Zona Horaria *</label>
+                          <label>{{ "CAMPAIGNS.TZ_REQ" | translate }}</label>
                           <select [(ngModel)]="timezone" name="timezone">
-                            <option [ngValue]="null" disabled>Selecciona una zona horaria</option>
+                            <option [ngValue]="null" disabled>{{ "CAMPAIGNS.PICK_TZ" | translate }}</option>
                             <option
                               *ngFor="let tz of availableTimezones"
                               [value]="tz.value"
@@ -612,11 +608,11 @@
 
                           </select>
                           <div *ngIf="showValidationErrors && !timezone && activeTab === 'schedule'" class="validation-error">
-                            La zona horaria es requerida.
+                            {{ "CAMPAIGNS.ERR_TZ" | translate }}
                           </div>
                         </div>
                         <div class="form-group">
-                          <label for="start-date">Fecha de Inicio *</label>
+                          <label for="start-date">{{ "CAMPAIGNS.F_START_REQ" | translate }}</label>
                           <input
                             type="date"
                             id="start-date"
@@ -624,11 +620,11 @@
                             name="startDate"
                           />
                           <div *ngIf="showValidationErrors && !startDate && activeTab === 'schedule'" class="validation-error">
-                            La fecha de inicio es requerida.
+                            {{ "CAMPAIGNS.ERR_START" | translate }}
                           </div>
                         </div>
                         <div class="form-group">
-                          <label for="end-date">Fecha de Fin *</label>
+                          <label for="end-date">{{ "CAMPAIGNS.F_END_REQ" | translate }}</label>
                           <input
                             type="date"
                             id="end-date"
@@ -636,34 +632,34 @@
                             name="endDate"
                           />
                           <div *ngIf="showValidationErrors && !endDate && activeTab === 'schedule'" class="validation-error">
-                            La fecha de fin es requerida.
+                            {{ "CAMPAIGNS.ERR_END" | translate }}
                           </div>
                         </div>
 
                         <!-- Time Range 1 -->
                         <div class="time-range">
                           <div class="form-group">
-                            <label>Desde (Franja 1) *</label>
+                            <label>{{ "CAMPAIGNS.FROM1" | translate }}</label>
                             <select [(ngModel)]="startTime" name="startTime">
-                              <option [ngValue]="null" disabled>Selecciona una hora</option>
+                              <option [ngValue]="null" disabled>{{ "CAMPAIGNS.PICK_TIME" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
                             </select>
                             <div *ngIf="showValidationErrors && !startTime && activeTab === 'schedule'" class="validation-error">
-                              La hora de inicio es requerida.
+                              {{ "CAMPAIGNS.ERR_FROM" | translate }}
                             </div>
                           </div>
                           <div class="form-group">
-                            <label>Hasta (Franja 1) *</label>
+                            <label>{{ "CAMPAIGNS.TO1" | translate }}</label>
                             <select [(ngModel)]="endTime" name="endTime">
-                              <option [ngValue]="null" disabled>Selecciona una hora</option>
+                              <option [ngValue]="null" disabled>{{ "CAMPAIGNS.PICK_TIME" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
                             </select>
                             <div *ngIf="showValidationErrors && !endTime && activeTab === 'schedule'" class="validation-error">
-                              La hora de fin es requerida.
+                              {{ "CAMPAIGNS.ERR_TO" | translate }}
                             </div>
                           </div>
                         </div>
@@ -671,18 +667,18 @@
                         <!-- Time Range 2 -->
                         <div class="time-range">
                           <div class="form-group">
-                            <label>Desde (Franja 2)</label>
+                            <label>{{ "CAMPAIGNS.FROM2" | translate }}</label>
                             <select [(ngModel)]="startTime2" name="startTime2">
-                              <option [ngValue]="null">No seleccionar</option>
+                              <option [ngValue]="null">{{ "CAMPAIGNS.NONE_OPT" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
                             </select>
                           </div>
                           <div class="form-group">
-                            <label>Hasta (Franja 2)</label>
+                            <label>{{ "CAMPAIGNS.TO2" | translate }}</label>
                             <select [(ngModel)]="endTime2" name="endTime2">
-                              <option [ngValue]="null">No seleccionar</option>
+                              <option [ngValue]="null">{{ "CAMPAIGNS.NONE_OPT" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
@@ -693,18 +689,18 @@
                         <!-- Time Range 3 -->
                         <div class="time-range">
                           <div class="form-group">
-                            <label>Desde (Franja 3)</label>
+                            <label>{{ "CAMPAIGNS.FROM3" | translate }}</label>
                             <select [(ngModel)]="startTime3" name="startTime3">
-                              <option [ngValue]="null">No seleccionar</option>
+                              <option [ngValue]="null">{{ "CAMPAIGNS.NONE_OPT" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
                             </select>
                           </div>
                           <div class="form-group">
-                            <label>Hasta (Franja 3)</label>
+                            <label>{{ "CAMPAIGNS.TO3" | translate }}</label>
                             <select [(ngModel)]="endTime3" name="endTime3">
-                              <option [ngValue]="null">No seleccionar</option>
+                              <option [ngValue]="null">{{ "CAMPAIGNS.NONE_OPT" | translate }}</option>
                               <option *ngFor="let time of timeOptions" [value]="time">
                                 {{ time }}
                               </option>
@@ -714,23 +710,23 @@
 
                         <!-- Interval Field -->
                         <div class="form-group">
-                          <label for="interval">Intervalo (minutos) *</label>
+                          <label for="interval">{{ "CAMPAIGNS.INTERVAL" | translate }}</label>
                           <input
                             type="number"
                             id="interval"
                             [(ngModel)]="interval"
                             name="interval"
-                            placeholder="Ej: 60"
+                            [attr.placeholder]="'CAMPAIGNS.PH_INTERVAL' | translate"
                           />
                           <div *ngIf="showValidationErrors && (!interval || interval <= 0) && activeTab === 'schedule'" class="validation-error">
-                            El intervalo es requerido y debe ser mayor a 0.
+                            {{ "CAMPAIGNS.ERR_INTERVAL" | translate }}
                           </div>
                         </div>
 
                         <div class="days-section">
-                          <h4>D&iacute;as de la semana *</h4>
+                          <h4>{{ "CAMPAIGNS.WEEKDAYS" | translate }}</h4>
                           <div *ngIf="showValidationErrors && !isAnyDaySelected() && activeTab === 'schedule'" class="validation-error">
-                            Debe seleccionar al menos un día de la semana.
+                            {{ "CAMPAIGNS.ERR_WEEKDAYS" | translate }}
                           </div>
                           <div class="days-grid">
                             <label class="checkbox-option"
@@ -738,49 +734,49 @@
                                 type="checkbox"
                                 [(ngModel)]="weekDays.monday"
                                 name="monday"
-                              /><span>Lunes</span></label
+                              /><span>{{ "CAMPAIGNS.MON" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.tuesday"
                                 name="tuesday"
-                              /><span>Martes</span></label
+                              /><span>{{ "CAMPAIGNS.TUE" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.wednesday"
                                 name="wednesday"
-                              /><span>Mi&eacute;rcoles</span></label
+                              /><span>{{ "CAMPAIGNS.WED" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.thursday"
                                 name="thursday"
-                              /><span>Jueves</span></label
+                              /><span>{{ "CAMPAIGNS.THU" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.friday"
                                 name="friday"
-                              /><span>Viernes</span></label
+                              /><span>{{ "CAMPAIGNS.FRI" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.saturday"
                                 name="saturday"
-                              /><span>S&aacute;bado</span></label
+                              /><span>{{ "CAMPAIGNS.SAT" | translate }}</span></label
                             >
                             <label class="checkbox-option"
                               ><input
                                 type="checkbox"
                                 [(ngModel)]="weekDays.sunday"
                                 name="sunday"
-                              /><span>Domingo</span></label
+                              /><span>{{ "CAMPAIGNS.SUN" | translate }}</span></label
                             >
                           </div>
                         </div>
@@ -790,7 +786,7 @@
                 </div>
               </div>
 
-              <!-- Acciones del Modal -->
+              <!-- {{ "CAMPAIGNS.COL_ACTIONS" | translate }} del Modal -->
               <div class="modal-actions">
                 <button
                   class="btn-secondary"
@@ -798,7 +794,7 @@
                   *ngIf="currentStep === 1"
                   (click)="hideCampaignModal()"
                 >
-                  Atr&aacute;s
+                  {{ "CAMPAIGNS.BACK" | translate }}
                 </button>
                 <button
                   class="btn-secondary"
@@ -806,7 +802,7 @@
                   *ngIf="currentStep === 2"
                   (click)="goToStep(1)"
                 >
-                  <i class="fas fa-arrow-left"></i> Volver
+                  <i class="fas fa-arrow-left"></i> {{ "CAMPAIGNS.RETURN" | translate }}
                 </button>
                 <button
                   class="btn-primary"
@@ -815,7 +811,7 @@
                   *ngIf="currentStep === 1"
                   (click)="goToStep(2)"
                 >
-                  Detalles de la Campa&ntilde;a →
+                  {{ "CAMPAIGNS.TO_DETAILS" | translate }}
                 </button>
                 <button
                   class="btn-primary"
@@ -823,7 +819,7 @@
                   *ngIf="currentStep === 2"
                   (click)="showConfirmationModal()"
                 >
-                  Publicar Campa&ntilde;a
+                  {{ "CAMPAIGNS.PUBLISH" | translate }}
                 </button>
               </div>
             </div>
@@ -854,16 +850,16 @@
                 <thead>
                   <tr>
                     <th>&nbsp;</th>
-                    <th width="30%">Nombre</th>
-                    <th width="30%">Correo</th>
-                    <th width="30%">Tel&eacute;fono</th>
+                    <th width="30%">{{ "CAMPAIGNS.COL_NAME" | translate }}</th>
+                    <th width="30%">{{ "CAMPAIGNS.COL_EMAIL" | translate }}</th>
+                    <th width="30%">{{ "CAMPAIGNS.COL_PHONE" | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <ng-container *ngIf="isLeadsObject(leadsToSelect)">
                     <ng-container *ngIf="leadsToSelect.people">
                       <tr class="lead-group-header">
-                        <td colspan="4">Personas</td>
+                        <td colspan="4">{{ "CAMPAIGNS.SEL_PEOPLE" | translate }}</td>
                       </tr>
                       <tr
                         *ngFor="let item of leadsToSelect.people; let i = index"
@@ -891,7 +887,7 @@
                     </ng-container>
                     <ng-container *ngIf="leadsToSelect.companies">
                       <tr class="lead-group-header">
-                        <td colspan="4">Empresas</td>
+                        <td colspan="4">{{ "CAMPAIGNS.SEL_COMPANIES" | translate }}</td>
                       </tr>
                       <tr
                         *ngFor="
@@ -952,14 +948,14 @@
               id="select-all-leads"
               (click)="selectAllLeads()"
             >
-              <i class="fas fa-check-double"></i> Seleccionar Todos
+              <i class="fas fa-check-double"></i> {{ "CAMPAIGNS.SELECT_ALL" | translate }}
             </button>
             <button
               class="btn-secondary"
               id="deselect-all-leads"
               (click)="deselectAllLeads()"
             >
-              <i class="fas fa-times-circle"></i> Deseleccionar Todos
+              <i class="fas fa-times-circle"></i> {{ "CAMPAIGNS.DESELECT_ALL" | translate }}
             </button>
 
             <button
@@ -967,14 +963,14 @@
               id="confirm-leads-selection"
               (click)="confirmLeadsSelection()"
             >
-              Confirmar Selecci&oacute;n
+              {{ "CAMPAIGNS.CONFIRM_SEL" | translate }}
             </button>
             <button
               class="btn-secondary"
               id="cancel-leads-selection"
               (click)="hideLeadsSelectionModal()"
             >
-              Cancelar
+              {{ "CAMPAIGNS.CANCEL" | translate }}
             </button>
           </div>
         </div>
@@ -989,8 +985,7 @@
         <div class="modal-content small">
           <div class="modal-body">
             <h3>
-              ¿Est&aacute;s seguro de que quieres guardar los datos de tu
-              campa&ntilde;a?
+              {{ "CAMPAIGNS.CONFIRM_SAVE" | translate }}
             </h3>
 
             <div class="modal-actions">
@@ -999,14 +994,14 @@
                 id="cancel-publish"
                 (click)="hideConfirmationModal()"
               >
-                Volver
+                {{ "CAMPAIGNS.RETURN" | translate }}
               </button>
               <button
                 class="btn-primary"
                 id="confirm-publish"
                 (click)="publishCampaign()"
               >
-                S&iacute;, actualizar campa&ntilde;a
+                {{ "CAMPAIGNS.YES_UPDATE" | translate }}
               </button>
             </div>
           </div>

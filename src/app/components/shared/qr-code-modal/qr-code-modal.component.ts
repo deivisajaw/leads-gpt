@@ -17,7 +17,9 @@ export class QrCodeModalComponent {
 
     constructor(private translate: TranslateService){
         if (!this.message) {
-            this.message = this.translate.instant('QR_CODE_MODAL.DEFAULT_MESSAGE');
+            // get() en vez de instant(): instant() devuelve la CLAVE si el archivo de
+    // idioma todavía no llegó, y nada en el arranque espera a que llegue.
+    this.translate.get('QR_CODE_MODAL.DEFAULT_MESSAGE').subscribe(v => this.message = v);
         }
     }
 

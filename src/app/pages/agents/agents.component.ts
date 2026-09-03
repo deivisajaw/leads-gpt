@@ -9,6 +9,7 @@ import { AgentService, Agent, Voice, PhoneNumber } from '../../services/agent.se
 import { QrCodeModalComponent } from '../../components/shared/qr-code-modal/qr-code-modal.component';
 import { ApiConfigService } from '../../services/api-config.service';
 import { OnboardingService } from '../../services/onboarding.service';
+import { fetchWithTimeout } from '../../services/http-timeout';
 
 export interface AlertMessage {
   type: "success" | "error"
@@ -114,7 +115,7 @@ export class AgentsComponent implements OnInit {
   testMessages: TestMessage[] = []
   testMessageInput = ""
   isVoiceActive = false
-  voiceStatusText = "Presiona el botón para iniciar una conversación de voz"
+  voiceStatusText = this.translate.instant("AGENTS.TEST_CHAT.PRESS_TO_TALK")
 
   voicePurposeOptions = [
     "Schedule Meetings",
@@ -250,7 +251,10 @@ export class AgentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAgents()
-    this.testMessages = [{ role: "agent", content: this.translate.instant("AGENTS.TEST_CHAT.DEFAULT_GREETING") }]
+    // get() en vez de instant(): instant() devuelve la CLAVE si el archivo de
+    // idioma todavía no llegó, y nada en el arranque espera a que llegue.
+    this.translate.get("AGENTS.TEST_CHAT.DEFAULT_GREETING")
+      .subscribe(v => this.testMessages = [{ role: "agent", content: v }])
     if (this.route.snapshot.queryParamMap.get('nuevo')) {
       this.showAgentModal()
     }
@@ -373,10 +377,10 @@ export class AgentsComponent implements OnInit {
     this.useInstagramIntegration = false;
     this.instagramWorkflowError = null;
     this.useWhatsappStepOption = false;
-    this.testMessages = [{ role: "agent", content: "¡Hola! Soy tu nuevo agente. ¿En qué puedo ayudarte hoy?" }]
+    this.testMessages = [{ role: "agent", content: this.translate.instant("AGENTS.TEST_CHAT.NEW_AGENT_GREETING") }]
     this.testMessageInput = ""
     this.isVoiceActive = false
-    this.voiceStatusText = "Presiona el botón para iniciar una conversación de voz"
+    this.voiceStatusText = this.translate.instant("AGENTS.TEST_CHAT.PRESS_TO_TALK")
   }
 
   // Custom Voice Dropdown Methods
@@ -811,7 +815,7 @@ export class AgentsComponent implements OnInit {
 
   private async triggerTextBotWorkflow(agentId: number): Promise<void> {
     try {
-      const response = await fetch(this.apiConfig.textBotCreatorUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.textBotCreatorUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -872,7 +876,7 @@ export class AgentsComponent implements OnInit {
 
   private async triggerVoiceBotWorkflow(agentId: number): Promise<void> {
     try {
-      const response = await fetch(this.apiConfig.voiceBotCreatorUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.voiceBotCreatorUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -929,7 +933,7 @@ export class AgentsComponent implements OnInit {
     this.instagramWorkflowError = null;
 
     try {
-      const response = await fetch(this.apiConfig.instagramBotCreatorUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.instagramBotCreatorUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agentId })
@@ -1156,7 +1160,7 @@ export class AgentsComponent implements OnInit {
     const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutos
 
     try {
-      const response = await fetch(this.apiConfig.promptGeneratorUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.promptGeneratorUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1207,7 +1211,7 @@ export class AgentsComponent implements OnInit {
 
   private async triggerSmsBotWorkflow(agentId: number): Promise<void> {
     try {
-      const response = await fetch(this.apiConfig.smsBotCreatorUrl, {
+      const response = await fetchWithTimeout(this.apiConfig.smsBotCreatorUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

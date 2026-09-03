@@ -149,7 +149,7 @@
     <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
     <p class="error-title">{{ "MESSAGES.LOAD_ERROR_TITLE" | translate }}</p>
     <p class="error-hint">{{ "MESSAGES.LOAD_ERROR_HINT" | translate }}</p>
-    <button class="btn-retry" (click)="ngOnInit()"><i class="fas fa-sync-alt"></i> Reintentar</button>
+    <button class="btn-retry" (click)="ngOnInit()"><i class="fas fa-sync-alt"></i> {{ "MESSAGES.RETRY" | translate }}</button>
   </div>
 
   <!-- ══ CANALES (inboxes reales) ══ -->
@@ -222,8 +222,7 @@
         <span class="ce-icon"><i class="fas fa-plug-circle-exclamation"></i></span>
         <p class="ce-title">{{ "MESSAGES.CHANNEL_DOWN" | translate }}</p>
         <p class="ce-sub">
-          No pudimos traer los chats en este momento.
-          Puedes reintentar o elegir otro canal arriba.
+          {{ "MESSAGES.LOAD_FAIL" | translate }}
         </p>
         <button class="btn-retry-sm" (click)="loadConversations()">
           <i class="fas fa-sync-alt"></i> {{ "MESSAGES.RETRY" | translate }}
@@ -305,11 +304,11 @@
           <div class="ai-toggle" [class.human]="!isAiOn(groupKey(g))"
                (click)="toggleAi(groupKey(g))"
                [title]="isAiOn(groupKey(g)) ? 'El agente IA está respondiendo — clic para tomar el control' : 'Lo llevas tú — clic para devolver al agente IA'">
-            <span class="ai-opt" [class.on]="isAiOn(groupKey(g))"><i class="fas fa-robot"></i> IA</span>
-            <span class="ai-opt" [class.on]="!isAiOn(groupKey(g))"><i class="fas fa-user"></i> Humano</span>
+            <span class="ai-opt" [class.on]="isAiOn(groupKey(g))"><i class="fas fa-robot"></i> {{ "MESSAGES.AI_BADGE" | translate }}</span>
+            <span class="ai-opt" [class.on]="!isAiOn(groupKey(g))"><i class="fas fa-user"></i>{{ "MESSAGES.HUMAN" | translate }}</span>
           </div>
             <button class="dc-btn" *ngIf="g.contact.phone_number"><i class="fas fa-phone"></i></button>
-            <button class="dc-btn" *ngIf="!showContext" (click)="showContext = true" title="Ver panel del lead"><i class="fas fa-address-card"></i></button>
+            <button class="dc-btn" *ngIf="!showContext" (click)="showContext = true" [attr.title]="'MESSAGES.TT_LEAD' | translate"><i class="fas fa-address-card"></i></button>
             <button class="dc-btn primary" (click)="toggleResolved(g)" [disabled]="isResolving">
               <img *ngIf="isResolving" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
               <i *ngIf="!isResolving" class="fas" [ngClass]="getFirstStatus(g) === 'resolved' ? 'fa-rotate-left' : 'fa-check'"></i>
@@ -325,7 +324,7 @@
 
         <div class="human-bar" *ngIf="!isAiOn(groupKey(g))">
           <i class="fas fa-hand"></i>
-          Agente IA en pausa — <b>{{ assignedName(groupKey(g)) }}</b> está atendiendo esta conversación
+          {{ "MESSAGES.AI_PAUSED" | translate }} <b>{{ assignedName(groupKey(g)) }}</b> {{ "MESSAGES.IS_HANDLING" | translate }}
         </div>
 
         <div class="dc-msgs" *ngIf="!isLoadingMsgs">
@@ -344,16 +343,16 @@
               </div>
               <div class="dc-by" *ngIf="m.message_type === 1 && m.sender?.name">
                 <span class="by-ini" [style.background]="svc.avatarColor(m.sender!.name)">{{ agentInitial(m.sender!.name) }}</span>
-                Respondido por <b>{{ m.sender!.name }}</b>
+                {{ "MESSAGES.ANSWERED_BY" | translate }} <b>{{ m.sender!.name }}</b>
               </div>
             </div>
           </ng-container>
         </div>
 
         <div class="dc-composer">
-          <button class="dc-icon" title="Adjuntar"><i class="fas fa-paperclip"></i></button>
+          <button class="dc-icon" [attr.title]="'MESSAGES.TT_ATTACH' | translate"><i class="fas fa-paperclip"></i></button>
           <input type="text" [attr.placeholder]='"MESSAGES.MESSAGE_PLACEHOLDER" | translate' />
-          <button class="dc-mic" title="Grabar nota de voz"><i class="fas fa-microphone"></i></button>
+          <button class="dc-mic" [attr.title]="'MESSAGES.TT_VOICE' | translate"><i class="fas fa-microphone"></i></button>
           <button class="dc-send"><i class="fas fa-paper-plane"></i></button>
         </div>
       </ng-container>
@@ -361,7 +360,7 @@
 
     <!-- panel del lead -->
     <div class="demo-ctx" *ngIf="showContext && selectedGroup as g">
-      <button class="ctx-close" (click)="showContext = false" title="Ocultar panel">
+      <button class="ctx-close" (click)="showContext = false" [attr.title]="'MESSAGES.TT_HIDE' | translate">
         <i class="fas fa-angles-right"></i>
       </button>
       <div class="ctx-lead">

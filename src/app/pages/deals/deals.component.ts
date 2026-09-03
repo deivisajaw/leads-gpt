@@ -88,19 +88,36 @@ export class DealsComponent implements OnInit {
 
   ngOnInit(): void { this.loadAll(); }
 
+  /**
+   * Con Promise.all, una sola petición lenta dejaba el tablero entero girando:
+   * si ésa no respondía nunca, las otras dos ya habían llegado y no servían de
+   * nada. Con allSettled pintamos lo que sí llegó y avisamos de lo que falló,
+   * en vez de quedarnos en el engranaje.
+   */
   async loadAll(): Promise<void> {
     this.isLoading = true;
     try {
-      [this.stageConfigs, this.allDeals, this.availableCampaigns] = await Promise.all([
-        this.svc.getStageConfigs().then(s => s.sort((a, b) => a.sortOrder - b.sortOrder)),
+      const [stages, deals, campaigns] = await Promise.allSettled([
+        this.svc.getStageConfigs(),
         this.svc.getDeals(),
         this.svc.getCampaignsByCompany(),
       ]);
+
+      this.stageConfigs = stages.status === 'fulfilled'
+        ? [...stages.value].sort((a, b) => a.sortOrder - b.sortOrder) : [];
+      this.allDeals = deals.status === 'fulfilled' ? deals.value : [];
+      this.availableCampaigns = campaigns.status === 'fulfilled' ? campaigns.value : [];
+
       this.initBoard();
       this.populateBoard();
       this.applyFilter();
-    } catch (e: any) {
-      this.notify.showError(e.message || 'Error al cargar deals.');
+
+      const failed = [stages, deals, campaigns].filter(r => r.status === 'rejected');
+      if (failed.length) {
+        const reason = (failed[0] as PromiseRejectedResult).reason;
+        const timedOut = reason?.name === 'RequestTimeoutError';
+        this.notify.showError(this.translate.instant(timedOut ? 'DEALS.LOAD_TIMEOUT' : 'DEALS.LOAD_FAILED'));
+      }
     } finally {
       this.isLoading = false;
     }

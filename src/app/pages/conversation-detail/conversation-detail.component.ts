@@ -28,7 +28,9 @@ export class ConversationDetailComponent implements OnInit {
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
-      this.error     = this.translate.instant('CONVERSATIONS.DETAIL.ERROR.NO_ID');
+      // get() en vez de instant(): en una carga en frío instant() habría puesto
+      // la clave cruda como mensaje de error.
+      this.translate.get('CONVERSATIONS.DETAIL.ERROR.NO_ID').subscribe(v => this.error = v);
       this.isLoading = false;
       return;
     }

@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="header">
       <button class="btn-primary" (click)="goBackToCampaign()">
-        <i class="fas fa-arrow-left"></i> Volver a Campa&ntilde;a
+        <i class="fas fa-arrow-left"></i> {{ "CAMPAIGN_VIEW.BACK" | translate }}
       </button>
       <h1 class="page-title">Grabaciones de Campa&ntilde;a: {{ campaignName }}</h1>
     </div>
@@ -11,7 +11,7 @@
     <!-- Loading and Error States -->
     <div *ngIf="isLoading" class="loading-container">
       <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
-      <p>Cargando grabaciones...</p>
+      <p>{{ "CALLS.LOADING" | translate }}</p>
     </div>
 
     <div *ngIf="errorMessage && !isLoading" class="error-container">
@@ -23,25 +23,25 @@
       <!-- Filters -->
       <div class="filters-section">
         <div class="form-group">
-          <label for="filterContact">Contacto:</label>
-          <input type="text" id="filterContact" #filterContactInput [(ngModel)]="filterContact" (ngModelChange)="onFilterChange()" placeholder="Nombre o Teléfono" />
+          <label for="filterContact">{{ "CALLS.F_CONTACT" | translate }}</label>
+          <input type="text" id="filterContact" #filterContactInput [(ngModel)]="filterContact" (ngModelChange)="onFilterChange()" [attr.placeholder]="'CALLS.PH_SEARCH' | translate" />
         </div>
         <div class="form-group">
-          <label for="filterOutcome">Resultado:</label>
+          <label for="filterOutcome">{{ "CALLS.F_OUTCOME" | translate }}</label>
           <select id="filterOutcome" [(ngModel)]="filterOutcome" (ngModelChange)="onFilterChange()">
-            <option value="">Todos</option>
-            <option value="APPOINTMENT_SET">Cita agendada</option>
-            <option value="INTERESTED">Interesado</option>
-            <option value="CALLBACK_REQUESTED">Solicita rellamada</option>
+            <option value="">{{ "CALLS.F_ALL" | translate }}</option>
+            <option value="APPOINTMENT_SET">{{ "CALLS.O_APPT" | translate }}</option>
+            <option value="INTERESTED">{{ "CALLS.O_INTERESTED" | translate }}</option>
+            <option value="CALLBACK_REQUESTED">{{ "CALLS.O_CALLBACK" | translate }}</option>
             <!-- Add other options as needed -->
           </select>
         </div>
         <div class="form-group">
-          <label for="filterType">Tipo:</label>
+          <label for="filterType">{{ "CALLS.F_TYPE" | translate }}</label>
           <select id="filterType" [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
-            <option value="">Todos</option>
-            <option value="inbound">Entrada</option>
-            <option value="outbound">Salida</option>
+            <option value="">{{ "CALLS.F_ALL" | translate }}</option>
+            <option value="inbound">{{ "CALLS.T_IN" | translate }}</option>
+            <option value="outbound">{{ "CALLS.T_OUT" | translate }}</option>
           </select>
         </div>
       </div>
@@ -54,20 +54,20 @@
             <thead>
               <tr>
                 <th></th>
-                <th>Fecha/Hora</th>
-                <th>Contacto</th>
-                <th>Tel&eacute;fono</th>
-                <th>Tipo</th>
-                <th>Agente</th>
-                <th>Tel&eacute;fono Compa&ntilde;&iacute;a</th>
-                <th>Resultado</th>
-                <th>Duraci&oacute;n</th>
+                <th>{{ "CALLS.COL_WHEN" | translate }}</th>
+                <th>{{ "CALLS.COL_CONTACT" | translate }}</th>
+                <th>{{ "CALLS.COL_PHONE" | translate }}</th>
+                <th>{{ "CALLS.COL_TYPE" | translate }}</th>
+                <th>{{ "CALLS.COL_AGENT" | translate }}</th>
+                <th>{{ "CALLS.COL_COMPANY_PHONE" | translate }}</th>
+                <th>{{ "CALLS.COL_OUTCOME" | translate }}</th>
+                <th>{{ "CALLS.COL_DURATION" | translate }}</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let recording of filteredRecordings; trackBy: trackByRecordingId">
                 <td>
-                  <button class="btn-action view" (click)="openPanel(recording)" title="Ver Detalles">
+                  <button class="btn-action view" (click)="openPanel(recording)" [attr.title]="'CALLS.TT_VIEW' | translate">
                     <i class="fas fa-eye"></i>
                   </button>
                 </td>
@@ -97,7 +97,7 @@
 
         <!-- Empty State -->
         <div *ngIf="filteredRecordings.length === 0 && !isLoading" class="empty-state">
-          <p>No hay grabaciones para mostrar.</p>
+          <p>{{ "CALLS.EMPTY" | translate }}</p>
         </div>
 
         <!-- Pagination -->
@@ -113,7 +113,7 @@
               (click)="prevPage()"
               [disabled]="currentPage === 1"
             >
-              Anterior
+              {{ "CALLS.PREV" | translate }}
             </button>
 
             <span class="pagination-info">
@@ -125,7 +125,7 @@
               (click)="nextPage()"
               [disabled]="currentPage === totalPages"
             >
-              Siguiente
+              {{ "CALLS.NEXT" | translate }}
             </button>
           </div>
         </div>
@@ -181,8 +181,8 @@
 
           <!-- Tabs Navigation -->
           <div class="tabs-nav">
-            <button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</button>
-            <button class="tab-btn" [class.active]="activeTab === 'transcript'" (click)="setActiveTab('transcript')">Transcript</button>
+            <button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">{{ "CALLS.TAB_OVERVIEW" | translate }}</button>
+            <button class="tab-btn" [class.active]="activeTab === 'transcript'" (click)="setActiveTab('transcript')">{{ "CALLS.TAB_TRANSCRIPT" | translate }}</button>
           </div>
 
           <!-- Tab Content: Overview -->
@@ -190,11 +190,11 @@
             <div class="info-grid">
               <div class="info-row">
                 <div class="info-item">
-                  <div class="info-label">Date/Time</div>
+                  <div class="info-label">{{ "CALLS.D_WHEN" | translate }}</div>
                   <div class="info-value">{{ selectedRecording.dateTime }}</div>
                 </div>
                 <div class="info-item">
-                  <div class="info-label">Outcome</div>
+                  <div class="info-label">{{ "CALLS.D_OUTCOME" | translate }}</div>
                   <div class="info-value">
                     <span class="outcome-badge" [ngClass]="getOutcomeBadgeClass(selectedRecording.outcome)">
                       {{ getOutcomeDisplayText(selectedRecording.outcome) | translate }}
@@ -204,11 +204,11 @@
               </div>
               <div class="info-row">
                 <div class="info-item">
-                  <div class="info-label"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="inline-icon"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4V8H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Duration</div>
+                  <div class="info-label"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="inline-icon"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4V8H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>{{ "CALLS.D_DURATION" | translate }}</div>
                   <div class="info-value">{{ selectedRecording.duration }}</div>
                 </div>
                 <div class="info-item">
-                  <div class="info-label">Type</div>
+                  <div class="info-label">{{ "CALLS.D_TYPE" | translate }}</div>
                   <div class="info-value">
                     <span class="type-badge" [ngClass]="{'type-inbound': selectedRecording.type === 'inbound', 'type-outbound': selectedRecording.type === 'outbound'}">
                       <i class="fas" [ngClass]="{'fa-arrow-down': selectedRecording.type === 'inbound', 'fa-arrow-up': selectedRecording.type === 'outbound'}"></i>
@@ -219,29 +219,29 @@
               </div>
               <div class="info-row">
                 <div class="info-item">
-                  <div class="info-label">Contact</div>
+                  <div class="info-label">{{ "CALLS.D_CONTACT" | translate }}</div>
                   <div class="info-value">{{ selectedRecording.contactName }}</div>
                 </div>
                 <div class="info-item">
-                  <div class="info-label">Agent</div>
+                  <div class="info-label">{{ "CALLS.D_AGENT" | translate }}</div>
                   <div class="info-value">{{ selectedRecording.agentName }}</div>
                 </div>
               </div>
               <div class="info-row single">
                 <div class="info-item full-width">
-                  <div class="info-label">Phone Number</div>
+                  <div class="info-label">{{ "CALLS.D_PHONE" | translate }}</div>
                   <div class="info-value">{{ selectedRecording.contactPhone }}</div>
                 </div>
               </div>
               <div class="info-row single">
                 <div class="info-item full-width">
-                  <div class="info-label">Campaign</div>
+                  <div class="info-label">{{ "CALLS.D_CAMPAIGN" | translate }}</div>
                   <div class="info-value">{{ campaignName }}</div>
                 </div>
               </div>
             </div>
             <div class="summary-section" *ngIf="selectedRecording.summary">
-              <h3 class="section-title">Summary</h3>
+              <h3 class="section-title">{{ "CALLS.D_SUMMARY" | translate }}</h3>
               <div class="summary-content">
                 <p class="summary-text">{{ selectedRecording.summary }}</p>
               </div>

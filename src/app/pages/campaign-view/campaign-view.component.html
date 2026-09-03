@@ -3,14 +3,14 @@
     <!-- Header -->
     <div class="header">
       <button class="btn-primary" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i> Volver a Campa&ntilde;as
+        <i class="fas fa-arrow-left"></i> {{ "CAMPAIGN_VIEW.BACK_LIST" | translate }}
       </button>
     </div>
 
     <!-- Loading and Error States -->
     <div *ngIf="isLoading" class="loading-container">
       <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
-      <p>Cargando detalles de la campa&ntilde;a...</p>
+      <p>{{ "CAMPAIGN_VIEW.LOADING" | translate }}</p>
     </div>
 
     <div *ngIf="errorMessage && !isLoading" class="error-container">
@@ -39,8 +39,8 @@
                 }"
               >
                 <span class="badge-dot"></span>
-                <span *ngIf="campaign.processed">Campa&ntilde;a Procesada</span>
-                <span *ngIf="!campaign.processed">Procesamiento Pendiente</span>
+                <span *ngIf="campaign.processed">{{ "CAMPAIGN_VIEW.PROCESSED" | translate }}</span>
+                <span *ngIf="!campaign.processed">{{ "CAMPAIGN_VIEW.PENDING" | translate }}</span>
               </span>
             </div>
             <div class="hero-tags">
@@ -66,27 +66,27 @@
               <div class="card-icon-wrapper bg-indigo-light">
                 <i class="fas fa-info-circle text-indigo"></i>
               </div>
-              <h3 class="card-title">Informaci&oacute;n General</h3>
+              <h3 class="card-title">{{ "CAMPAIGN_VIEW.GENERAL" | translate }}</h3>
             </div>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Nombre de Campa&ntilde;a</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.NAME" | translate }}</label>
               <p class="info-value-box"><i class="fas fa-tag"></i> {{ campaign.name }}</p>
             </div>
             <div class="info-item">
-              <label class="info-label">Tipo de Campa&ntilde;a</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.TYPE" | translate }}</label>
               <p class="info-value-box">
                 <i [class]="getCampaignTypeIcon(campaign.campaignType)"></i>
                 {{ campaign.campaignType }}
               </p>
             </div>
             <div class="info-item">
-              <label class="info-label">Agente Asociado</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.AGENT" | translate }}</label>
               <p class="info-value-box"><i class="fas fa-robot"></i> {{ campaign.agentName || 'N/A' }}</p>
             </div>
             <div class="info-item">
-              <label class="info-label">Estado</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.STATUS" | translate }}</label>
               <p class="info-value-box"><i class="fas fa-info-circle"></i> {{ getCampaignStatusText(campaign.status) }}</p>
             </div>
           </div>
@@ -99,23 +99,23 @@
               <div class="card-icon-wrapper bg-emerald-light">
                 <i class="fas fa-users text-emerald"></i>
               </div>
-              <h3 class="card-title">Estad&iacute;sticas de Leads</h3>
+              <h3 class="card-title">{{ "CAMPAIGN_VIEW.LEAD_STATS" | translate }}</h3>
             </div>
             <button *ngIf="campaign.campaignType === 'VOICE'" class="btn-view-recordings" [routerLink]="['/campaigns', campaign.id, 'recordings']">
-              <i class="fas fa-phone-volume"></i> Ver Grabaciones
+              <i class="fas fa-phone-volume"></i> {{ "CAMPAIGN_VIEW.RECORDINGS" | translate }}
             </button>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Leads Registrados</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.LEADS_REG" | translate }}</label>
               <p class="info-value-box large-text">{{ campaign.registeredLeadsCount }}</p>
             </div>
             <div class="info-item">
-              <label class="info-label">Leads Conectados</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.LEADS_CONN" | translate }}</label>
               <p class="info-value-box large-text">{{ campaign.connectedLeadsCount }}</p>
             </div>
             <div class="info-item">
-              <label class="info-label">Meetings Programados</label>
+              <label class="info-label">{{ "CAMPAIGN_VIEW.MEETINGS" | translate }}</label>
               <p class="info-value-box large-text">{{ campaign.scheduledMeetingsCount }}</p>
             </div>
           </div>
@@ -131,45 +131,45 @@
               <div class="card-icon-wrapper bg-blue-light">
                 <i class="fas fa-clock text-blue"></i>
               </div>
-              <h3 class="card-title">Programaci&oacute;n</h3>
+              <h3 class="card-title">{{ "CAMPAIGN_VIEW.SCHEDULE" | translate }}</h3>
             </div>
           </div>
           <div class="card-body">
             <div class="info-grid two-columns">
               <div class="info-item">
-                <label class="info-label">Fecha de Inicio</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.START" | translate }}</label>
                 <p class="info-value-box">{{ campaign.startDate | date:'longDate' }}</p>
               </div>
               <div class="info-item">
-                <label class="info-label">Fecha de Fin</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.END" | translate }}</label>
                 <p class="info-value-box">{{ campaign.endDate | date:'longDate' }}</p>
               </div>
               <div class="info-item">
-                <label class="info-label">Rango Horario 1</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.SLOT1" | translate }}</label>
                 <p class="info-value-box">{{ campaign.startTime || 'N/A' }} - {{ campaign.endTime || 'N/A' }}</p>
               </div>
               <ng-container *ngIf="campaign.startTime2">
                 <div class="info-item">
-                  <label class="info-label">Rango Horario 2</label>
+                  <label class="info-label">{{ "CAMPAIGN_VIEW.SLOT2" | translate }}</label>
                   <p class="info-value-box">{{ campaign.startTime2 }} - {{ campaign.endTime2 }}</p>
                 </div>
               </ng-container>
               <ng-container *ngIf="campaign.startTime3">
                 <div class="info-item">
-                  <label class="info-label">Rango Horario 3</label>
+                  <label class="info-label">{{ "CAMPAIGN_VIEW.SLOT3" | translate }}</label>
                   <p class="info-value-box">{{ campaign.startTime3 }} - {{ campaign.endTime3 }}</p>
                 </div>
               </ng-container>
               <div class="info-item">
-                <label class="info-label">Intervalo (minutos)</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.INTERVAL" | translate }}</label>
                 <p class="info-value-box">{{ campaign.period || 'N/A' }}</p>
               </div>
               <div class="info-item" style="grid-column: 1 / -1;">
-                <label class="info-label">Zona Horaria</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.TZ" | translate }}</label>
                 <p class="info-value-box">{{ campaign.timezone || 'N/A' }}</p>
               </div>
               <div class="info-item" style="grid-column: 1 / -1;">
-                <label class="info-label">D&iacute;as de la Semana</label>
+                <label class="info-label">{{ "CAMPAIGN_VIEW.WEEKDAYS" | translate }}</label>
                 <p class="info-value-box">{{ getDaysOfWeekDisplay(campaign.daysOfWeek) }}</p>
               </div>
             </div>
@@ -196,7 +196,7 @@
           </div>
           <div class="card-body">
             <div *ngIf="getLeadsCount(campaign.leads) === 0" class="info-value-box small-text">
-              No hay leads asociados a esta campa&ntilde;a.
+              {{ "CAMPAIGN_VIEW.NO_LEADS" | translate }}
             </div>
             <div *ngIf="getLeadsCount(campaign.leads) > 0" class="leads-list-scroll-area">
               <div *ngFor="let lead of campaign.leads" class="lead-item-display">
@@ -208,8 +208,8 @@
                   <p class="lead-contact-display">{{ lead.email || lead.phone }}</p>
                 </div>
                 <div class="lead-status-indicator">
-                  <span *ngIf="lead.contacted" class="status-circle status-green" title="Contactado"></span>
-                  <span *ngIf="!lead.contacted" class="status-circle status-red" title="No Contactado"></span>
+                  <span *ngIf="lead.contacted" class="status-circle status-green" [attr.title]="'CAMPAIGN_VIEW.TT_CONTACTED' | translate"></span>
+                  <span *ngIf="!lead.contacted" class="status-circle status-red" [attr.title]="'CAMPAIGN_VIEW.TT_NOT_CONTACTED' | translate"></span>
                 </div>
               </div>
             </div>

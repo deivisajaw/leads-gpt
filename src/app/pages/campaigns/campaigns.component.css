@@ -23,14 +23,10 @@
   color: var(--text-primary);
 }
 
+/* El tamaño lo pone .btn-primary global: aquí sólo queda el color de fondo,
+   para que este botón mida lo mismo que en Agentes y en Números. */
 .btn-primary {
   background: var(--primary-blue);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
   transition: background-color 0.2s;
 }
 

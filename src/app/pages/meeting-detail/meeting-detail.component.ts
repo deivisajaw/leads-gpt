@@ -25,7 +25,9 @@ export class MeetingDetailComponent implements OnInit {
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('uid');
     if (!id) {
-      this.error     = this.translate.instant('MEETINGS.DETAIL.ERROR.NO_UID');
+      // get() en vez de instant(): en una carga en frío instant() habría puesto
+      // la clave cruda como mensaje de error.
+      this.translate.get('MEETINGS.DETAIL.ERROR.NO_UID').subscribe(v => this.error = v);
       this.isLoading = false;
       return;
     }

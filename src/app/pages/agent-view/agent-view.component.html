@@ -3,21 +3,21 @@
     <!-- Header -->
     <div class="header">
       <button class="btn-primary" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i> Volver a Agentes
+        <i class="fas fa-arrow-left"></i> {{ "AGENT_VIEW.BACK" | translate }}
       </button>
       <button
         *ngIf="agent && agent.processed && agent.agentType && agent.agentType.toLowerCase() === 'voice'"
         class="btn-primary"
         (click)="openTestCallModal(agent.id)"
       >
-        <i class="fas fa-phone"></i> Llamame Ahora
+        <i class="fas fa-phone"></i> {{ "AGENT_VIEW.CALL_ME" | translate }}
       </button>
     </div>
 
     <!-- Loading and Error States -->
     <div *ngIf="isLoading" class="loading-container">
       <img class="gear-loader" src="images/gear_hr_256.png" alt="" />
-      <p>Cargando detalles del agente...</p>
+      <p>{{ "AGENT_VIEW.LOADING" | translate }}</p>
     </div>
 
     <div *ngIf="errorMessage && !isLoading" class="error-container">
@@ -46,8 +46,8 @@
                 }"
               >
                 <span class="badge-dot"></span>
-                <span *ngIf="agent.processed">Agente Activo</span>
-                <span *ngIf="!agent.processed">Agente Inactivo</span>
+                <span *ngIf="agent.processed">{{ "AGENT_VIEW.ACTIVE" | translate }}</span>
+                <span *ngIf="!agent.processed">{{ "AGENT_VIEW.INACTIVE" | translate }}</span>
               </span>
             </div>
             <div class="hero-tags">
@@ -66,7 +66,7 @@
             </div>
           </div>
           <div class="hero-opening-line">
-            <p class="opening-line-label">LÍNEA DE APERTURA</p>
+            <p class="opening-line-label">{{ "AGENT_VIEW.OPENING" | translate }}</p>
             <p class="opening-line-text">"{{ agent.openingLine }}"</p>
           </div>
         </div>
@@ -80,20 +80,20 @@
             <div class="card-icon-wrapper bg-indigo-light">
               <i class="fas fa-robot text-indigo"></i>
             </div>
-            <h3 class="card-title">Identidad del Agente</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.IDENTITY" | translate }}</h3>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Nombre del Sistema</label>
+              <label class="info-label">{{ "AGENT_VIEW.SYS_NAME" | translate }}</label>
               <p class="info-value-box">{{ agent.agentSystemName }}</p>
             </div>
             <div class="description-scroll-area">
               <div class="info-item">
-                <label class="info-label">Propósito</label>
+                <label class="info-label">{{ "AGENT_VIEW.PURPOSE" | translate }}</label>
                 <p class="purpose-text">{{ agent.purpose }}</p>
               </div>
               <div class="info-item">
-                <label class="info-label">Descripción</label>
+                <label class="info-label">{{ "AGENT_VIEW.DESCRIPTION" | translate }}</label>
                 <p class="description-text">{{ agent.description || 'No proporcionada' }}</p>
               </div>
             </div>
@@ -109,22 +109,22 @@
             <div class="card-icon-wrapper bg-purple-light">
               <i class="fas fa-microphone text-purple"></i>
             </div>
-            <h3 class="card-title">Configuración de Voz</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.VOICE_CFG" | translate }}</h3>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Voz Seleccionada</label>
+              <label class="info-label">{{ "AGENT_VIEW.VOICE" | translate }}</label>
               <p class="info-value-box bg-purple-extralight">{{ agent.voiceName || 'N/A' }}</p>
             </div>
             <div class="info-item" *ngIf="agent.voiceGender">
-              <label class="info-label">Género</label>
+              <label class="info-label">{{ "AGENT_VIEW.GENDER" | translate }}</label>
               <p class="info-value-box">
                 <i class="fas" [ngClass]="{'fa-mars': agent.voiceGender === 'MALE', 'fa-venus': agent.voiceGender === 'FEMALE'}"></i>
                 {{ agent.voiceGender === 'MALE' ? 'Masculino' : 'Femenino' }}
               </p>
             </div>
             <div class="info-item" *ngIf="agent.voiceAccent">
-              <label class="info-label">Acento</label>
+              <label class="info-label">{{ "AGENT_VIEW.ACCENT" | translate }}</label>
               <p class="info-value-box">
                 <i class="fas fa-globe"></i>
                 {{ agent.voiceAccent }}
@@ -139,15 +139,15 @@
             <div class="card-icon-wrapper bg-blue-light">
               <i class="fas fa-clock text-blue"></i>
             </div>
-            <h3 class="card-title">Información Temporal</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.TIMES" | translate }}</h3>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Creado</label>
+              <label class="info-label">{{ "AGENT_VIEW.CREATED" | translate }}</label>
               <p class="info-value-box bg-blue-extralight">{{ agent.createDate | date:'medium' }}</p>
             </div>
             <div class="info-item">
-              <label class="info-label">Última Actualización</label>
+              <label class="info-label">{{ "AGENT_VIEW.UPDATED" | translate }}</label>
               <p class="info-value-box">{{ agent.updateDate | date:'medium' }}</p>
             </div>
           </div>
@@ -159,22 +159,22 @@
             <div class="card-icon-wrapper bg-emerald-light">
               <i class="fas fa-phone-alt text-emerald"></i>
             </div>
-            <h3 class="card-title">Canales de Contacto</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.CHANNELS" | translate }}</h3>
           </div>
           <div class="card-body">
             <div class="info-item">
-              <label class="info-label">Número WhatsApp</label>
+              <label class="info-label">{{ "AGENT_VIEW.WA_NUMBER" | translate }}</label>
               <p class="info-value-box large-text bg-emerald-extralight">{{ agent.whatsappNumber || 'N/A' }}</p>
             </div>
             <div class="info-item" *ngIf="agent.companyPhoneNumberNumber">
-              <label class="info-label">Teléfono Compañía</label>
+              <label class="info-label">{{ "AGENT_VIEW.COMPANY_PHONE" | translate }}</label>
               <p class="info-value-box">
                 <i class="fas fa-phone"></i>
                 {{ agent.companyPhoneNumberNumber }}
               </p>
             </div>
             <div class="info-item">
-              <label class="info-label">Mensaje de Correo de Voz</label>
+              <label class="info-label">{{ "AGENT_VIEW.VOICEMAIL" | translate }}</label>
               <p class="info-value-box small-text">{{ agent.voicemailMessage || 'N/A' }}</p>
             </div>
           </div>
@@ -225,7 +225,7 @@
             <div class="card-icon-wrapper bg-orange-light">
               <i class="fas fa-list-ol text-orange"></i>
             </div>
-            <h3 class="card-title">Instrucciones de Comportamiento</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.BEHAVIOUR" | translate }}</h3>
           </div>
           <pre class="pre-box">{{ agent.instructions }}</pre>
         </div>
@@ -236,7 +236,7 @@
             <div class="card-icon-wrapper bg-violet-light">
               <i class="fas fa-terminal text-violet"></i>
             </div>
-            <h3 class="card-title">Prompt del Sistema</h3>
+            <h3 class="card-title">{{ "AGENT_VIEW.SYS_PROMPT" | translate }}</h3>
           </div>
           <pre class="pre-box">{{ agent.prompt }}</pre>
         </div>
@@ -248,33 +248,33 @@
   <div id="test-call-modal" class="modal" [class.active]="isTestCallModalVisible">
     <div class="modal-content small">
       <div class="modal-header">
-        <h2>Probar Agente AI</h2>
+        <h2>{{ "AGENT_VIEW.TEST" | translate }}</h2>
         <button class="close-btn" (click)="closeTestCallModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="modal-body">
-        <p>Ingresa los detalles de contacto para probar tu agente AI.</p>
+        <p>{{ "AGENT_VIEW.TEST_HELP" | translate }}</p>
         <div class="form-group">
-          <label for="contact-phone">Número de Contacto *</label>
+          <label for="contact-phone">{{ "AGENT_VIEW.TEST_PHONE" | translate }}</label>
           <input type="text" id="contact-phone" [(ngModel)]="testCallContactPhone" required />
           <div *ngIf="showTestCallValidationErrors && !testCallContactPhone" class="validation-error">
-            El número de contacto es requerido.
+            {{ "AGENT_VIEW.ERR_PHONE" | translate }}
           </div>
         </div>
         <div class="form-group">
-          <label for="contact-name">Nombre de Contacto *</label>
+          <label for="contact-name">{{ "AGENT_VIEW.TEST_NAME" | translate }}</label>
           <input type="text" id="contact-name" [(ngModel)]="testCallContactName" required />
           <div *ngIf="showTestCallValidationErrors && !testCallContactName" class="validation-error">
-            El nombre de contacto es requerido.
+            {{ "AGENT_VIEW.ERR_NAME" | translate }}
           </div>
         </div>
         <div class="form-group">
-          <label for="contact-email">Email de Contacto (Opcional)</label>
+          <label for="contact-email">{{ "AGENT_VIEW.TEST_EMAIL" | translate }}</label>
           <input type="email" id="contact-email" [(ngModel)]="testCallContactEmail" />
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" (click)="closeTestCallModal()">Cancelar</button>
+          <button class="btn-secondary" (click)="closeTestCallModal()">{{ "AGENT_VIEW.CANCEL" | translate }}</button>
           <button class="btn-primary" [disabled]="!isTestCallFormValid() || isTestCallLoading" (click)="triggerTestCall()">
             <img *ngIf="isTestCallLoading" class="gear-loader-sm btn-gear" src="images/gear_hr_256.png" alt="" />
             {{ isTestCallLoading ? 'Llamando...' : 'Llamame' }}
