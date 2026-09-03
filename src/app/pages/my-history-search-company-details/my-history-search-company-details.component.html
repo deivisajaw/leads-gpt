@@ -237,11 +237,14 @@
                       (change)="toggleCompanySelection(company.id)"
                     />
                     <div>
-                      <!-- Estaba subrayado y con cursor de mano, pero sin ningún (click):
-                           parecía un enlace y no hacía nada. -->
-                      <button type="button" class="row-name-link" (click)="openCompany(company.id)">
-                        {{ company.title }}
-                      </button>
+                      <!-- Ojo: NO es un enlace a propósito.
+                           /people-details y /company-details usan getPeopleDetails /
+                           getCompanyDetails, que exigen que el registro este GUARDADO
+                           en la lista del usuario (filtran por savedBy). Los registros
+                           del Historial son resultados de busqueda sin guardar, asi que
+                           la ficha salia vacia. Para verlos hay que agregarlos a la
+                           lista primero. -->
+                      <span class="row-name">{{ company.title }}</span>
                       <div
                         *ngIf="company.website"
                         style="font-size: 12px; color: #64748b"

@@ -505,10 +505,6 @@ export class MyHistorySearchPeopleDetailsComponent implements OnInit, OnDestroy,
     }
   }
 
-  /** El nombre de la fila lleva a la ficha completa de la persona. */
-  openPerson(peopleId: number): void {
-    this.router.navigate(['/people-details', peopleId]);
-  }
 
   /** Volver a preguntar por una búsqueda que se pasó del tope de sondeo. */
   reloadSearch(): void {

@@ -507,10 +507,6 @@ export class MyHistorySearchCompanyDetailsComponent implements OnInit, OnDestroy
     }
   }
 
-  /** El nombre de la fila lleva a la ficha completa de la empresa. */
-  openCompany(companyId: number): void {
-    this.router.navigate(['/company-details', companyId]);
-  }
 
   /** Volver a preguntar por una búsqueda que se pasó del tope de sondeo. */
   reloadSearch(): void {
